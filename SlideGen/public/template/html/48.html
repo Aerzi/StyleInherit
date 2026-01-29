@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 严格禁止动画、滚动条、交互 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Noto Sans SC', sans-serif; background-color: #f0f2f5; color: #333; }
+    
+    /* 布局容器 */
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 背景装饰 - 减少留白感 */
+    .bg-decoration {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 600px;
+      height: 720px;
+      background: linear-gradient(135deg, #e0e7ff 0%, #f0f2f5 60%);
+      clip-path: polygon(20% 0%, 100% 0, 100% 100%, 0% 100%);
+      z-index: -1;
+    }
+
+    /* 头部 - 仅包含 main-title */
+    header {
+      height: 100px;
+      padding: 0 50px;
+      display: flex;
+      align-items: center;
+      background: linear-gradient(90deg, #1e3a8a, #3b82f6); /* 深蓝到亮蓝，避免紫调 */
+      color: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* 主体内容区 */
+    main {
+      flex: 1;
+      padding: 30px 50px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 25px;
+    }
+
+    /* 卡片设计 */
+    .stage-card {
+      background: white;
+      border-radius: 12px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border-left: 6px solid #3b82f6;
+      justify-content: space-between;
+    }
+
+    /* 阶段编号 */
+    .stage-number {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 48px;
+      font-weight: 900;
+      color: #f1f5f9;
+      z-index: 0;
+      line-height: 1;
+    }
+
+    /* 卡片内容层级 */
+    .card-content {
+      position: relative;
+      z-index: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 图标容器 */
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      background: #eff6ff;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 15px;
+    }
+
+    .icon-box i {
+      font-size: 24px;
+      color: #1e3a8a;
+    }
+
+    /* 标题与文本 */
+    h3 {
+      font-size: 24px;
+      color: #1e293b;
+      margin-bottom: 12px;
+      font-weight: 700;
+    }
+
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #64748b;
+      text-align: justify;
+    }
+
+    /* 特定卡片颜色微调 (可选，保持统一风格更佳，这里用统一风格) */
+    
+    /* 流程连接线示意（利用伪元素做简单的视觉引导，不使用复杂SVG） */
+    .stage-card::after {
+      content: '';
+      position: absolute;
+      bottom: 25px;
+      right: 25px;
+      width: 20px;
+      height: 4px;
+      background-color: #cbd5e1;
+      border-radius: 2px;
+    }
+    
+    /* 最后一项不需要连接线 */
+    .stage-card:last-child::after {
+      display: none;
+    }
+
+    /* 强调列表点 */
+    .key-point {
+      display: flex;
+      align-items: center;
+      margin-top: 8px;
+      font-size: 14px;
+      font-weight: 500;
+      color: #475569;
+    }
+    .key-point::before {
+      content: '';
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      background-color: #3b82f6;
+      border-radius: 50%;
+      margin-right: 8px;
+    }
+
+  </style>
+  <!-- 布局紧凑，无动画，符合尺寸要求 -->
+</head>
+<body>
+  <div class="bg-decoration"></div>
+  <div class="container">
+    <header>
+      <h1>软件开发生命周期 (SDLC)</h1>
+    </header>
+
+    <main>
+      <!-- 阶段 1 -->
+      <div class="stage-card">
+        <div class="stage-number">01</div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i class="fa-solid fa-clipboard-list"></i>
+          </div>
+          <h3>需求分析</h3>
+          <p>明确项目目标，与利益相关者沟通，收集并整理功能与非功能需求，输出需求规格说明书。</p>
+          <div style="margin-top: auto;">
+            <div class="key-point">可行性研究</div>
+            <div class="key-point">需求文档 (SRS)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 阶段 2 -->
+      <div class="stage-card">
+        <div class="stage-number">02</div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i class="fa-solid fa-pen-ruler"></i>
+          </div>
+          <h3>系统设计</h3>
+          <p>根据需求文档规划系统架构。包括概要设计与详细设计，定义数据库结构、接口规范及UI原型。</p>
+          <div style="margin-top: auto;">
+            <div class="key-point">架构设计</div>
+            <div class="key-point">UI/UX 原型</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 阶段 3 -->
+      <div class="stage-card">
+        <div class="stage-number">03</div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i class="fa-solid fa-code"></i>
+          </div>
+          <h3>开发 / 编码</h3>
+          <p>开发团队根据设计文档编写代码。前端与后端协同工作，构建功能模块，并进行代码审查。</p>
+          <div style="margin-top: auto;">
+            <div class="key-point">代码编写</div>
+            <div class="key-point">版本控制</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 阶段 4 -->
+      <div class="stage-card">
+        <div class="stage-number">04</div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i class="fa-solid fa-bug-slash"></i>
+          </div>
+          <h3>测试阶段</h3>
+          <p>QA团队执行测试计划，通过单元测试、集成测试和系统测试发现并修复Bug，确保软件质量。</p>
+          <div style="margin-top: auto;">
+            <div class="key-point">功能测试</div>
+            <div class="key-point">Bug 修复</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 阶段 5 -->
+      <div class="stage-card">
+        <div class="stage-number">05</div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i class="fa-solid fa-rocket"></i>
+          </div>
+          <h3>部署上线</h3>
+          <p>将软件发布到生产环境。包括配置服务器、数据迁移、正式发布以及向用户提供必要的培训文档。</p>
+          <div style="margin-top: auto;">
+            <div class="key-point">环境配置</div>
+            <div class="key-point">正式发布</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 阶段 6 -->
+      <div class="stage-card">
+        <div class="stage-number">06</div>
+        <div class="card-content">
+          <div class="icon-box">
+            <i class="fa-solid fa-screwdriver-wrench"></i>
+          </div>
+          <h3>维护与迭代</h3>
+          <p>软件上线后的持续支持。监控系统性能，修复潜在问题，根据反馈进行功能更新与版本迭代。</p>
+          <div style="margin-top: auto;">
+            <div class="key-point">性能监控</div>
+            <div class="key-point">功能升级</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

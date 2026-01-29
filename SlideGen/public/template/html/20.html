@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 基础重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Noto Sans SC', sans-serif; }
+    
+    /* 整体布局与背景 */
+    body {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      color: #1b5e20;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 60px;
+    }
+
+    /* 头部设计 */
+    header {
+      flex: 0 0 auto;
+      height: 100px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      border-left: 8px solid #2e7d32;
+      padding-left: 24px;
+    }
+
+    header h1 {
+      font-size: 48px;
+      font-weight: 900;
+      color: #1b5e20;
+      letter-spacing: 2px;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+    }
+
+    /* 主体内容区域 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      justify-content: space-between;
+      gap: 24px;
+      position: relative;
+    }
+
+    /* 流程连接线背景 */
+    .flow-line {
+      position: absolute;
+      top: 35%;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: #a5d6a7;
+      z-index: 0;
+      border-radius: 2px;
+    }
+
+    /* 卡片容器 */
+    .step-card {
+      flex: 1;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 10px 25px rgba(27, 94, 32, 0.1);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 0;
+      position: relative;
+      z-index: 1;
+      overflow: hidden;
+      border: 1px solid rgba(46, 125, 50, 0.1);
+    }
+
+    /* 顶部装饰条 */
+    .card-top {
+      width: 100%;
+      height: 12px;
+      background: #4caf50;
+    }
+    .step-card:nth-child(2) .card-top { background: #43a047; }
+    .step-card:nth-child(3) .card-top { background: #388e3c; }
+    .step-card:nth-child(4) .card-top { background: #2e7d32; }
+
+    /* 背景数字装饰 */
+    .bg-number {
+      position: absolute;
+      bottom: -30px;
+      right: -20px;
+      font-size: 180px;
+      font-weight: 900;
+      color: rgba(46, 125, 50, 0.05);
+      line-height: 1;
+      z-index: 0;
+    }
+
+    /* 图标区域 */
+    .icon-area {
+      width: 120px;
+      height: 120px;
+      background: #f1f8e9;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-top: 50px;
+      margin-bottom: 30px;
+      border: 4px solid #ffffff;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      z-index: 2;
+    }
+
+    .icon-area i {
+      font-size: 50px;
+      color: #2e7d32;
+    }
+
+    /* 文字内容 */
+    .text-content {
+      text-align: center;
+      padding: 0 20px;
+      z-index: 2;
+    }
+
+    .step-title {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1b5e20;
+      margin-bottom: 15px;
+      border-bottom: 2px solid #a5d6a7;
+      padding-bottom: 10px;
+      display: inline-block;
+    }
+
+    .step-desc {
+      font-size: 18px;
+      color: #558b2f;
+      line-height: 1.6;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+
+    /* 底部状态条 */
+    .status-bar {
+      margin-top: auto;
+      width: 100%;
+      padding: 15px;
+      background: #f9fbe7;
+      text-align: center;
+      font-size: 14px;
+      color: #827717;
+      border-top: 1px solid #f0f4c3;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    /* 针对不同步骤的微调 */
+    .step-card:nth-child(2) .icon-area i { color: #388e3c; }
+    .step-card:nth-child(3) .icon-area i { color: #2e7d32; }
+    .step-card:nth-child(4) .icon-area i { color: #1b5e20; }
+
+  </style>
+  <!-- 符合要求，严格控制尺寸，无动画，绿色系环保风格。 -->
+</head>
+<body>
+
+  <header>
+    <h1>垃圾分类处理流程</h1>
+  </header>
+
+  <div class="main-content">
+    <!-- 连接线 -->
+    <div class="flow-line"></div>
+
+    <!-- 步骤 1 -->
+    <div class="step-card">
+      <div class="card-top"></div>
+      <div class="bg-number">01</div>
+      <div class="icon-area">
+        <i class="fa-solid fa-hands-holding-circle"></i>
+      </div>
+      <div class="text-content">
+        <div class="step-title">分类投放</div>
+        <p class="step-desc">源头分类<br>定点投放</p>
+      </div>
+      <div class="status-bar">STEP 01 - START</div>
+    </div>
+
+    <!-- 步骤 2 -->
+    <div class="step-card">
+      <div class="card-top"></div>
+      <div class="bg-number">02</div>
+      <div class="icon-area">
+        <i class="fa-solid fa-truck-pickup"></i>
+      </div>
+      <div class="text-content">
+        <div class="step-title">分类收集</div>
+        <p class="step-desc">专车专收<br>杜绝混装</p>
+      </div>
+      <div class="status-bar">STEP 02 - COLLECT</div>
+    </div>
+
+    <!-- 步骤 3 -->
+    <div class="step-card">
+      <div class="card-top"></div>
+      <div class="bg-number">03</div>
+      <div class="icon-area">
+        <i class="fa-solid fa-truck-fast"></i>
+      </div>
+      <div class="text-content">
+        <div class="step-title">分类运输</div>
+        <p class="step-desc">密闭运输<br>中转分流</p>
+      </div>
+      <div class="status-bar">STEP 03 - TRANSIT</div>
+    </div>
+
+    <!-- 步骤 4 -->
+    <div class="step-card">
+      <div class="card-top"></div>
+      <div class="bg-number">04</div>
+      <div class="icon-area">
+        <i class="fa-solid fa-recycle"></i>
+      </div>
+      <div class="text-content">
+        <div class="step-title">分类处理</div>
+        <p class="step-desc">资源再生<br>无害处理</p>
+      </div>
+      <div class="status-bar">STEP 04 - PROCESS</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

@@ -1,0 +1,403 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #F3F4F6;
+        color: #1F2937;
+    }
+
+    /* Layout Structure */
+    .container {
+        display: grid;
+        grid-template-rows: 80px 1fr;
+        height: 100%;
+        padding: 30px 40px;
+        gap: 25px;
+    }
+
+    /* Header */
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: white;
+        padding: 0 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        border-left: 6px solid #059669; /* Emerald Green */
+    }
+
+    .header-title h1 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-title h1 i {
+        color: #059669;
+        font-size: 24px;
+    }
+
+    .header-meta {
+        font-size: 16px;
+        color: #6B7280;
+        font-weight: 500;
+        background: #ECFDF5;
+        padding: 8px 16px;
+        border-radius: 20px;
+        color: #047857;
+    }
+
+    /* Main Content Grid */
+    .main-content {
+        display: grid;
+        grid-template-columns: 3fr 2fr; /* Table takes more space */
+        gap: 25px;
+        height: 100%;
+    }
+
+    /* Left Panel: Table */
+    .panel-left {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .panel-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        color: #374151;
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+    }
+
+    .data-table th {
+        text-align: left;
+        padding: 12px 15px;
+        background-color: #F9FAFB;
+        color: #6B7280;
+        font-weight: 600;
+        border-bottom: 2px solid #E5E7EB;
+    }
+
+    .data-table td {
+        padding: 14px 15px;
+        border-bottom: 1px solid #F3F4F6;
+        color: #1F2937;
+        font-weight: 500;
+    }
+
+    .data-table tr:last-child td {
+        border-bottom: none;
+    }
+
+    .text-right { text-align: right; }
+    .font-mono { font-family: monospace, sans-serif; font-size: 15px; }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+    .status-good { background: #D1FAE5; color: #065F46; }
+    .status-warning { background: #FEF3C7; color: #92400E; }
+    .status-danger { background: #FEE2E2; color: #991B1B; }
+
+    /* Right Panel: KPIs & Chart */
+    .panel-right {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    /* KPI Cards */
+    .kpi-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+
+    .kpi-card {
+        background: white;
+        padding: 20px;
+        border-radius: 16px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .kpi-card::after {
+        content: '';
+        position: absolute;
+        right: -10px;
+        top: -10px;
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        opacity: 0.1;
+    }
+
+    .kpi-card.primary::after { background: #059669; }
+    .kpi-card.danger::after { background: #DC2626; }
+
+    .kpi-label {
+        font-size: 14px;
+        color: #6B7280;
+        margin-bottom: 8px;
+    }
+
+    .kpi-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .kpi-sub {
+        font-size: 12px;
+        margin-top: 5px;
+    }
+    .text-green { color: #059669; }
+    .text-red { color: #DC2626; }
+
+    /* Chart Container */
+    .chart-box {
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #inventoryChart {
+        width: 100%;
+        height: 100%;
+        flex-grow: 1;
+    }
+
+    /* Utility for Dead Stock Highlight */
+    .highlight-money {
+        color: #DC2626;
+        font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- Header -->
+    <header style="border-bottom: none;">
+        <div class="header-title">
+            <h1> 库存周转率分析表</h1>
+        </div>
+        
+    </header>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Left: Detailed Table -->
+        <div class="panel-left">
+            <div class="panel-title">
+                <i class="fa-solid fa-list-ul" style="color: #059669;"></i> 各品类库存明细
+            </div>
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>品类名称</th>
+                        <th class="text-right">当前库存 (件)</th>
+                        <th class="text-right">周转天数</th>
+                        <th class="text-right">呆滞库存金额</th>
+                        <th class="text-right">健康状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><i class="fa-solid fa-mobile-screen" style="color:#9CA3AF; margin-right:8px;"></i> 数码电子</td>
+                        <td class="text-right font-mono">12,450</td>
+                        <td class="text-right font-mono">28</td>
+                        <td class="text-right font-mono">¥ 45,200</td>
+                        <td class="text-right"><span class="status-badge status-good">健康</span></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-shirt" style="color:#9CA3AF; margin-right:8px;"></i> 服装服饰</td>
+                        <td class="text-right font-mono">45,200</td>
+                        <td class="text-right font-mono">55</td>
+                        <td class="text-right font-mono highlight-money">¥ 128,500</td>
+                        <td class="text-right"><span class="status-badge status-warning">预警</span></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-couch" style="color:#9CA3AF; margin-right:8px;"></i> 家居用品</td>
+                        <td class="text-right font-mono">8,300</td>
+                        <td class="text-right font-mono">42</td>
+                        <td class="text-right font-mono">¥ 32,100</td>
+                        <td class="text-right"><span class="status-badge status-good">健康</span></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-pump-soap" style="color:#9CA3AF; margin-right:8px;"></i> 美妆个护</td>
+                        <td class="text-right font-mono">22,100</td>
+                        <td class="text-right font-mono">35</td>
+                        <td class="text-right font-mono">¥ 15,800</td>
+                        <td class="text-right"><span class="status-badge status-good">健康</span></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-basketball" style="color:#9CA3AF; margin-right:8px;"></i> 户外运动</td>
+                        <td class="text-right font-mono">5,600</td>
+                        <td class="text-right font-mono">72</td>
+                        <td class="text-right font-mono highlight-money">¥ 89,400</td>
+                        <td class="text-right"><span class="status-badge status-danger">呆滞</span></td>
+                    </tr>
+                    <tr>
+                        <td><i class="fa-solid fa-kitchen-set" style="color:#9CA3AF; margin-right:8px;"></i> 厨房家电</td>
+                        <td class="text-right font-mono">3,200</td>
+                        <td class="text-right font-mono">65</td>
+                        <td class="text-right font-mono highlight-money">¥ 56,200</td>
+                        <td class="text-right"><span class="status-badge status-warning">预警</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Right: KPIs & Charts -->
+        <div class="panel-right">
+            <!-- KPI Cards -->
+            <div class="kpi-container">
+                <div class="kpi-card primary">
+                    <div class="kpi-label">平均周转天数</div>
+                    <div class="kpi-value">49.5 <span style="font-size:16px; font-weight:400; color:#6B7280;">天</span></div>
+                    <div class="kpi-sub text-green"><i class="fa-solid fa-arrow-down"></i> 环比下降 3.2%</div>
+                    <i class="fa-solid fa-rotate-right" style="position:absolute; bottom:20px; right:20px; font-size:30px; color:#059669; opacity:0.2;"></i>
+                </div>
+                <div class="kpi-card danger">
+                    <div class="kpi-label">呆滞库存总额</div>
+                    <div class="kpi-value">¥ 36.7 <span style="font-size:16px; font-weight:400; color:#6B7280;">万</span></div>
+                    <div class="kpi-sub text-red"><i class="fa-solid fa-arrow-up"></i> 环比上升 1.5%</div>
+                    <i class="fa-solid fa-triangle-exclamation" style="position:absolute; bottom:20px; right:20px; font-size:30px; color:#DC2626; opacity:0.2;"></i>
+                </div>
+            </div>
+
+            <!-- Chart -->
+            <div class="chart-box">
+                <div class="panel-title" style="font-size: 16px; margin-bottom: 10px;">
+                    <i class="fa-solid fa-chart-simple" style="color: #059669;"></i> 库存量 vs 周转天数
+                </div>
+                <div id="inventoryChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Initialize ECharts
+    var chartDom = document.getElementById('inventoryChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+        animation: false, // Strictly disabled
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' }
+        },
+        legend: {
+            data: ['库存量', '周转天数'],
+            right: 0,
+            top: 0,
+            textStyle: { color: '#6B7280' }
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '3%',
+            top: '15%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['数码', '服装', '家居', '美妆', '户外', '厨电'],
+            axisLine: { lineStyle: { color: '#E5E7EB' } },
+            axisLabel: { color: '#4B5563', fontWeight: 'bold' }
+        },
+        yAxis: [
+            {
+                type: 'value',
+                name: '库存量 (件)',
+                splitLine: { lineStyle: { type: 'dashed', color: '#F3F4F6' } },
+                axisLabel: { color: '#6B7280' }
+            },
+            {
+                type: 'value',
+                name: '周转天数',
+                splitLine: { show: false },
+                axisLabel: { color: '#6B7280' }
+            }
+        ],
+        series: [
+            {
+                name: '库存量',
+                type: 'bar',
+                barWidth: '40%',
+                itemStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: '#34D399' }, // Light Emerald
+                        { offset: 1, color: '#059669' }  // Dark Emerald
+                    ]),
+                    borderRadius: [4, 4, 0, 0]
+                },
+                data: [12450, 45200, 8300, 22100, 5600, 3200]
+            },
+            {
+                name: '周转天数',
+                type: 'line',
+                yAxisIndex: 1,
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+                itemStyle: {
+                    color: '#F59E0B', // Amber/Orange
+                    borderWidth: 2,
+                    borderColor: '#fff'
+                },
+                lineStyle: {
+                    width: 3,
+                    color: '#F59E0B'
+                },
+                data: [28, 55, 42, 35, 72, 65]
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+</script>
+
+
+</body></html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 核心重置与基础样式 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+        padding: 40px;
+    }
+
+    /* 头部样式 - 仅保留主标题 */
+    header {
+        flex: 0 0 auto;
+        margin-bottom: 30px;
+        border-left: 8px solid #0d9488; /* Teal accent */
+        padding-left: 24px;
+        display: flex;
+        align-items: center;
+    }
+
+    h1 {
+        font-size: 48px;
+        font-weight: 900;
+        color: #111827;
+        letter-spacing: 2px;
+        line-height: 1;
+    }
+
+    /* 主体网格布局 - 填充空间 */
+    .grid-content {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+        gap: 24px;
+    }
+
+    /* 卡片通用样式 */
+    .card {
+        background: #fff;
+        border-radius: 16px;
+        padding: 32px;
+        position: relative;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        overflow: hidden;
+        border-top: 6px solid transparent;
+    }
+
+    /* 卡片内容排版 */
+    .card-icon {
+        font-size: 42px;
+        margin-bottom: 16px;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(0,0,0,0.05);
+    }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: #1f2937;
+    }
+
+    .card-desc {
+        font-size: 18px;
+        line-height: 1.5;
+        color: #4b5563;
+        flex-grow: 1;
+    }
+
+    /* 装饰性背景数字 */
+    .bg-number {
+        position: absolute;
+        bottom: -20px;
+        right: -10px;
+        font-size: 140px;
+        font-weight: 900;
+        color: rgba(0,0,0,0.03);
+        line-height: 1;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    /* 独立配色方案 */
+    /* 1. 语言积累 - 绿色 */
+    .card-1 { border-color: #059669; }
+    .card-1 .card-icon { color: #059669; background-color: #ecfdf5; }
+    
+    /* 2. 阅读 - 青色 */
+    .card-2 { border-color: #0891b2; }
+    .card-2 .card-icon { color: #0891b2; background-color: #ecfeff; }
+
+    /* 3. 社交 - 靛蓝 (避免蓝紫渐变，使用纯色) */
+    .card-3 { border-color: #4f46e5; }
+    .card-3 .card-icon { color: #4f46e5; background-color: #eef2ff; }
+
+    /* 4. 技能 - 蓝色 */
+    .card-4 { border-color: #2563eb; }
+    .card-4 .card-icon { color: #2563eb; background-color: #eff6ff; }
+
+    /* 5. 运动 - 橙色 */
+    .card-5 { border-color: #ea580c; }
+    .card-5 .card-icon { color: #ea580c; background-color: #fff7ed; }
+
+    /* 6. 复盘 - 深灰 */
+    .card-6 { border-color: #475569; }
+    .card-6 .card-icon { color: #475569; background-color: #f8fafc; }
+
+    /* 强调文字 */
+    strong {
+        color: #000;
+        font-weight: 700;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- 修复逻辑：使用 Grid 3x2 布局完美填充 1280x720 空间，无留白，严格限制 header 内容 -->
+  <div class="container">
+    <header>
+      <h1>自我提升行动计划</h1>
+    </header>
+
+    <main class="grid-content">
+      <!-- 每天背单词 -->
+      <div class="card card-1">
+        <div class="bg-number">01</div>
+        <div>
+            <div class="card-icon"><i class="fa-solid fa-language"></i></div>
+            <h2 class="card-title">语言积累</h2>
+            <p class="card-desc">坚持<strong>每天背20个单词</strong>，通过日积月累扩大词汇量，夯实语言基础。</p>
+        </div>
+      </div>
+
+      <!-- 每周读书 -->
+      <div class="card card-2">
+        <div class="bg-number">02</div>
+        <div>
+            <div class="card-icon"><i class="fa-solid fa-book-open"></i></div>
+            <h2 class="card-title">深度阅读</h2>
+            <p class="card-desc">保持<strong>每周读一本书</strong>的习惯，拓宽认知边界，汲取跨领域的智慧与知识。</p>
+        </div>
+      </div>
+
+      <!-- 行业交流 -->
+      <div class="card card-3">
+        <div class="bg-number">03</div>
+        <div>
+            <div class="card-icon"><i class="fa-solid fa-users-viewfinder"></i></div>
+            <h2 class="card-title">行业洞察</h2>
+            <p class="card-desc"><strong>每月参加一次行业交流会</strong>，建立人脉网络，紧跟行业前沿动态。</p>
+        </div>
+      </div>
+
+      <!-- 技能学习 -->
+      <div class="card card-4">
+        <div class="bg-number">04</div>
+        <div>
+            <div class="card-icon"><i class="fa-solid fa-laptop-code"></i></div>
+            <h2 class="card-title">技能拓展</h2>
+            <p class="card-desc">持续学习硬核新技能，重点攻克<strong>编程或设计</strong>，提升核心竞争力。</p>
+        </div>
+      </div>
+
+      <!-- 身体锻炼 -->
+      <div class="card card-5">
+        <div class="bg-number">05</div>
+        <div>
+            <div class="card-icon"><i class="fa-solid fa-heart-pulse"></i></div>
+            <h2 class="card-title">身心健康</h2>
+            <p class="card-desc">规律<strong>锻炼身体</strong>，保持充沛的精力和健康的体魄，为持续奋斗提供本钱。</p>
+        </div>
+      </div>
+
+      <!-- 定期复盘 -->
+      <div class="card card-6">
+        <div class="bg-number">06</div>
+        <div>
+            <div class="card-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+            <h2 class="card-title">总结优化</h2>
+            <p class="card-desc">建立<strong>定期复盘</strong>机制，分析阶段性得失，动态调整计划以确保目标达成。</p>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>

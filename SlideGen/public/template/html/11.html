@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0fdfa; /* Light Teal Background */
+      color: #333;
+    }
+
+    /* 布局结构 */
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      height: 100px;
+      background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); /* Deep Teal Gradient */
+      display: flex;
+      align-items: center;
+      padding-left: 50px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      color: #fff;
+      font-size: 42px;
+      font-weight: 900;
+      letter-spacing: 2px;
+    }
+
+    .container {
+      flex: 1;
+      padding: 30px 50px;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr;
+      gap: 30px;
+      height: calc(720px - 100px);
+    }
+
+    /* 卡片通用样式 */
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 25px rgba(15, 118, 110, 0.08);
+      display: flex;
+      flex-direction: column;
+      border-top: 5px solid #0d9488;
+    }
+
+    .card-header {
+      font-size: 24px;
+      font-weight: 700;
+      color: #115e59;
+      margin-bottom: 25px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      border-bottom: 2px solid #f0fdfa;
+      padding-bottom: 15px;
+    }
+
+    .card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      justify-content: space-around; /* 均匀分布，减少留白 */
+    }
+
+    /* 第一列：硬性指标 */
+    .highlight-box {
+      background: #f0fdfa;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .big-number {
+      font-size: 64px;
+      font-weight: 900;
+      color: #0f766e;
+      line-height: 1;
+    }
+
+    .text-group h3 {
+      font-size: 22px;
+      color: #333;
+      margin-bottom: 5px;
+    }
+
+    .text-group p {
+      font-size: 16px;
+      color: #666;
+    }
+
+    .tag-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+    }
+
+    .skill-tag {
+      background: #ccfbf1;
+      color: #115e59;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      font-weight: 700;
+      font-size: 18px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .skill-tag i {
+      font-size: 24px;
+    }
+
+    /* 第二列：软性素质 */
+    .trait-list {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      flex: 1;
+    }
+
+    .trait-item {
+      display: flex;
+      align-items: center;
+      background: #fff7ed; /* Warm orange tint */
+      padding: 18px;
+      border-radius: 12px;
+      color: #9a3412;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .trait-item i {
+      width: 40px;
+      height: 40px;
+      background: #ffedd5;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      font-size: 18px;
+      color: #c2410c;
+    }
+
+    .urgent-banner {
+      background: linear-gradient(90deg, #ea580c, #c2410c);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: 700;
+      margin-top: auto; /* Push to bottom */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    /* 第三列：薪资福利 */
+    .salary-box {
+      text-align: center;
+      padding: 20px;
+      background: #ecfdf5;
+      border-radius: 12px;
+      border: 1px dashed #10b981;
+    }
+
+    .salary-title {
+      font-size: 16px;
+      color: #047857;
+      margin-bottom: 5px;
+    }
+
+    .salary-val {
+      font-size: 32px;
+      font-weight: 900;
+      color: #059669;
+    }
+
+    .benefit-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 15px;
+      flex: 1;
+    }
+
+    .benefit-card {
+      background: #f8fafc;
+      border-left: 6px solid #3b82f6;
+      padding: 20px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+      font-weight: 600;
+      color: #334155;
+    }
+
+    .benefit-card i {
+      color: #3b82f6;
+      margin-right: 15px;
+      font-size: 24px;
+    }
+    
+    .benefit-card.vacation { border-color: #8b5cf6; }
+    .benefit-card.vacation i { color: #8b5cf6; }
+
+  </style>
+</head>
+<body>
+
+  <!-- Header: 仅包含 main-title -->
+  <header>
+    <h1><i class="fa-solid fa-bullhorn" style="margin-right: 15px;"></i>诚聘：高级运营专员</h1>
+  </header>
+
+  <!-- Main Content -->
+  <div class="container">
+    
+    <!-- Column 1: 任职资格 -->
+    <div class="card">
+      <div class="card-header">
+        <i class="fa-solid fa-user-check"></i>
+        <span>任职资格</span>
+      </div>
+      <div class="card-content">
+        <!-- 经验 -->
+        <div class="highlight-box">
+          <div class="big-number">3<span style="font-size: 24px;">年</span></div>
+          <div class="text-group">
+            <h3>相关工作经验</h3>
+            <p>熟悉运营流程与策略</p>
+          </div>
+        </div>
+        
+        <!-- 学历 -->
+        <div class="highlight-box" style="background-color: #f1f5f9;">
+          <i class="fa-solid fa-graduation-cap" style="font-size: 40px; color: #475569;"></i>
+          <div class="text-group">
+            <h3>本科及以上学历</h3>
+            <p>优先考虑相关专业</p>
+          </div>
+        </div>
+
+        <!-- 核心技能 -->
+        <div class="tag-grid">
+          <div class="skill-tag">
+            <i class="fa-solid fa-pen-nib"></i>
+            文案撰写
+          </div>
+          <div class="skill-tag">
+            <i class="fa-solid fa-video"></i>
+            视频剪辑
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 2: 综合素质 -->
+    <div class="card" style="border-top-color: #f97316;">
+      <div class="card-header" style="color: #c2410c;">
+        <i class="fa-solid fa-star"></i>
+        <span>综合素质</span>
+      </div>
+      <div class="card-content">
+        <div class="trait-list">
+          <div class="trait-item">
+            <i class="fa-regular fa-face-laugh-beam"></i>
+            性格开朗，善于沟通
+          </div>
+          <div class="trait-item">
+            <i class="fa-solid fa-dumbbell"></i>
+            抗压能力强，结果导向
+          </div>
+          <div class="trait-item">
+            <i class="fa-solid fa-lightbulb"></i>
+            具备创新思维与执行力
+          </div>
+        </div>
+        
+        <div class="urgent-banner">
+          <i class="fa-solid fa-rocket"></i>
+          急招岗位，期待尽快入职
+        </div>
+      </div>
+    </div>
+
+    <!-- Column 3: 薪资福利 -->
+    <div class="card" style="border-top-color: #3b82f6;">
+      <div class="card-header" style="color: #1e40af;">
+        <i class="fa-solid fa-gift"></i>
+        <span>薪资福利</span>
+      </div>
+      <div class="card-content">
+        <div class="salary-box">
+          <div class="salary-title">薪资待遇</div>
+          <div class="salary-val">薪资面议</div>
+        </div>
+
+        <div class="benefit-grid">
+          <div class="benefit-card">
+            <i class="fa-solid fa-shield-heart"></i>
+            <div>
+              <div style="font-size: 14px; color: #64748b; font-weight: 400;">完善保障</div>
+              五险一金
+            </div>
+          </div>
+          
+          <div class="benefit-card vacation">
+            <i class="fa-solid fa-umbrella-beach"></i>
+             <div>
+              <div style="font-size: 14px; color: #64748b; font-weight: 400;">工作平衡</div>
+              带薪年假
+            </div>
+          </div>
+
+          <div class="benefit-card" style="border-color: #10b981;">
+             <i class="fa-solid fa-arrow-trend-up" style="color: #10b981;"></i>
+             <div>
+              <div style="font-size: 14px; color: #64748b; font-weight: 400;">职业发展</div>
+              晋升空间广阔
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+<!-- 
+  设计符合要求：无动画/滚动/溢出，尺寸固定1280x720，配色现代，布局紧凑无留白。
+-->
+</body>
+</html>

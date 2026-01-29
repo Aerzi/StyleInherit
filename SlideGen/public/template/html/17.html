@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年度核心业绩概览</title>
+    <style>
+        :root {
+            --primary-blue: #1a3a6c;
+            --highlight-orange: #ff9d2e;
+            --text-dark: #333;
+            --text-light: #666;
+            --card-bg: #f4f7fa;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1280px;
+            height: 720px;
+            background-color: white;
+            position: relative;
+            padding: 50px 80px 80px 80px; /* 增加底部 padding */
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        /* Top Header */
+        .top-header {
+            font-size: 16px;
+            color: var(--primary-blue);
+            font-weight: bold;
+            margin-bottom: 50px;
+        }
+
+        .main-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center; /* 改为整体居中 */
+            flex: 1;
+        }
+
+        /* Left Section */
+        .left-section {
+            width: 55%;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .title-group {
+            margin-bottom: 50px;
+        }
+
+        .main-title {
+            font-size: 46px;
+            color: var(--primary-blue);
+            line-height: 1.35;
+            font-weight: 800;
+            margin-bottom: 20px;
+        }
+
+        .orange-line {
+            width: 80px;
+            height: 5px;
+            background-color: var(--highlight-orange);
+        }
+
+        .section-subtitle {
+            font-size: 22px;
+            color: var(--highlight-orange);
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .points-list {
+            list-style: none;
+        }
+
+        .point-item {
+            position: relative;
+            padding-left: 25px;
+            margin-bottom: 25px;
+            font-size: 19px;
+            color: var(--text-light);
+            line-height: 1.7;
+        }
+
+        .point-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 6px;
+            bottom: 6px;
+            width: 4px;
+            background-color: var(--primary-blue);
+        }
+
+        /* Right Section */
+        .right-section {
+            width: 40%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 35px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 40px 35px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .card-label {
+            font-size: 18px;
+            color: #888;
+            margin-bottom: 12px;
+        }
+
+        .card-value {
+            font-size: 60px;
+            color: var(--primary-blue);
+            font-weight: 900;
+            margin-bottom: 12px;
+        }
+
+        .card-footer {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--highlight-orange);
+        }
+
+        .footer-page {
+            position: absolute;
+            bottom: 40px; /* 向上移动一点，留出更多边缘空白 */
+            right: 50px;
+            font-size: 16px;
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="top-header">WPS 市场部 2025 年度工作总结</div>
+        
+        <div class="main-content">
+            <div class="left-section">
+                <div class="title-group">
+                    <h1 class="main-title">2025年度核心业绩概览：<br>营收与月活双创新高</h1>
+                    <div class="orange-line"></div>
+                </div>
+
+                <div class="section-subtitle">业绩综述</div>
+                <ul class="points-list">
+                    <li class="point-item">2025年，WPS市场部紧扣“AI落地”与“信创深耕”两大主线，实现核心指标全面超额达成。</li>
+                    <li class="point-item">全球月活设备数突破6.69亿，同比增长8.5%，稳固办公软件第一梯队。</li>
+                    <li class="point-item">年度总营收同比增长28%，其中WPS 365企业级服务营收贡献率提升至45%。</li>
+                </ul>
+            </div>
+
+            <div class="right-section">
+                <div class="card">
+                    <div class="card-label">全球月活设备数 (MAU)</div>
+                    <div class="card-value">6.69亿</div>
+                    <div class="card-footer">↑ 8.5% YoY</div>
+                </div>
+
+                <div class="card">
+                    <div class="card-label">年度总营收同比增长率</div>
+                    <div class="card-value">28%</div>
+                    <div class="card-footer">超额完成KPI 112%</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-page">3</div>
+    </div>
+</body>
+</html>

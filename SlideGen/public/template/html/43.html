@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>吴承恩：科举失意,文坛留名</title>
+    <style>
+        :root {
+            --bg-dark: #14110f;
+            --card-bg: #1f1a17;
+            --accent-gold: #c8a064;
+            --text-white: #e0dcd9;
+            --text-gray: #a8a098;
+            --highlight: #d47e3a;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "STHeiti", "Microsoft YaHei", serif;
+        }
+
+        body {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1280px;
+            height: 720px;
+            background-color: var(--bg-dark);
+            position: relative;
+            padding: 40px 60px;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-white);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-num {
+            font-size: 32px;
+            color: var(--accent-gold);
+            font-weight: bold;
+            border-bottom: 3px solid var(--accent-gold);
+        }
+
+        .main-title {
+            font-size: 40px;
+            font-weight: 800;
+        }
+
+        /* Main Content Grid */
+        .main-content {
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            gap: 25px;
+            flex: 1;
+            min-height: 0;
+            margin-bottom: 25px;
+        }
+
+        .left-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 8px;
+            padding: 20px 25px;
+            border-left: 2px solid rgba(200, 160, 100, 0.2);
+        }
+
+        .card-title {
+            font-size: 22px;
+            color: var(--accent-gold);
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .card-p {
+            font-size: 14.5px;
+            line-height: 1.7;
+            color: var(--text-gray);
+            margin-bottom: 12px;
+        }
+
+        .highlight-quote {
+            color: var(--highlight);
+            font-weight: bold;
+        }
+
+        /* Right Timeline Card */
+        .timeline-card {
+            height: 100%;
+            border-left: 3px solid var(--accent-gold);
+            padding: 25px 35px;
+        }
+
+        .timeline-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 25px;
+            font-size: 15.5px;
+        }
+
+        .time-year {
+            color: var(--accent-gold);
+            font-weight: bold;
+            width: 60px;
+            flex-shrink: 0;
+        }
+
+        .time-event {
+            color: var(--text-gray);
+        }
+
+        /* Bottom Row */
+        .bottom-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr) 1.5fr;
+            gap: 20px;
+            height: 120px;
+        }
+
+        .stat-card {
+            background-color: rgba(200, 160, 100, 0.05);
+            border: 1px solid rgba(200, 160, 100, 0.15);
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .stat-val {
+            font-size: 28px;
+            color: var(--accent-gold);
+            font-weight: 900;
+            margin-bottom: 5px;
+        }
+
+        .stat-lab {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .quote-card {
+            background-color: rgba(212, 126, 58, 0.05);
+            border-radius: 8px;
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            font-size: 14.5px;
+            line-height: 1.6;
+            color: var(--text-gray);
+            font-style: italic;
+            border-bottom: 1px solid rgba(212, 126, 58, 0.2);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <span class="header-num">01</span>
+            <h1 class="main-title">吴承恩：科举失意,文坛留名</h1>
+        </div>
+
+        <div class="main-content">
+            <div class="left-col">
+                <div class="card">
+                    <div class="card-title">生平轨迹</div>
+                    <p class="card-p">吴承恩(约1506—1582),字汝忠,号射阳山人,淮安府山阳县人。少年聪慧,性敏多慧,博极群书,精于绘画、书法、填词、围棋,尤喜神仙鬼怪、狐妖猴精之类书籍。</p>
+                    <p class="card-p">但科举之路坎坷,七次乡试未中,中年才补岁贡生。曾任浙江长兴县丞、湖北蕲州荆王府纪善,终因看不惯官场黑暗而辞官归隐,晚年放浪诗酒,贫老以终。</p>
+                </div>
+                <div class="card">
+                    <div class="card-title">创作缘起</div>
+                    <p class="card-p">科举失意、生活困顿加深了吴承恩对封建社会现实的认识,促使他运用志怪小说形式表达内心不满。他自言:<span class="highlight-quote">"虽然吾书名为志怪,盖不专明鬼,实记人间变异,亦微有鉴戒寓焉。"</span>《西游记》约于隆庆二年至四年(1568—1570)在淮安家乡完成,万历二十年(1592)由南京金陵世德堂刻印出版。</p>
+                </div>
+            </div>
+
+            <div class="card timeline-card">
+                <div class="card-title" style="font-size: 26px; margin-bottom: 30px;">人生节点</div>
+                <ul class="timeline-list">
+                    <li class="timeline-item"><span class="time-year">1506年</span><span class="time-event">出生于淮安府山阳县</span></li>
+                    <li class="timeline-item"><span class="time-year">1529年</span><span class="time-event">进入龙溪书院,得葛木赏识</span></li>
+                    <li class="timeline-item"><span class="time-year">1550年</span><span class="time-event">补岁贡生,进京求官未果</span></li>
+                    <li class="timeline-item"><span class="time-year">1556年</span><span class="time-event">任长兴县丞,后遭诬告归隐</span></li>
+                    <li class="timeline-item"><span class="time-year">1568年</span><span class="time-event">任荆王府纪善</span></li>
+                    <li class="timeline-item"><span class="time-year">1570年</span><span class="time-event">回乡着力创作《西游记》</span></li>
+                    <li class="timeline-item"><span class="time-year">1582年</span><span class="time-event">贫老以终,享年约76岁</span></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bottom-row">
+            <div class="stat-card">
+                <span class="stat-val">七次</span>
+                <span class="stat-lab">乡试落第</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val">1573年</span>
+                <span class="stat-lab">完成《西游记》</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-val">1592年</span>
+                <span class="stat-lab">首次出版</span>
+            </div>
+            <div class="quote-card">
+                "天生我才必有用。"吴承恩虽然一生坎坷,无缘富贵,但他以不朽的《西游记》超越时空,获得了中国人民乃至世界人民的敬重。
+            </div>
+        </div>
+    </div>
+</body>
+</html>

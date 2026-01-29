@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Noto Sans SC', sans-serif; background-color: #f8f9fa; color: #333; }
+    
+    /* Header - 仅保留主标题 */
+    header {
+      height: 90px;
+      padding: 0 50px;
+      display: flex;
+      align-items: center;
+      background-color: #fff;
+      border-bottom: 4px solid #e67e22;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      position: relative;
+      z-index: 10;
+    }
+    
+    header h1 {
+      font-size: 36px;
+      font-weight: 900;
+      color: #2c3e50;
+      letter-spacing: 1px;
+    }
+    
+    header h1 i {
+      color: #e67e22;
+      margin-right: 15px;
+    }
+
+    /* Main Content Layout */
+    .container {
+      display: grid;
+      grid-template-columns: 480px 1fr; /* 左侧文字，右侧图示 */
+      height: 630px; /* 720 - 90 */
+      padding: 40px 50px;
+      gap: 50px;
+    }
+
+    /* Left Side: Concepts */
+    .content-left {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .concept-card {
+      background: #fff;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      position: relative;
+      border-left: 6px solid #2c3e50;
+    }
+
+    .concept-card.highlight {
+      border-left-color: #e67e22;
+      background: linear-gradient(to right, #fff, #fffbf7);
+    }
+
+    .concept-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .concept-title i {
+      margin-right: 10px;
+      font-size: 20px;
+      color: #7f8c8d;
+    }
+
+    .concept-card.highlight .concept-title i {
+      color: #e67e22;
+    }
+
+    .concept-text {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #555;
+      text-align: justify;
+    }
+
+    .key-points {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 15px;
+      margin-top: 10px;
+    }
+
+    .point-item {
+      background: #eff3f6;
+      padding: 15px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      color: #2c3e50;
+      display: flex;
+      align-items: center;
+    }
+    
+    .point-item i {
+      color: #2980b9;
+      margin-right: 10px;
+    }
+
+    /* Right Side: Flywheel Visualization */
+    .content-right {
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 4px 25px rgba(0,0,0,0.05);
+      border: 1px solid #eee;
+    }
+
+    /* Flywheel Container */
+    .flywheel-wrapper {
+      position: relative;
+      width: 550px;
+      height: 550px;
+    }
+
+    /* Center Hub */
+    .hub {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 160px;
+      height: 160px;
+      background: #2c3e50;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      z-index: 5;
+      box-shadow: 0 10px 25px rgba(44, 62, 80, 0.4);
+      border: 4px solid #ecf0f1;
+    }
+
+    .hub i {
+      font-size: 40px;
+      margin-bottom: 10px;
+      color: #e67e22;
+    }
+
+    .hub span {
+      font-size: 20px;
+      font-weight: 700;
+    }
+    
+    .hub small {
+      font-size: 12px;
+      opacity: 0.8;
+      margin-top: 5px;
+    }
+
+    /* Nodes */
+    .node {
+      position: absolute;
+      width: 130px;
+      height: 130px;
+      background: #fff;
+      border: 3px solid #bdc3c7;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      z-index: 4;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    }
+    
+    .node strong {
+      display: block;
+      font-size: 16px;
+      color: #2c3e50;
+      margin-top: 5px;
+    }
+    
+    .node i {
+      font-size: 28px;
+    }
+
+    /* Positioning Nodes */
+    .n1 { top: 20px; left: 50%; transform: translateX(-50%); border-color: #e67e22; } /* Top */
+    .n2 { top: 50%; right: 20px; transform: translateY(-50%); border-color: #27ae60; } /* Right */
+    .n3 { bottom: 20px; left: 50%; transform: translateX(-50%); border-color: #2980b9; } /* Bottom */
+    .n4 { top: 50%; left: 20px; transform: translateY(-50%); border-color: #8e44ad; } /* Left */
+
+    .n1 i { color: #e67e22; }
+    .n2 i { color: #27ae60; }
+    .n3 i { color: #2980b9; }
+    .n4 i { color: #8e44ad; }
+
+    /* Connecting Arrows (SVG) */
+    .connections {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Custom labels for context */
+    .annotation {
+      position: absolute;
+      background: #2c3e50;
+      color: #fff;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    .a1 { top: 110px; right: 100px; }
+    .a2 { bottom: 110px; right: 100px; }
+    .a3 { bottom: 110px; left: 100px; }
+    .a4 { top: 110px; left: 100px; }
+
+  </style>
+</head>
+<body>
+
+<header>
+  <h1><i class="fa-solid fa-arrows-spin"></i> 飞轮效应在企业增长中的应用</h1>
+</header>
+
+<div class="container">
+  
+  <!-- Left Side: Content -->
+  <div class="content-left">
+    
+    <div class="concept-card">
+      <div class="concept-title"><i class="fa-solid fa-book-open"></i> 核心定义</div>
+      <div class="concept-text">
+        飞轮效应（Flywheel Effect）指出，企业的增长并非源于单次的惊人举措，而是通过构建一个<strong>良性循环的闭环系统</strong>。每一次的努力不仅产出当前成果，更为下一轮循环积累势能，从而实现从“费力推动”到“自动加速”的质变。
+      </div>
+    </div>
+
+    <div class="concept-card highlight">
+      <div class="concept-title"><i class="fa-solid fa-rocket"></i> 构建三部曲</div>
+      <div class="concept-text" style="margin-bottom: 15px;">
+        要让静止的飞轮转动起来，必须在关键节点持续投入，直到突破临界点。
+      </div>
+      <div class="key-points">
+        <div class="point-item"><i class="fa-solid fa-bullseye"></i> 明确闭环逻辑</div>
+        <div class="point-item"><i class="fa-solid fa-hand-holding-dollar"></i> 饱和资源投入</div>
+        <div class="point-item"><i class="fa-solid fa-oil-can"></i> 消除摩擦阻力</div>
+        <div class="point-item"><i class="fa-solid fa-chart-line"></i> 长期复利思维</div>
+      </div>
+    </div>
+
+    <div class="concept-card" style="border-left-color: #7f8c8d; background: transparent; box-shadow: none; padding: 10px 0;">
+      <div class="concept-text" style="font-size: 14px; color: #666;">
+        <i class="fa-solid fa-quote-left" style="color:#bdc3c7; margin-right: 5px;"></i>
+        一旦飞轮转动起来，其自身的动量将成为增长的最强驱动力，此时保持推动比初始启动要轻松得多，但速度却快得多。
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Right Side: Flywheel Graphic -->
+  <div class="content-right">
+    <div class="flywheel-wrapper">
+      
+      <!-- SVG Connecting Lines -->
+      <svg class="connections" viewBox="0 0 550 550">
+        <defs>
+          <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+            <polygon points="0 0, 10 3.5, 0 7" fill="#bdc3c7" />
+          </marker>
+        </defs>
+        <!-- Curved paths connecting nodes -->
+        <!-- Top to Right -->
+        <path d="M 300 85 Q 430 85 465 210" fill="none" stroke="#e67e22" stroke-width="4" marker-end="url(#arrowhead)" stroke-dasharray="10,5" style="opacity: 0.6"/>
+        <!-- Right to Bottom -->
+        <path d="M 465 340 Q 430 465 300 465" fill="none" stroke="#27ae60" stroke-width="4" marker-end="url(#arrowhead)" stroke-dasharray="10,5" style="opacity: 0.6"/>
+        <!-- Bottom to Left -->
+        <path d="M 250 465 Q 120 465 85 340" fill="none" stroke="#2980b9" stroke-width="4" marker-end="url(#arrowhead)" stroke-dasharray="10,5" style="opacity: 0.6"/>
+        <!-- Left to Top -->
+        <path d="M 85 210 Q 120 85 250 85" fill="none" stroke="#8e44ad" stroke-width="4" marker-end="url(#arrowhead)" stroke-dasharray="10,5" style="opacity: 0.6"/>
+      </svg>
+
+      <!-- Center Hub -->
+      <div class="hub">
+        <i class="fa-solid fa-gauge-high"></i>
+        <span>企业增长</span>
+        <small>持续加速引擎</small>
+      </div>
+
+      <!-- Nodes -->
+      <div class="node n1">
+        <i class="fa-solid fa-lightbulb"></i>
+        <strong>优质产品</strong>
+        <span style="font-size:12px; color:#777;">(起点)</span>
+      </div>
+
+      <div class="node n2">
+        <i class="fa-solid fa-face-smile"></i>
+        <strong>客户体验</strong>
+        <span style="font-size:12px; color:#777;">满意度提升</span>
+      </div>
+
+      <div class="node n3">
+        <i class="fa-solid fa-users-viewfinder"></i>
+        <strong>流量增长</strong>
+        <span style="font-size:12px; color:#777;">口碑传播</span>
+      </div>
+
+      <div class="node n4">
+        <i class="fa-solid fa-handshake"></i>
+        <strong>生态/成本</strong>
+        <span style="font-size:12px; color:#777;">规模效应</span>
+      </div>
+
+      <!-- Annotations for process -->
+      <div class="annotation a1">价值转化</div>
+      <div class="annotation a2">口碑裂变</div>
+      <div class="annotation a3">议价能力</div>
+      <div class="annotation a4">投入研发</div>
+
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>

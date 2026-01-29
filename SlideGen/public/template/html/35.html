@@ -1,0 +1,342 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* Layout Grid */
+    .container {
+      display: grid;
+      grid-template-columns: 320px 1fr; /* 稍微减小侧边栏宽度以留给右侧更多空间 */
+      height: 100%;
+    }
+
+    /* Left Sidebar */
+    .sidebar {
+      background: linear-gradient(160deg, #263238 0%, #37474F 100%);
+      color: white;
+      padding: 40px 30px; /* 减少内边距 */
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: 4px 0 20px rgba(0,0,0,0.15);
+      z-index: 10;
+    }
+
+    .sidebar-header h1 {
+      font-size: 32px; /* 减小字体 */
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 10px;
+      letter-spacing: -1px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 16px; /* 减小字体 */
+      font-weight: 400;
+      color: #B0BEC5;
+      margin-bottom: 20px; /* 减少间距 */
+      border-left: 4px solid #FF7043;
+      padding-left: 12px;
+    }
+
+    .chart-wrapper {
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-height: 0; /* 防止溢出 */
+    }
+
+    .chart-title {
+      font-size: 13px;
+      color: #B0BEC5;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 5px;
+    }
+
+    #churnChart {
+      width: 100%;
+      height: 220px; /* 减小图表高度 */
+    }
+
+    .sidebar-footer {
+      font-size: 12px;
+      color: #78909C;
+      border-top: 1px solid #455A64;
+      padding-top: 15px;
+      margin-top: 10px;
+    }
+
+    /* Right Content */
+    .main-content {
+      padding: 30px 40px; /* 减少内边距 */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 18px; /* 减少卡片间距 */
+      background-color: #ECEFF1;
+    }
+
+    .section-label {
+      font-size: 16px;
+      font-weight: 700;
+      color: #546E7A;
+      margin-bottom: 0; /* 调整间距 */
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-label::before {
+      content: '';
+      width: 20px;
+      height: 3px;
+      background-color: #546E7A;
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 10px;
+      padding: 20px; /* 减少卡片内边距 */
+      display: flex;
+      align-items: flex-start;
+      gap: 18px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+      border-left: 5px solid transparent;
+      position: relative;
+    }
+
+    .card-1 { border-left-color: #D84315; }
+    .card-2 { border-left-color: #F9A825; }
+    .card-3 { border-left-color: #00897B; }
+
+    .icon-box {
+      width: 48px; /* 减小图标容器 */
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px; /* 减小图标 */
+      flex-shrink: 0;
+    }
+
+    .card-1 .icon-box { background-color: #FBE9E7; color: #D84315; }
+    .card-2 .icon-box { background-color: #FFFDE7; color: #F9A825; }
+    .card-3 .icon-box { background-color: #E0F2F1; color: #00897B; }
+
+    .card-content {
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 18px; /* 减小标题字体 */
+      font-weight: 700;
+      color: #263238;
+      margin-bottom: 6px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .severity-badge {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .sev-high { background-color: #FFEBEE; color: #C62828; }
+    .sev-med { background-color: #FFF3E0; color: #EF6C00; }
+    .sev-low { background-color: #E8F5E9; color: #2E7D32; }
+
+    .card-desc {
+      font-size: 13px; /* 减小正文字体 */
+      color: #546E7A;
+      line-height: 1.5; /* 调整行高 */
+      text-align: justify;
+    }
+
+    .data-point {
+      margin-top: 8px;
+      font-size: 12px;
+      font-weight: 600;
+      color: #37474F;
+      background: #F5F7F8;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    
+    .data-point i {
+      margin-right: 6px;
+      color: #78909C;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h1>用户流失<br>根本原因分析</h1>
+      <h2>产品体验端三大痛点</h2>
+    </div>
+
+    <div class="chart-wrapper">
+      <div class="chart-title">流失原因归因占比</div>
+      <div id="churnChart"></div>
+    </div>
+
+    <div class="sidebar-footer">
+      <p><i class="fa-solid fa-calendar-days"></i> 分析周期: 2023 Q4</p>
+      <p style="margin-top:5px"><i class="fa-solid fa-file-signature"></i> 体验设计部报告</p>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <div class="section-label">核心问题详情</div>
+
+    <!-- Card 1: Operation Path -->
+    <div class="card card-1">
+      <div class="icon-box">
+        <i class="fa-solid fa-route"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">
+          操作路径过长导致中断
+          <span class="severity-badge sev-high">高危</span>
+        </div>
+        <p class="card-desc">
+          核心业务流程层级过深。用户完成一次标准操作平均需点击 <strong>7-9 次</strong>（行业标准 3-4 次）。繁琐步骤导致用户耐心耗尽，在支付/提交前的最后一步流失率激增。
+        </p>
+        <div class="data-point">
+          <i class="fa-solid fa-chart-line"></i> 流程中断率: 42% (集中在第5步)
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2: Mobile Adaptation -->
+    <div class="card card-2">
+      <div class="icon-box">
+        <i class="fa-solid fa-mobile-screen-button"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">
+          移动端适配性差
+          <span class="severity-badge sev-high">严重</span>
+        </div>
+        <p class="card-desc">
+          小屏设备（如 iPhone SE）响应式布局存在错误。关键按钮（如“确认”）常被底部导航栏遮挡或溢出屏幕，导致用户无法进行下一步操作，造成物理性阻塞。
+        </p>
+        <div class="data-point">
+          <i class="fa-solid fa-triangle-exclamation"></i> 移动端客诉占比: 65%
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 3: Documentation -->
+    <div class="card card-3">
+      <div class="icon-box">
+        <i class="fa-solid fa-book-open-reader"></i>
+      </div>
+      <div class="card-content">
+        <div class="card-title">
+          帮助文档缺失导致引导失败
+          <span class="severity-badge sev-med">中等</span>
+        </div>
+        <p class="card-desc">
+          新功能上线缺乏配套引导。新手用户面对复杂界面无从下手，搜索帮助中心因关键词匹配度低而无果，最终因挫败感强烈而放弃使用。
+        </p>
+        <div class="data-point">
+          <i class="fa-solid fa-user-clock"></i> 首周留存率下降: 15%
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<script>
+  // Initialize ECharts
+  var chartDom = document.getElementById('churnChart');
+  var myChart = echarts.init(chartDom);
+  var option;
+
+  option = {
+    animation: false, 
+    tooltip: {
+      trigger: 'item'
+    },
+    legend: {
+      bottom: '0%',
+      left: 'center',
+      textStyle: {
+        color: '#B0BEC5',
+        fontSize: 11
+      },
+      itemWidth: 8,
+      itemHeight: 8,
+      padding: 0
+    },
+    series: [
+      {
+        name: '流失原因',
+        type: 'pie',
+        radius: ['45%', '65%'],
+        center: ['50%', '40%'],
+        avoidLabelOverlap: false,
+        itemStyle: {
+          borderRadius: 4,
+          borderColor: '#263238',
+          borderWidth: 2
+        },
+        label: {
+          show: false,
+          position: 'center'
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 16,
+            fontWeight: 'bold',
+            color: '#fff',
+            formatter: '{d}%'
+          }
+        },
+        labelLine: {
+          show: false
+        },
+        data: [
+          { value: 58, name: '产品体验', itemStyle: { color: '#FF7043' } },
+          { value: 22, name: '价格因素', itemStyle: { color: '#546E7A' } },
+          { value: 12, name: '服务质量', itemStyle: { color: '#78909C' } },
+          { value: 8, name: '其他', itemStyle: { color: '#455A64' } }
+        ]
+      }
+    ]
+  };
+
+  myChart.setOption(option);
+</script>
+
+
+</body></html>

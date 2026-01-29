@@ -1,0 +1,400 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    /* Background Decoration */
+    .bg-shape {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 300px;
+        background: linear-gradient(180deg, #e0e4e8 0%, #f0f2f5 100%);
+        z-index: -1;
+    }
+
+    /* Layout Grid */
+    .container {
+        display: grid;
+        grid-template-rows: 80px 1fr 100px;
+        height: 100%;
+        padding: 40px 60px;
+        gap: 20px;
+    }
+
+    /* Header */
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: 2px solid #d1d5db;
+        padding-bottom: 20px;
+    }
+    h1 {
+        font-size: 36px;
+        font-weight: 900;
+        color: #1f2937;
+        letter-spacing: 1px;
+    }
+    .subtitle {
+        font-size: 20px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    /* Main Content */
+    .main-content {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr 1fr;
+        gap: 30px;
+        align-items: center;
+    }
+
+    /* Cards */
+    .card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        height: 100%;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        z-index: 2;
+    }
+
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: white;
+        margin-right: 15px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #111;
+    }
+    .card-role {
+        font-size: 14px;
+        color: #666;
+        font-weight: 500;
+    }
+
+    .feature-list {
+        list-style: none;
+        z-index: 2;
+    }
+    .feature-list li {
+        margin-bottom: 15px;
+        display: flex;
+        align-items: flex-start;
+        font-size: 16px;
+        color: #4b5563;
+        line-height: 1.5;
+    }
+    .feature-list li i {
+        margin-right: 10px;
+        margin-top: 4px;
+        font-size: 14px;
+    }
+
+    /* AE Specifics */
+    .ae-card { border-top: 6px solid #00897b; }
+    .ae-icon { background: linear-gradient(135deg, #00897b, #4db6ac); }
+    .ae-text { color: #00695c; }
+    
+    /* PE Specifics */
+    .pe-card { border-top: 6px solid #e65100; }
+    .pe-icon { background: linear-gradient(135deg, #e65100, #ff9800); }
+    .pe-text { color: #bf360c; }
+
+    /* Chart Area */
+    .chart-wrapper {
+        background: white;
+        border-radius: 16px;
+        height: 100%;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .chart-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #374151;
+        margin-bottom: 10px;
+        text-align: center;
+    }
+    #radarChart {
+        width: 100%;
+        height: 360px;
+    }
+
+    /* Footer / Insights */
+    .insights {
+        background: white;
+        border-radius: 12px;
+        padding: 0 30px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        border-left: 8px solid #374151;
+    }
+    .insight-item {
+        display: flex;
+        flex-direction: column;
+        width: 48%;
+    }
+    .insight-label {
+        font-size: 14px;
+        font-weight: 700;
+        color: #9ca3af;
+        text-transform: uppercase;
+        margin-bottom: 5px;
+    }
+    .insight-text {
+        font-size: 18px;
+        font-weight: 500;
+        color: #1f2937;
+    }
+    .divider {
+        width: 1px;
+        height: 50px;
+        background-color: #e5e7eb;
+    }
+
+    /* Decorative background numbers */
+    .bg-number {
+        position: absolute;
+        bottom: -20px;
+        right: -10px;
+        font-size: 120px;
+        font-weight: 900;
+        opacity: 0.05;
+        z-index: 1;
+        line-height: 1;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="bg-shape"></div>
+  <div class="container">
+    
+    <!-- Header -->
+    <header style="border-bottom: none;">
+      <div>
+        <h1>应用工程师  流程工程师</h1>
+      </div>
+      
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+      
+      <!-- AE Card -->
+      <div class="card ae-card">
+        <div class="bg-number">AE</div>
+        <div class="card-header">
+          <div class="icon-box ae-icon">
+            <i class="fa-solid fa-user-gear"></i>
+          </div>
+          <div>
+            <div class="card-title">应用工程师</div>
+            <div class="card-role">Application Engineer</div>
+          </div>
+        </div>
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-check ae-text"></i>
+            <span><strong>核心关注：</strong>客户需求与场景落地</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check ae-text"></i>
+            <span><strong>工作模式：</strong>灵活多变，解决突发问题</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check ae-text"></i>
+            <span><strong>能力要求：</strong>技术广度 + 沟通协调</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check ae-text"></i>
+            <span><strong>产出物：</strong>解决方案、Demo、技术支持</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Chart Area -->
+      <div class="chart-wrapper">
+        <div class="chart-title">能力维度对比模型</div>
+        <div id="radarChart"></div>
+      </div>
+
+      <!-- PE Card -->
+      <div class="card pe-card">
+        <div class="bg-number">PE</div>
+        <div class="card-header">
+          <div class="icon-box pe-icon">
+            <i class="fa-solid fa-microchip"></i>
+          </div>
+          <div>
+            <div class="card-title">流程工程师</div>
+            <div class="card-role">Process Engineer</div>
+          </div>
+        </div>
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-check pe-text"></i>
+            <span><strong>核心关注：</strong>良率提升与制程稳定</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check pe-text"></i>
+            <span><strong>工作模式：</strong>严谨规范，SOP 标准化</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check pe-text"></i>
+            <span><strong>能力要求：</strong>技术深度 + 数据分析</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check pe-text"></i>
+            <span><strong>产出物：</strong>工艺规范、良率报告、改进案</span>
+          </li>
+        </ul>
+      </div>
+
+    </main>
+
+    <!-- Footer / Insights -->
+    <footer class="insights">
+      <div class="insight-item">
+        <span class="insight-label">AE 感悟</span>
+        <span class="insight-text">连接产品与市场的桥梁，不仅要懂技术，更要懂“人”与“场景”。</span>
+      </div>
+      <div class="divider"></div>
+      <div class="insight-item" style="align-items: flex-end; text-align: right;">
+        <span class="insight-label">PE 感悟</span>
+        <span class="insight-text">保障品质与效率的基石，在毫厘之间追求极致的稳定与优化。</span>
+      </div>
+    </footer>
+
+  </div>
+
+  <script>
+    // Initialize ECharts
+    var chartDom = document.getElementById('radarChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // Strictly disable animation
+      color: ['#00897b', '#e65100'],
+      legend: {
+        data: ['应用工程师 (AE)', '流程工程师 (PE)'],
+        bottom: 0,
+        textStyle: {
+            fontSize: 14,
+            fontFamily: 'Noto Sans SC'
+        }
+      },
+      radar: {
+        indicator: [
+          { name: '对外沟通\nCommunication', max: 100 },
+          { name: '技术广度\nBreadth', max: 100 },
+          { name: '应变能力\nAgility', max: 100 },
+          { name: '技术深度\nDepth', max: 100 },
+          { name: '规范执行\nStandardization', max: 100 },
+          { name: '数据分析\nData Analysis', max: 100 }
+        ],
+        radius: '65%',
+        center: ['50%', '45%'],
+        splitNumber: 4,
+        axisName: {
+          color: '#6b7280',
+          fontSize: 12,
+          fontWeight: 'bold'
+        },
+        splitArea: {
+          areaStyle: {
+            color: ['#f8fafc', '#f1f5f9', '#e2e8f0', '#cbd5e1'],
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        axisLine: {
+            lineStyle: {
+                color: 'rgba(0,0,0,0.1)'
+            }
+        },
+        splitLine: {
+            lineStyle: {
+                color: 'rgba(0,0,0,0.1)'
+            }
+        }
+      },
+      series: [
+        {
+          name: 'AE vs PE',
+          type: 'radar',
+          data: [
+            {
+              value: [95, 90, 90, 60, 50, 60],
+              name: '应用工程师 (AE)',
+              areaStyle: {
+                color: 'rgba(0, 137, 123, 0.2)'
+              },
+              lineStyle: {
+                  width: 3
+              },
+              symbol: 'circle',
+              symbolSize: 6
+            },
+            {
+              value: [50, 60, 50, 95, 95, 90],
+              name: '流程工程师 (PE)',
+              areaStyle: {
+                color: 'rgba(230, 81, 0, 0.2)'
+              },
+              lineStyle: {
+                  width: 3
+              },
+              symbol: 'circle',
+              symbolSize: 6
+            }
+          ]
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

@@ -1,0 +1,108 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  /* 浅色主题：温暖米白配金铜色 */
+  --main-bg: #faf8f5;
+  --panel-bg: #ffffff;
+  --card-bg: #f7f5f2;
+  --input-bg: #f2f0ed;
+  --hover-bg: #edeae5;
+  
+  --border-color: #e0dbd4;
+  
+  --text-primary: #2c2825;
+  --text-secondary: #6b6560;
+  --text-tertiary: #9a948d;
+  
+  /* 强调色：温暖金铜色 */
+  --accent-color: #b87333;
+  --accent-hover: #a5652d;
+  --accent-light: #daa06d;
+  --accent-gradient: linear-gradient(135deg, #c9884a 0%, #b87333 100%);
+  --accent-bg: rgba(184, 115, 51, 0.08);
+  
+  --success-color: #2e9e5a;
+  --error-color: #d64545;
+  --warning-color: #d4940a;
+  
+  --shadow-sm: 0 1px 3px rgba(44, 40, 37, 0.06);
+  --shadow-md: 0 4px 12px rgba(44, 40, 37, 0.08);
+  --shadow-lg: 0 8px 24px rgba(44, 40, 37, 0.12);
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  font-family: 'Crimson Pro', 'Noto Serif SC', Georgia, serif;
+  background: var(--main-bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#app {
+  height: 100%;
+  width: 100%;
+}
+
+/* 滚动条 */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary);
+}
+
+::selection {
+  background: rgba(184, 115, 51, 0.2);
+  color: inherit;
+}
+
+button {
+  font-family: inherit;
+}
+
+textarea, input, select {
+  font-family: 'Inter', 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+textarea::placeholder,
+input::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* 动画 */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 基础重置与布局 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f4f8;
+        color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 50px 60px;
+    }
+
+    /* 头部设计 - 仅包含主标题 */
+    header {
+        height: 100px;
+        display: flex;
+        align-items: center;
+        margin-bottom: 30px;
+        position: relative;
+    }
+    
+    header h1 {
+        font-size: 48px;
+        font-weight: 900;
+        color: #1e293b;
+        letter-spacing: 2px;
+        position: relative;
+        padding-left: 20px;
+        border-left: 10px solid #00897b; /* 深青色强调条 */
+        line-height: 1;
+    }
+
+    /* 主体网格布局 */
+    .main-content {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr); /* 6列网格以实现3上2下的布局 */
+        grid-template-rows: repeat(2, 1fr);
+        gap: 30px;
+        padding-bottom: 20px;
+    }
+
+    /* 卡片通用样式 */
+    .step-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        position: relative;
+        border-top: 5px solid transparent;
+    }
+
+    /* 卡片具体布局控制 */
+    .step-card.top-row {
+        grid-column: span 2; /* 上排每个卡片占2列，共3个 */
+    }
+    
+    .step-card.bottom-row {
+        grid-column: span 3; /* 下排每个卡片占3列，共2个 */
+    }
+
+    /* 卡片色彩定义 */
+    .card-1 { border-top-color: #4db6ac; }
+    .card-2 { border-top-color: #26a69a; }
+    .card-3 { border-top-color: #009688; }
+    .card-4 { border-top-color: #00897b; }
+    .card-5 { border-top-color: #00796b; }
+
+    /* 卡片内容样式 */
+    .step-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 15px;
+    }
+
+    .icon-box {
+        width: 60px;
+        height: 60px;
+        background: #e0f2f1;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: #00796b;
+        margin-right: 20px;
+        flex-shrink: 0;
+    }
+
+    .step-number {
+        font-size: 40px;
+        font-weight: 900;
+        color: #eceff1;
+        position: absolute;
+        top: 15px;
+        right: 20px;
+        line-height: 1;
+    }
+
+    .step-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #37474f;
+    }
+
+    .step-desc {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #546e7a;
+        background: #fafafa;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid #cfd8dc;
+        height: 100%; /* 撑满剩余高度 */
+        display: flex;
+        align-items: center;
+    }
+    
+    /* 底部总结栏特别样式 */
+    .bottom-row .step-desc {
+        font-size: 20px; /* 下排文字略大 */
+    }
+
+  </style>
+</head>
+<body>
+<!-- 修复判断：符合要求，固定尺寸无溢出无动画。 -->
+
+<div class="container">
+  <header>
+    <h1>客户投诉处理标准流程</h1>
+  </header>
+
+  <div class="main-content">
+    
+    <!-- 第一步 -->
+    <div class="step-card top-row card-1">
+      <div class="step-number">01</div>
+      <div class="step-header">
+        <div class="icon-box"><i class="fa-solid fa-hand-holding-heart"></i></div>
+        <div class="step-title">安抚情绪</div>
+      </div>
+      <div class="step-desc">
+        首先要安抚客户情绪，真诚表示歉意，建立沟通基础。
+      </div>
+    </div>
+
+    <!-- 第二步 -->
+    <div class="step-card top-row card-2">
+      <div class="step-number">02</div>
+      <div class="step-header">
+        <div class="icon-box"><i class="fa-solid fa-file-pen"></i></div>
+        <div class="step-title">了解记录</div>
+      </div>
+      <div class="step-desc">
+        耐心倾听了解具体情况，将关键信息详细记录下来。
+      </div>
+    </div>
+
+    <!-- 第三步 -->
+    <div class="step-card top-row card-3">
+      <div class="step-number">03</div>
+      <div class="step-header">
+        <div class="icon-box"><i class="fa-solid fa-clipboard-check"></i></div>
+        <div class="step-title">提出方案</div>
+      </div>
+      <div class="step-desc">
+        给出切实可行的解决方案，并明确承诺解决的时间节点。
+      </div>
+    </div>
+
+    <!-- 第四步 -->
+    <div class="step-card bottom-row card-4">
+      <div class="step-number">04</div>
+      <div class="step-header">
+        <div class="icon-box"><i class="fa-solid fa-phone-volume"></i></div>
+        <div class="step-title">回访确认</div>
+      </div>
+      <div class="step-desc">
+        问题处理完毕后进行主动回访，确认客户对处理结果满意，形成闭环。
+      </div>
+    </div>
+
+    <!-- 第五步 -->
+    <div class="step-card bottom-row card-5">
+      <div class="step-number">05</div>
+      <div class="step-header">
+        <div class="icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+        <div class="step-title">总结预防</div>
+      </div>
+      <div class="step-desc">
+        复盘案例，总结经验教训，优化服务流程，防止类似问题再次发生。
+      </div>
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>

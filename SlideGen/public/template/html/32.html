@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>教育市场深度布局</title>
+    <style>
+        :root {
+            --bg-dark: #1a1d21;
+            --card-bg: #2a2e35;
+            --primary-cyan: #40e0d0;
+            --text-white: #ffffff;
+            --text-gray: #a0a5ad;
+            --accent-cyan: rgba(64, 224, 208, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1280px;
+            height: 720px;
+            background-color: var(--bg-dark);
+            position: relative;
+            padding: 35px 50px;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-white);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header-tag {
+            font-size: 13px;
+            color: var(--primary-cyan);
+            border-left: 3px solid var(--primary-cyan);
+            padding-left: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .main-title {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        /* Top Stats Grid */
+        .top-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+        }
+
+        .stat-card.active {
+            border: 1px solid rgba(64, 224, 208, 0.4);
+            box-shadow: 0 0 15px rgba(64, 224, 208, 0.1);
+        }
+
+        .stat-icon {
+            font-size: 24px;
+            color: var(--primary-cyan);
+            margin-bottom: 8px;
+        }
+
+        .stat-value {
+            font-size: 42px;
+            font-weight: 900;
+            color: var(--primary-cyan);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-gray);
+        }
+
+        /* Bottom Content */
+        .bottom-content {
+            display: grid;
+            grid-template-columns: 1.2fr 0.8fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* University Grid */
+        .uni-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            flex: 1;
+        }
+
+        .uni-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            padding: 12px 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .uni-name {
+            font-size: 15px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .uni-name::before {
+            content: "🎓";
+            font-size: 14px;
+            color: var(--primary-cyan);
+        }
+
+        .uni-desc {
+            font-size: 12px;
+            color: var(--text-gray);
+        }
+
+        /* Right Column Stack */
+        .right-col {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .sub-card {
+            flex: 1;
+        }
+
+        .strategy-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .strategy-item {
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .strategy-num {
+            font-size: 18px;
+            font-weight: 900;
+            color: var(--primary-cyan);
+            line-height: 1;
+        }
+
+        .strategy-text {
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .strategy-text b { color: var(--text-white); margin-right: 5px; }
+
+        .impact-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .impact-item {
+            display: flex;
+            gap: 10px;
+            font-size: 13.5px;
+            line-height: 1.4;
+            color: var(--text-gray);
+        }
+
+        .impact-icon { color: var(--primary-cyan); font-weight: bold; }
+        .impact-item span b { color: var(--text-white); }
+
+        .social-card {
+            border: 1px solid rgba(64, 224, 208, 0.2);
+            background-color: rgba(64, 224, 208, 0.02);
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-tag">PROJECT 03 · EDUCATION</div>
+            <h1 class="main-title">教育市场深度布局</h1>
+        </div>
+
+        <div class="top-stats">
+            <div class="stat-card active">
+                <span class="stat-icon">🏛️</span>
+                <span class="stat-value">近400</span>
+                <span class="stat-label">服务高校总数</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">👨‍🏫</span>
+                <span class="stat-value">200+</span>
+                <span class="stat-label">一体化教学平台</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-icon">🏅</span>
+                <span class="stat-value">1项</span>
+                <span class="stat-label">年度社会责任案例</span>
+            </div>
+        </div>
+
+        <div class="bottom-content">
+            <!-- Left: University Cases -->
+            <div class="card">
+                <div class="card-title">TOP20名校合作案例（部分）</div>
+                <div class="uni-grid">
+                    <div class="uni-item">
+                        <div class="uni-name">清华大学</div>
+                        <div class="uni-desc">全校师生智能化协同办公新模式</div>
+                    </div>
+                    <div class="uni-item">
+                        <div class="uni-name">中国人民大学</div>
+                        <div class="uni-desc">WPS 365教育版深度应用示范校</div>
+                    </div>
+                    <div class="uni-item">
+                        <div class="uni-name">浙江大学</div>
+                        <div class="uni-desc">教学管理全流程数字化解决方案</div>
+                    </div>
+                    <div class="uni-item">
+                        <div class="uni-name">复旦大学</div>
+                        <div class="uni-desc">智慧校园协同办公标杆案例</div>
+                    </div>
+                    <div class="uni-item">
+                        <div class="uni-name">上海交通大学</div>
+                        <div class="uni-desc">AI赋能教学创新实践基地</div>
+                    </div>
+                    <div class="uni-item">
+                        <div class="uni-name">中山大学</div>
+                        <div class="uni-desc">多校区协同办公平台典范</div>
+                    </div>
+                    <div class="uni-item">
+                        <div class="uni-name">四川大学</div>
+                        <div class="uni-desc">西南区域教育数字化转型样板</div>
+                    </div>
+                    <div class="uni-item">
+                        <div class="uni-name">华中科技大学</div>
+                        <div class="uni-desc">教学研一体化协同平台</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Strategy & Impact -->
+            <div class="right-col">
+                <div class="card sub-card">
+                    <div class="card-title"><span style="color:var(--primary-cyan)">🎯</span> 市场策略</div>
+                    <div class="strategy-list">
+                        <div class="strategy-item">
+                            <span class="strategy-num">1</span>
+                            <div class="strategy-text"><b>WPS 365教育版:</b> 搭建"学练考评管"一体化教学平台</div>
+                        </div>
+                        <div class="strategy-item">
+                            <span class="strategy-num">2</span>
+                            <div class="strategy-text"><b>校企合作:</b> 与顶尖高校建立战略合作关系</div>
+                        </div>
+                        <div class="strategy-item">
+                            <span class="strategy-num">3</span>
+                            <div class="strategy-text"><b>示范引领:</b> 打造可复制推广的智慧校园方案</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card sub-card social-card">
+                    <div class="card-title"><span style="color:var(--primary-cyan)">🤝</span> 社会影响</div>
+                    <div class="impact-list">
+                        <div class="impact-item">
+                            <span class="impact-icon">✓</span>
+                            <span>入选36氪WISE 2024商业之王"年度社会责任案例"</span>
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-icon">✓</span>
+                            <span>助力基层教育数字化转型，缩小城乡教育差距</span>
+                        </div>
+                        <div class="impact-item">
+                            <span class="impact-icon">✓</span>
+                            <span>推动AI+教育融合，赋能教育高质量发展</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

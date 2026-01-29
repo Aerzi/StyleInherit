@@ -1,0 +1,397 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* Layout Grid */
+    .container {
+      display: grid;
+      grid-template-rows: 80px 1fr;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      padding: 40px;
+      height: 100%;
+    }
+
+    /* Header */
+    .header {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 10px;
+    }
+
+    .title-group h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #1a1a1a;
+      letter-spacing: 1px;
+    }
+
+    .title-group p {
+      font-size: 18px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .header-icon {
+      font-size: 32px;
+      color: #546e7a;
+    }
+
+    /* Main Content Area */
+    .content-left {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .content-right {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Strategy Cards */
+    .strategy-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      border-left: 6px solid transparent;
+    }
+
+    .card-single {
+      border-left-color: #00897b; /* Teal */
+    }
+
+    .card-multi {
+      border-left-color: #e65100; /* Deep Orange */
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-right: 16px;
+      color: white;
+    }
+
+    .single-icon-bg { background: linear-gradient(135deg, #26a69a, #00695c); }
+    .multi-icon-bg { background: linear-gradient(135deg, #ff7043, #bf360c); }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: #777;
+      font-weight: 500;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 12px;
+      font-size: 15px;
+      line-height: 1.5;
+      color: #444;
+    }
+
+    .feature-list li i {
+      margin-right: 10px;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .check-single { color: #00897b; }
+    .check-multi { color: #e65100; }
+
+    /* Chart Section */
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .chart-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .chart-legend-custom {
+      display: flex;
+      gap: 15px;
+      font-size: 14px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+    }
+    
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    #penetrationChart {
+      width: 100%;
+      height: 100%;
+      flex: 1;
+    }
+
+    /* Key Insight Box */
+    .insight-box {
+      margin-top: 15px;
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      border-left: 4px solid #546e7a;
+    }
+    
+    .insight-title {
+      font-weight: 700;
+      font-size: 14px;
+      color: #2c3e50;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+    
+    .insight-text {
+      font-size: 14px;
+      color: #555;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <div class="header" style="border-bottom: none;">
+      <div class="title-group">
+        <h1>单一品牌 vs 多品牌策略</h1>
+        
+      </div>
+      
+    </div>
+
+    <!-- Left Column: Strategy Comparison -->
+    <div class="content-left">
+      
+      <!-- Single Brand Card -->
+      <div class="strategy-card card-single">
+        <div class="card-header">
+          <div class="card-icon single-icon-bg">
+            <i class="fa-solid fa-bullseye"></i>
+          </div>
+          <div>
+            <div class="card-title">单一品牌策略</div>
+            <div class="card-subtitle">资源聚焦 · 深度渗透</div>
+          </div>
+        </div>
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-check check-single"></i>
+            <span><strong>资源集中：</strong> 营销预算与研发力量集中，打造核心竞争力。</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check check-single"></i>
+            <span><strong>品牌认知：</strong> 形象统一，用户心智占领快，忠诚度高。</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-minus" style="color: #999;"></i>
+            <span><strong>局限性：</strong> 难以跨越价格带或满足差异化极大的细分市场。</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Multi Brand Card -->
+      <div class="strategy-card card-multi">
+        <div class="card-header">
+          <div class="card-icon multi-icon-bg">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div>
+            <div class="card-title">多品牌策略</div>
+            <div class="card-subtitle">全面覆盖 · 广度渗透</div>
+          </div>
+        </div>
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-check check-multi"></i>
+            <span><strong>全域覆盖：</strong> 通过不同子品牌切入高、中、低端及细分市场。</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-check check-multi"></i>
+            <span><strong>风险分散：</strong> 单一品牌危机不会波及整个集团，构筑护城河。</span>
+          </li>
+          <li>
+            <i class="fa-solid fa-minus" style="color: #999;"></i>
+            <span><strong>挑战：</strong> 资源分散，管理成本高，可能出现品牌内部蚕食。</span>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Right Column: Data Visualization -->
+    <div class="content-right">
+      <div class="chart-header">
+        <div class="chart-title">市场细分渗透率模拟数据</div>
+        <div class="chart-legend-custom">
+          <div class="legend-item"><div class="dot" style="background: #00897b;"></div>单一品牌</div>
+          <div class="legend-item"><div class="dot" style="background: #ff7043;"></div>多品牌 A</div>
+          <div class="legend-item"><div class="dot" style="background: #ffb74d;"></div>多品牌 B</div>
+          <div class="legend-item"><div class="dot" style="background: #ffe0b2;"></div>多品牌 C</div>
+        </div>
+      </div>
+      
+      <div id="penetrationChart"></div>
+
+      <div class="insight-box">
+        <div class="insight-title"><i class="fa-solid fa-lightbulb"></i> 核心洞察</div>
+        <div class="insight-text">
+          单一品牌在特定细分市场（如中端大众）能达到极高的渗透深度，但在高端或利基市场表现乏力。多品牌策略通过组合拳，虽然单品牌份额较低，但集团总市场占有率（Total Share）显著更高，实现了对市场的全面封锁。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Initialize ECharts
+    var chartDom = document.getElementById('penetrationChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // Strictly disable animation
+      grid: {
+        top: '10%',
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' }
+      },
+      xAxis: {
+        type: 'category',
+        data: ['价格敏感型', '大众实用型', '品质追求型', '高端奢华型'],
+        axisLine: { lineStyle: { color: '#ccc' } },
+        axisLabel: { color: '#666', fontSize: 14, fontWeight: 'bold' }
+      },
+      yAxis: {
+        type: 'value',
+        name: '市场渗透率 (%)',
+        max: 100,
+        splitLine: { lineStyle: { type: 'dashed', color: '#eee' } },
+        axisLabel: { color: '#888' }
+      },
+      series: [
+        {
+          name: '单一品牌',
+          type: 'bar',
+          barWidth: '25%',
+          data: [15, 65, 20, 5], // Strong in mass market, weak elsewhere
+          itemStyle: {
+            color: '#00897b',
+            borderRadius: [4, 4, 0, 0]
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}%',
+            color: '#00897b',
+            fontWeight: 'bold'
+          }
+        },
+        {
+          name: '多品牌组合', // Invisible series for spacing/legend logic if needed, but here we stack
+          type: 'bar',
+          barWidth: '25%',
+          barGap: '40%', // Gap between Single and Multi groups
+          stack: 'Multi',
+          data: [40, 0, 0, 0], // Brand A (Low end)
+          itemStyle: { color: '#ffe0b2' }
+        },
+        {
+          name: '多品牌 B',
+          type: 'bar',
+          stack: 'Multi',
+          data: [0, 45, 10, 0], // Brand B (Mid range)
+          itemStyle: { color: '#ffb74d' }
+        },
+        {
+          name: '多品牌 C',
+          type: 'bar',
+          stack: 'Multi',
+          data: [0, 0, 35, 55], // Brand C (High end)
+          itemStyle: { 
+            color: '#ff7043',
+            borderRadius: [4, 4, 0, 0] 
+          },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params) => {
+              // Calculate total for the stack manually for display
+              const totals = [40, 45, 45, 55]; 
+              return totals[params.dataIndex] + '%';
+            },
+            color: '#e65100',
+            fontWeight: 'bold'
+          }
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

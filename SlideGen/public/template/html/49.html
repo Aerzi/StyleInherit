@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 基础重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Noto Sans SC', sans-serif; background-color: #f0f2f5; color: #333; }
+
+    /* 布局结构 */
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 头部设计 - 严格符合Header要求 */
+    header {
+      height: 90px;
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 36px;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    /* 主体内容网格 */
+    .container {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 20px;
+      padding: 25px 40px;
+      background-color: #e5e9f0; /* 填充背景色 */
+    }
+
+    /* 流程卡片 */
+    .step-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      border-left: 6px solid #ddd;
+    }
+
+    /* 卡片颜色区分 (大地色系/装修色系，避免蓝紫) */
+    .step-1 { border-left-color: #e67e22; } /* 设计 - 橙色 */
+    .step-2 { border-left-color: #c0392b; } /* 拆改 - 红色 */
+    .step-3 { border-left-color: #2980b9; } /* 水电 - 蓝色(非紫) */
+    .step-4 { border-left-color: #27ae60; } /* 木瓦油 - 绿色 */
+    .step-5 { border-left-color: #7f8c8d; } /* 安装 - 灰色 */
+    .step-6 { border-left-color: #d35400; } /* 软装 - 深橙 */
+
+    /* 步骤序号背景 */
+    .step-bg-num {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      font-size: 60px;
+      font-weight: 900;
+      color: rgba(0,0,0,0.03);
+      line-height: 1;
+      pointer-events: none;
+    }
+
+    /* 卡片头部 */
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: #fff;
+      margin-right: 15px;
+      flex-shrink: 0;
+    }
+
+    /* 图标背景色 */
+    .step-1 .icon-box { background: linear-gradient(135deg, #e67e22, #f39c12); }
+    .step-2 .icon-box { background: linear-gradient(135deg, #c0392b, #e74c3c); }
+    .step-3 .icon-box { background: linear-gradient(135deg, #2980b9, #3498db); }
+    .step-4 .icon-box { background: linear-gradient(135deg, #27ae60, #2ecc71); }
+    .step-5 .icon-box { background: linear-gradient(135deg, #7f8c8d, #95a5a6); }
+    .step-6 .icon-box { background: linear-gradient(135deg, #d35400, #e67e22); }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    /* 列表内容 */
+    .task-list {
+      list-style: none;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-around; /* 均匀分布减少留白 */
+    }
+
+    .task-item {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
+      color: #555;
+      background-color: #f8f9fa;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    .task-item i {
+      color: #7f8c8d;
+      margin-right: 10px;
+      font-size: 12px;
+    }
+    
+    /* 阶段标签 */
+    .phase-badge {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 4px;
+      opacity: 0.6;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 修复想法：使用网格布局严格控制尺寸，无动画，内容填满视口 -->
+  
+  <header>
+    <h1>家庭装修全流程指南</h1>
+  </header>
+
+  <main class="container">
+    
+    <!-- 阶段 1: 设计 -->
+    <div class="step-card step-1">
+      <div class="step-bg-num">01</div>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-compass-drafting"></i></div>
+        <div>
+          <div class="phase-badge">Phase 01</div>
+          <div class="card-title">前期设计</div>
+        </div>
+      </div>
+      <ul class="task-list">
+        <li class="task-item"><i class="fa-solid fa-check"></i> 房屋现场量房与尺寸确认</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 确定装修风格与主体色调</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 制定装修预算与材料清单</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 签订装修合同与施工图纸</li>
+      </ul>
+    </div>
+
+    <!-- 阶段 2: 拆改 -->
+    <div class="step-card step-2">
+      <div class="step-bg-num">02</div>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-hammer"></i></div>
+        <div>
+          <div class="phase-badge">Phase 02</div>
+          <div class="card-title">主体拆改</div>
+        </div>
+      </div>
+      <ul class="task-list">
+        <li class="task-item"><i class="fa-solid fa-check"></i> 墙体拆除与垃圾清运</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 砌墙与新建隔断</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 铲除墙皮与窗户拆旧</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 暖气与燃气管道改造报备</li>
+      </ul>
+    </div>
+
+    <!-- 阶段 3: 水电 -->
+    <div class="step-card step-3">
+      <div class="step-bg-num">03</div>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-bolt"></i></div>
+        <div>
+          <div class="phase-badge">Phase 03</div>
+          <div class="card-title">水电改造</div>
+        </div>
+      </div>
+      <ul class="task-list">
+        <li class="task-item"><i class="fa-solid fa-check"></i> 强弱电点位定位与开槽</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 给排水管道铺设与打压</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 强弱电穿线与绝缘测试</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 厨卫防水施工与闭水试验</li>
+      </ul>
+    </div>
+
+    <!-- 阶段 4: 木瓦油 -->
+    <div class="step-card step-4">
+      <div class="step-bg-num">04</div>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-paint-roller"></i></div>
+        <div>
+          <div class="phase-badge">Phase 04</div>
+          <div class="card-title">木瓦油工</div>
+        </div>
+      </div>
+      <ul class="task-list">
+        <li class="task-item"><i class="fa-solid fa-check"></i> 瓦工：地面找平、瓷砖铺贴</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 木工：吊顶制作、背景墙打底</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 油工：墙面基层处理、腻子</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 油工：乳胶漆/壁纸/硅藻泥</li>
+      </ul>
+    </div>
+
+    <!-- 阶段 5: 安装 -->
+    <div class="step-card step-5">
+      <div class="step-bg-num">05</div>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-screwdriver-wrench"></i></div>
+        <div>
+          <div class="phase-badge">Phase 05</div>
+          <div class="card-title">主材安装</div>
+        </div>
+      </div>
+      <ul class="task-list">
+        <li class="task-item"><i class="fa-solid fa-check"></i> 厨卫吊顶与橱柜安装</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 木门、地板与踢脚线安装</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 开关插座与灯具安装</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 洁具、五金件与窗帘杆</li>
+      </ul>
+    </div>
+
+    <!-- 阶段 6: 软装 -->
+    <div class="step-card step-6">
+      <div class="step-bg-num">06</div>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-couch"></i></div>
+        <div>
+          <div class="phase-badge">Phase 06</div>
+          <div class="card-title">软装入住</div>
+        </div>
+      </div>
+      <ul class="task-list">
+        <li class="task-item"><i class="fa-solid fa-check"></i> 全屋开荒保洁</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 家具进场与家电调试</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 窗帘、地毯、装饰画搭配</li>
+        <li class="task-item"><i class="fa-solid fa-check"></i> 通风除醛与乔迁入住</li>
+      </ul>
+    </div>
+
+  </main>
+</body>
+</html>

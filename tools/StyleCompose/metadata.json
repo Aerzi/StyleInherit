@@ -1,0 +1,5 @@
+{
+  "name": "PPT视觉基因对比审计工具",
+  "description": "基于 Gemini 3 Flash 的专业 PPT 视觉一致性审计工具，通过深度多模态分析，确保演示文稿的品牌视觉基因高度统一。",
+  "requestFramePermissions": []
+}

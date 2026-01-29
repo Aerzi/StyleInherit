@@ -1,0 +1,421 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+      display: grid;
+      grid-template-rows: 80px 1fr;
+      height: 100%;
+      padding: 30px 40px;
+      gap: 20px;
+    }
+
+    /* 头部样式 */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fff;
+      padding: 0 30px;
+      border-radius: 12px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border-left: 6px solid #2c3e50;
+    }
+
+    .header-title h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1f2937;
+      letter-spacing: 1px;
+    }
+
+    .header-title span {
+      font-size: 16px;
+      color: #6b7280;
+      margin-left: 15px;
+      font-weight: 400;
+    }
+
+    .header-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: #6b7280;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f3f4f6;
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      display: grid;
+      grid-template-columns: 2fr 1fr; /* 左侧图表宽，右侧卡片窄 */
+      gap: 24px;
+      height: 100%;
+    }
+
+    /* 左侧图表卡片 */
+    .chart-card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    #performanceChart {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 右侧数据卡片列表 */
+    .stats-column {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 100%;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+      border-left: 5px solid transparent;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 等级颜色定义 */
+    .grade-s { border-left-color: #f59e0b; }
+    .grade-a { border-left-color: #10b981; }
+    .grade-b { border-left-color: #3b82f6; }
+    .grade-c { border-left-color: #64748b; }
+    .grade-d { border-left-color: #ef4444; }
+
+    /* 卡片内部布局 */
+    .stat-left {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .grade-badge {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .bg-s { background: linear-gradient(135deg, #fcd34d, #f59e0b); }
+    .bg-a { background: linear-gradient(135deg, #34d399, #10b981); }
+    .bg-b { background: linear-gradient(135deg, #60a5fa, #3b82f6); }
+    .bg-c { background: linear-gradient(135deg, #94a3b8, #64748b); }
+    .bg-d { background: linear-gradient(135deg, #f87171, #ef4444); }
+
+    .stat-info h3 {
+      font-size: 14px;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .stat-info p {
+      font-size: 12px;
+      color: #9ca3af;
+    }
+
+    .stat-right {
+      text-align: right;
+    }
+
+    .stat-count {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1f2937;
+      line-height: 1.2;
+    }
+
+    .stat-percent {
+      font-size: 14px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+
+    .text-s { color: #d97706; background: #fef3c7; }
+    .text-a { color: #059669; background: #d1fae5; }
+    .text-b { color: #2563eb; background: #dbeafe; }
+    .text-c { color: #475569; background: #f1f5f9; }
+    .text-d { color: #dc2626; background: #fee2e2; }
+
+    /* 装饰性背景图标 */
+    .card-bg-icon {
+      position: absolute;
+      right: -10px;
+      bottom: -10px;
+      font-size: 80px;
+      opacity: 0.05;
+      color: #000;
+      z-index: 0;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header style="border-bottom: none;">
+      <div class="header-title">
+        <h1> 员工绩效分布概览</h1>
+        
+      </div>
+      
+    </header>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      
+      <!-- 左侧：ECharts 图表 -->
+      <div class="chart-card">
+        <div class="card-title">
+          <i class="fa-solid fa-wave-square" style="color: #3b82f6;"></i>
+          正态分布模型分析
+        </div>
+        <div id="performanceChart"></div>
+      </div>
+
+      <!-- 右侧：统计卡片 -->
+      <div class="stats-column">
+        
+        <!-- S级 -->
+        <div class="stat-card grade-s">
+          <i class="fa-solid fa-trophy card-bg-icon"></i>
+          <div class="stat-left">
+            <div class="grade-badge bg-s">S</div>
+            <div class="stat-info">
+              <h3>卓越绩效</h3>
+              <p>远超预期目标</p>
+            </div>
+          </div>
+          <div class="stat-right">
+            <div class="stat-count">42</div>
+            <div class="stat-percent text-s">5%</div>
+          </div>
+        </div>
+
+        <!-- A级 -->
+        <div class="stat-card grade-a">
+          <i class="fa-solid fa-thumbs-up card-bg-icon"></i>
+          <div class="stat-left">
+            <div class="grade-badge bg-a">A</div>
+            <div class="stat-info">
+              <h3>优秀绩效</h3>
+              <p>超出预期目标</p>
+            </div>
+          </div>
+          <div class="stat-right">
+            <div class="stat-count">170</div>
+            <div class="stat-percent text-a">20%</div>
+          </div>
+        </div>
+
+        <!-- B级 -->
+        <div class="stat-card grade-b">
+          <i class="fa-solid fa-user-check card-bg-icon"></i>
+          <div class="stat-left">
+            <div class="grade-badge bg-b">B</div>
+            <div class="stat-info">
+              <h3>良好绩效</h3>
+              <p>符合预期目标</p>
+            </div>
+          </div>
+          <div class="stat-right">
+            <div class="stat-count">425</div>
+            <div class="stat-percent text-b">50%</div>
+          </div>
+        </div>
+
+        <!-- C级 -->
+        <div class="stat-card grade-c">
+          <i class="fa-solid fa-circle-exclamation card-bg-icon"></i>
+          <div class="stat-left">
+            <div class="grade-badge bg-c">C</div>
+            <div class="stat-info">
+              <h3>需改进</h3>
+              <p>部分符合预期</p>
+            </div>
+          </div>
+          <div class="stat-right">
+            <div class="stat-count">170</div>
+            <div class="stat-percent text-c">20%</div>
+          </div>
+        </div>
+
+        <!-- D级 -->
+        <div class="stat-card grade-d">
+          <i class="fa-solid fa-triangle-exclamation card-bg-icon"></i>
+          <div class="stat-left">
+            <div class="grade-badge bg-d">D</div>
+            <div class="stat-info">
+              <h3>不合格</h3>
+              <p>未达标</p>
+            </div>
+          </div>
+          <div class="stat-right">
+            <div class="stat-count">43</div>
+            <div class="stat-percent text-d">5%</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script>
+    // 初始化图表
+    var chartDom = document.getElementById('performanceChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    // 数据配置
+    // 为了展示正态分布（钟形曲线），X轴顺序设为 D -> C -> B -> A -> S
+    // 这样 B (50%) 在中间，形成高峰
+    const categories = ['D (不合格)', 'C (需改进)', 'B (良好)', 'A (优秀)', 'S (卓越)'];
+    const dataCounts = [43, 170, 425, 170, 42]; // 对应 D, C, B, A, S
+    const colors = ['#ef4444', '#64748b', '#3b82f6', '#10b981', '#f59e0b'];
+
+    option = {
+      animation: false, // 严格禁止动画
+      grid: {
+        top: '15%',
+        left: '3%',
+        right: '4%',
+        bottom: '5%',
+        containLabel: true
+      },
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        textStyle: { color: '#333' },
+        extraCssText: 'box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 8px;'
+      },
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLine: { lineStyle: { color: '#e5e7eb' } },
+        axisLabel: { 
+          color: '#4b5563',
+          fontWeight: 'bold',
+          fontSize: 14,
+          margin: 15
+        },
+        axisTick: { show: false }
+      },
+      yAxis: {
+        type: 'value',
+        name: '人数',
+        nameTextStyle: { color: '#9ca3af', padding: [0, 0, 0, 20] },
+        splitLine: { 
+          lineStyle: { 
+            type: 'dashed',
+            color: '#f3f4f6' 
+          } 
+        },
+        axisLabel: { color: '#9ca3af' }
+      },
+      series: [
+        {
+          name: '人数',
+          type: 'bar',
+          barWidth: '45%',
+          data: dataCounts,
+          itemStyle: {
+            color: function(params) {
+              return colors[params.dataIndex];
+            },
+            borderRadius: [6, 6, 0, 0]
+          },
+          label: {
+            show: true,
+            position: 'top',
+            color: '#374151',
+            fontSize: 16,
+            fontWeight: 'bold',
+            formatter: '{c}人'
+          }
+        },
+        {
+          name: '分布趋势',
+          type: 'line',
+          smooth: 0.4,
+          data: dataCounts,
+          symbol: 'circle',
+          symbolSize: 10,
+          itemStyle: {
+            color: '#2c3e50',
+            borderWidth: 2,
+            borderColor: '#fff'
+          },
+          lineStyle: {
+            width: 3,
+            color: '#2c3e50',
+            type: 'solid'
+          },
+          areaStyle: {
+            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: 'rgba(44, 62, 80, 0.1)' },
+              { offset: 1, color: 'rgba(44, 62, 80, 0)' }
+            ])
+          }
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

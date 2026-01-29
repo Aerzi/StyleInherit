@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 全局重置与基础设置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f4f8;
+        color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        padding: 40px 50px;
+        background: linear-gradient(180deg, #f0f4f8 0%, #e1e9f0 100%);
+    }
+
+    /* 头部区域 */
+    header {
+        flex: 0 0 auto;
+        margin-bottom: 30px;
+        text-align: center;
+        position: relative;
+    }
+
+    header h1 {
+        font-size: 42px;
+        font-weight: 900;
+        color: #004d40; /* 深青色，稳重 */
+        letter-spacing: 2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        position: relative;
+        display: inline-block;
+        padding-bottom: 15px;
+    }
+
+    header h1::after {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 4px;
+        background-color: #00897b; /* 稍亮的青色 */
+        border-radius: 2px;
+    }
+
+    /* 主体内容区域 */
+    .content-wrapper {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    /* 上半部分：行动/措施 (Actions) */
+    .actions-section {
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        background: white;
+        padding: 25px 40px;
+        border-radius: 16px;
+        box-shadow: 0 4px 15px rgba(0,77,64, 0.08);
+        border-left: 8px solid #004d40;
+    }
+
+    .action-intro {
+        flex: 0 0 280px;
+        font-size: 20px;
+        font-weight: 700;
+        color: #004d40;
+        line-height: 1.4;
+        margin-right: 30px;
+    }
+
+    .action-items {
+        flex: 1;
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+    }
+
+    .action-item {
+        flex: 1;
+        background-color: #e0f2f1;
+        padding: 15px 20px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        border: 1px solid #b2dfdb;
+    }
+
+    .action-icon {
+        width: 45px;
+        height: 45px;
+        background-color: #00796b;
+        color: white;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+    }
+
+    .action-text {
+        font-size: 20px;
+        font-weight: 700;
+        color: #004d40;
+    }
+
+    /* 下半部分：结果/影响 (Results) - 网格布局 */
+    .results-section {
+        flex: 1;
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 25px;
+    }
+
+    .result-card {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 顶部装饰条 */
+    .result-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 6px;
+    }
+    
+    .card-1::before { background-color: #0288d1; } /* 供排水 - 蓝色 */
+    .card-2::before { background-color: #ef6c00; } /* 税收监管 - 橙色 */
+    .card-3::before { background-color: #2e7d32; } /* 国企担当 - 绿色 */
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        gap: 15px;
+    }
+
+    .card-icon {
+        font-size: 32px;
+    }
+    .card-1 .card-icon { color: #0288d1; }
+    .card-2 .card-icon { color: #ef6c00; }
+    .card-3 .card-icon { color: #2e7d32; }
+
+    .card-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #333;
+    }
+
+    .card-body {
+        font-size: 18px;
+        line-height: 1.6;
+        color: #555;
+        text-align: justify;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+    }
+
+    .highlight {
+        font-weight: 700;
+        color: #000;
+    }
+  </style>
+</head>
+<body>
+<!-- 符合尺寸要求，无动画，布局紧凑，配色专业 -->
+  <div class="container">
+    <header>
+      <h1>做好做优水务业务，促进社会经济发展</h1>
+    </header>
+
+    <div class="content-wrapper">
+      <!-- 措施层：北投环保水务集团的动作 -->
+      <div class="actions-section">
+        <div class="action-intro">
+            合作实现后，<br>
+            北投环保水务集团<br>
+            <span style="font-size: 16px; color: #666; font-weight: 500;">采取三大核心举措赋能：</span>
+        </div>
+        <div class="action-items">
+            <div class="action-item">
+                <div class="action-icon"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+                <div class="action-text">优化债务结构</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon"><i class="fa-solid fa-chart-line"></i></div>
+                <div class="action-text">加大投资力度</div>
+            </div>
+            <div class="action-item">
+                <div class="action-icon"><i class="fa-solid fa-gears"></i></div>
+                <div class="action-text">强化运营管理</div>
+            </div>
+        </div>
+      </div>
+
+      <!-- 结果层：三大维度的影响 -->
+      <div class="results-section">
+        <!-- 居民服务维度 -->
+        <div class="result-card card-1">
+            <div class="card-header">
+                <i class="fa-solid fa-hand-holding-droplet card-icon"></i>
+                <div class="card-title">更优服务品质</div>
+            </div>
+            <div class="card-body">
+                为柳州市居民带来<span class="highlight">更好的供排水服务</span>。通过技术升级与管理优化，直接提升民生福祉，为柳州市打造一个更优质、更高效的现代化水务企业。
+            </div>
+        </div>
+
+        <!-- 政府监管维度 -->
+        <div class="result-card card-2">
+            <div class="card-header">
+                <i class="fa-solid fa-landmark card-icon"></i>
+                <div class="card-title">政企监管与税收</div>
+            </div>
+            <div class="card-body">
+                标的公司依旧为柳州市带来<span class="highlight">稳定税收</span>，持续贡献财政收入。同时，企业依旧受政府行业主管部门<span class="highlight">严格监管</span>，确保业务合规、透明运行。
+            </div>
+        </div>
+
+        <!-- 经济发展维度 -->
+        <div class="result-card card-3">
+            <div class="card-header">
+                <i class="fa-solid fa-city card-icon"></i>
+                <div class="card-title">国企担当与保障</div>
+            </div>
+            <div class="card-body">
+                一如既往地严格履行<span class="highlight">社会责任</span>，积极践行国企担当。作为基础设施骨干力量，为柳州市的整体<span class="highlight">经济发展</span>提供强有力的水务要素保障。
+            </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

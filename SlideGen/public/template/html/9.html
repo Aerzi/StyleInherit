@@ -1,0 +1,376 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    /* 背景装饰 */
+    .bg-decoration {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 300px;
+        background: linear-gradient(135deg, #e0e7ec 0%, #f0f2f5 100%);
+        z-index: -1;
+        border-bottom-right-radius: 50% 100px;
+        border-bottom-left-radius: 50% 100px;
+    }
+
+    .container {
+        padding: 40px 60px;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 头部样式 */
+    header {
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+    }
+
+    h1 {
+        font-size: 42px;
+        font-weight: 900;
+        color: #1a202c;
+        letter-spacing: -1px;
+        position: relative;
+        padding-left: 20px;
+    }
+
+    h1::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 8px;
+        bottom: 8px;
+        width: 6px;
+        background: #2d3748;
+        border-radius: 3px;
+    }
+
+    .subtitle {
+        font-size: 18px;
+        color: #718096;
+        font-weight: 500;
+    }
+
+    /* 主体网格 */
+    .roadmap-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 30px;
+        flex: 1;
+    }
+
+    /* 卡片样式 */
+    .stage-card {
+        background: white;
+        border-radius: 16px;
+        padding: 0;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+        border: 1px solid rgba(0,0,0,0.03);
+    }
+
+    /* 阶段头部颜色条 */
+    .stage-header {
+        padding: 20px 24px;
+        color: white;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .stage-1 .stage-header { background: linear-gradient(to right, #0f766e, #14b8a6); } /* Teal */
+    .stage-2 .stage-header { background: linear-gradient(to right, #1e3a8a, #3b82f6); } /* Blue */
+    .stage-3 .stage-header { background: linear-gradient(to right, #c2410c, #f97316); } /* Orange */
+
+    .stage-title {
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .stage-time {
+        font-size: 14px;
+        background: rgba(255,255,255,0.2);
+        padding: 4px 10px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .stage-content {
+        padding: 24px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* 子项模块 */
+    .sub-section {
+        background: #f8fafc;
+        border-radius: 10px;
+        padding: 12px 16px;
+        border-left: 4px solid #cbd5e1;
+    }
+
+    .stage-1 .sub-section { border-left-color: #14b8a6; background: #f0fdfa; }
+    .stage-2 .sub-section { border-left-color: #3b82f6; background: #eff6ff; }
+    .stage-3 .sub-section { border-left-color: #f97316; background: #fff7ed; }
+
+    .sub-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .sub-title i {
+        font-size: 14px;
+        opacity: 0.8;
+    }
+
+    .action-list {
+        list-style: none;
+    }
+
+    .action-list li {
+        font-size: 13px;
+        color: #475569;
+        margin-bottom: 5px;
+        padding-left: 14px;
+        position: relative;
+        line-height: 1.4;
+    }
+
+    .action-list li::before {
+        content: '•';
+        position: absolute;
+        left: 0;
+        color: #94a3b8;
+        font-weight: bold;
+    }
+
+    .stage-1 .action-list li::before { color: #0d9488; }
+    .stage-2 .action-list li::before { color: #2563eb; }
+    .stage-3 .action-list li::before { color: #ea580c; }
+
+    /* 底部进度条装饰 */
+    .progress-bar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 6px;
+        width: 100%;
+        background: #e2e8f0;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: #cbd5e1;
+    }
+    .stage-1 .progress-fill { width: 33%; background: #14b8a6; }
+    .stage-2 .progress-fill { width: 66%; background: #3b82f6; }
+    .stage-3 .progress-fill { width: 100%; background: #f97316; }
+
+    /* 步骤编号 */
+    .step-number {
+        position: absolute;
+        top: -15px;
+        right: 20px;
+        font-size: 80px;
+        font-weight: 900;
+        color: rgba(0,0,0,0.03);
+        z-index: 0;
+        pointer-events: none;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="bg-decoration"></div>
+
+  <div class="container">
+    <header style="border-bottom: none;">
+      <div>
+        <h1>2025 数据平台建设路线图</h1>
+        
+      </div>
+      
+    </header>
+
+    <div class="roadmap-grid">
+      
+      <!-- 阶段一 -->
+      <div class="stage-card stage-1">
+        <div class="step-number">01</div>
+        <div class="stage-header">
+          <span class="stage-title">阶段一：夯实基础</span>
+          <span class="stage-time">Q1 - Q2</span>
+        </div>
+        <div class="stage-content">
+          
+          <!-- 技术架构 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-server"></i> 技术架构
+            </div>
+            <ul class="action-list">
+              <li>搭建湖仓一体化基础平台 (Data Lakehouse)</li>
+              <li>统一数据采集规范与实时流接入</li>
+              <li>完成核心数仓分层设计 (ODS/DWD/DWS)</li>
+            </ul>
+          </div>
+
+          <!-- 业务支持 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-chart-pie"></i> 业务支持
+            </div>
+            <ul class="action-list">
+              <li>核心经营报表迁移与自动化</li>
+              <li>建立企业级统一指标字典</li>
+              <li>支持财务与销售关键数据T+1产出</li>
+            </ul>
+          </div>
+
+          <!-- 团队建设 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-users-gear"></i> 团队建设
+            </div>
+            <ul class="action-list">
+              <li>组建数据工程核心团队</li>
+              <li>确立代码规范与CI/CD发布流程</li>
+              <li>开展SQL与基础数据工具培训</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+      </div>
+
+      <!-- 阶段二 -->
+      <div class="stage-card stage-2">
+        <div class="step-number">02</div>
+        <div class="stage-header">
+          <span class="stage-title">阶段二：治理与赋能</span>
+          <span class="stage-time">Q3</span>
+        </div>
+        <div class="stage-content">
+          
+          <!-- 技术架构 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-shield-halved"></i> 技术架构
+            </div>
+            <ul class="action-list">
+              <li>部署数据质量监控平台 (DQC)</li>
+              <li>上线元数据管理与血缘分析系统</li>
+              <li>优化查询引擎性能，降低延迟</li>
+            </ul>
+          </div>
+
+          <!-- 业务支持 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-magnifying-glass-chart"></i> 业务支持
+            </div>
+            <ul class="action-list">
+              <li>推广自助式BI (Self-service BI) 试点</li>
+              <li>构建用户360画像与标签体系</li>
+              <li>供应链与库存专项数据分析</li>
+            </ul>
+          </div>
+
+          <!-- 团队建设 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-user-graduate"></i> 团队建设
+            </div>
+            <ul class="action-list">
+              <li>设立数据管家 (Data Steward) 角色</li>
+              <li>建立数据问题响应与SLA机制</li>
+              <li>举办内部数据分析案例分享会</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+      </div>
+
+      <!-- 阶段三 -->
+      <div class="stage-card stage-3">
+        <div class="step-number">03</div>
+        <div class="stage-header">
+          <span class="stage-title">阶段三：智能与生态</span>
+          <span class="stage-time">Q4</span>
+        </div>
+        <div class="stage-content">
+          
+          <!-- 技术架构 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-brain"></i> 技术架构
+            </div>
+            <ul class="action-list">
+              <li>引入AI/ML Ops，支持算法模型部署</li>
+              <li>构建统一数据API网关服务</li>
+              <li>探索非结构化数据处理能力</li>
+            </ul>
+          </div>
+
+          <!-- 业务支持 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-rocket"></i> 业务支持
+            </div>
+            <ul class="action-list">
+              <li>基于预测模型的智能决策支持</li>
+              <li>数据资产化与外部数据合作</li>
+              <li>全渠道营销归因分析</li>
+            </ul>
+          </div>
+
+          <!-- 团队建设 -->
+          <div class="sub-section">
+            <div class="sub-title">
+              <i class="fa-solid fa-people-group"></i> 团队建设
+            </div>
+            <ul class="action-list">
+              <li>建立全员数据驱动文化</li>
+              <li>举办年度数据黑客松 (Hackathon)</li>
+              <li>完善数据人才晋升通道</li>
+            </ul>
+          </div>
+
+        </div>
+        <div class="progress-bar"><div class="progress-fill"></div></div>
+      </div>
+
+    </div>
+  </div>
+
+
+</body></html>

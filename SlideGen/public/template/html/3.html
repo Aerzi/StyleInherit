@@ -1,0 +1,316 @@
+<!-- 布局严谨，无溢出，无动画，符合严格设计规范 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --text-main: #1f2937;
+      --text-sub: #4b5563;
+      --accent-internal: #059669; /* 翡翠绿 - 内部 */
+      --accent-internal-light: #ecfdf5;
+      --accent-external: #2563eb; /* 皇家蓝 - 外部 */
+      --accent-external-light: #eff6ff;
+      --border-color: #e5e7eb;
+      --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: var(--primary-bg);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 头部区域 - 仅包含主标题 */
+    header {
+      height: 90px;
+      display: flex;
+      align-items: center;
+      padding: 0 48px;
+      background: white;
+      border-bottom: 1px solid var(--border-color);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      flex-shrink: 0;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 900;
+      color: #111827;
+      letter-spacing: -0.02em;
+    }
+
+    h1 i {
+      color: var(--accent-external);
+      margin-right: 16px;
+    }
+
+    /* 主体内容区 */
+    main {
+      flex: 1;
+      padding: 32px 48px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* 表格容器 - 使用 Grid 布局模拟表格以获得更好的样式控制 */
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 200px 1fr 1fr;
+      grid-template-rows: 80px repeat(5, 1fr);
+      height: 100%;
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    /* 通用单元格样式 */
+    .cell {
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 18px;
+    }
+
+    .cell:last-child {
+      border-right: none;
+    }
+
+    /* 表头样式 */
+    .header-cell {
+      background-color: #f9fafb;
+      font-weight: 700;
+      font-size: 22px;
+      color: #374151;
+      justify-content: center;
+      border-bottom: 2px solid var(--border-color);
+    }
+
+    .header-internal {
+      color: var(--accent-internal);
+      background-color: var(--accent-internal-light);
+      justify-content: flex-start;
+    }
+    
+    .header-external {
+      color: var(--accent-external);
+      background-color: var(--accent-external-light);
+      justify-content: flex-start;
+    }
+
+    /* 第一列：维度 */
+    .col-dimension {
+      background-color: #f9fafb;
+      font-weight: 700;
+      color: #4b5563;
+      justify-content: center;
+      border-right: 1px solid var(--border-color);
+    }
+
+    /* 内容单元格 */
+    .content-cell {
+      line-height: 1.5;
+      font-weight: 500;
+    }
+
+    .internal-cell {
+      border-right: 1px dashed var(--border-color);
+    }
+
+    /* 优势与劣势的视觉标记 */
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 4px 12px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      margin-right: 12px;
+      min-width: 65px;
+      justify-content: center;
+    }
+
+    .tag-pro {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+
+    .tag-con {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* 装饰性图标 */
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 16px;
+    }
+    
+    .icon-internal { background: white; color: var(--accent-internal); }
+    .icon-external { background: white; color: var(--accent-external); }
+
+    /* 文字内容包装 */
+    .text-wrapper {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .main-text { font-size: 18px; color: var(--text-main); font-weight: 700; }
+    .sub-text { font-size: 15px; color: var(--text-sub); font-weight: 400; }
+
+    /* 消除最后一行边框 */
+    .comparison-grid > div:nth-last-child(-n+3) {
+      border-bottom: none;
+    }
+    
+    /* 维度图标 */
+    .dim-icon {
+      margin-right: 10px;
+      color: #9ca3af;
+      width: 24px;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1><i class="fa-solid fa-users-viewfinder"></i>内部招聘与外部招聘优劣势分析</h1>
+  </header>
+
+  <main>
+    <div class="comparison-grid">
+      <!-- Row 1: Headers -->
+      <div class="cell header-cell">对比维度</div>
+      <div class="cell header-cell header-internal">
+        <div class="icon-box icon-internal"><i class="fa-solid fa-building-user"></i></div>
+        内部招聘 (Internal)
+      </div>
+      <div class="cell header-cell header-external">
+        <div class="icon-box icon-external"><i class="fa-solid fa-earth-americas"></i></div>
+        外部招聘 (External)
+      </div>
+
+      <!-- Row 2: 成本 -->
+      <div class="cell col-dimension">
+        <i class="fa-solid fa-sack-dollar dim-icon"></i> 成本投入
+      </div>
+      <div class="cell content-cell internal-cell">
+        <span class="tag tag-pro">优势</span>
+        <div class="text-wrapper">
+          <span class="main-text">费用低廉，成本可控</span>
+          <span class="sub-text">无猎头费、广告费，流程简单开销少</span>
+        </div>
+      </div>
+      <div class="cell content-cell">
+        <span class="tag tag-con">劣势</span>
+        <div class="text-wrapper">
+          <span class="main-text">招聘成本较高</span>
+          <span class="sub-text">涉及渠道费、猎头佣金及大量筛选时间成本</span>
+        </div>
+      </div>
+
+      <!-- Row 3: 效率 -->
+      <div class="cell col-dimension">
+        <i class="fa-solid fa-stopwatch dim-icon"></i> 招聘效率
+      </div>
+      <div class="cell content-cell internal-cell">
+        <span class="tag tag-pro">优势</span>
+        <div class="text-wrapper">
+          <span class="main-text">上手快，适应期短</span>
+          <span class="sub-text">熟悉企业文化与业务流程，即插即用</span>
+        </div>
+      </div>
+      <div class="cell content-cell">
+        <span class="tag tag-con">劣势</span>
+        <div class="text-wrapper">
+          <span class="main-text">筛选周期长，磨合慢</span>
+          <span class="sub-text">搜寻难度大，且入职后需要较长的适应期</span>
+        </div>
+      </div>
+
+      <!-- Row 4: 激励/风险 -->
+      <div class="cell col-dimension">
+        <i class="fa-solid fa-chart-line dim-icon"></i> 团队激励
+      </div>
+      <div class="cell content-cell internal-cell">
+        <span class="tag tag-pro">优势</span>
+        <div class="text-wrapper">
+          <span class="main-text">提升士气，增强归属感</span>
+          <span class="sub-text">提供晋升通道，留住核心人才，正向激励</span>
+        </div>
+      </div>
+      <div class="cell content-cell">
+        <span class="tag tag-con">劣势</span>
+        <div class="text-wrapper">
+          <span class="main-text">可能打击内部积极性</span>
+          <span class="sub-text">若空降管理层，可能导致老员工产生抵触情绪</span>
+        </div>
+      </div>
+
+      <!-- Row 5: 创新/思维 -->
+      <div class="cell col-dimension">
+        <i class="fa-solid fa-lightbulb dim-icon"></i> 创新思维
+      </div>
+      <div class="cell content-cell internal-cell">
+        <span class="tag tag-con">劣势</span>
+        <div class="text-wrapper">
+          <span class="main-text">容易产生“近亲繁殖”</span>
+          <span class="sub-text">思维固化，缺乏新鲜视角，可能抑制创新</span>
+        </div>
+      </div>
+      <div class="cell content-cell">
+        <span class="tag tag-pro">优势</span>
+        <div class="text-wrapper">
+          <span class="main-text">引入“鲶鱼效应”</span>
+          <span class="sub-text">带来新理念、新技术和外部竞争压力，激活团队</span>
+        </div>
+      </div>
+
+      <!-- Row 6: 风险 -->
+      <div class="cell col-dimension">
+        <i class="fa-solid fa-shield-halved dim-icon"></i> 潜在风险
+      </div>
+      <div class="cell content-cell internal-cell">
+        <span class="tag tag-con">劣势</span>
+        <div class="text-wrapper">
+          <span class="main-text">内部关系复杂化</span>
+          <span class="sub-text">可能引发派系斗争，且产生新的职位空缺</span>
+        </div>
+      </div>
+      <div class="cell content-cell">
+        <span class="tag tag-con">劣势</span>
+        <div class="text-wrapper">
+          <span class="main-text">人岗匹配风险高</span>
+          <span class="sub-text">信息不对称，实际能力或文化契合度可能不符</span>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+</body>
+</html>

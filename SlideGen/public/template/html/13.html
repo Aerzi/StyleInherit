@@ -1,0 +1,350 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f4f6f8;
+      color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+      display: grid;
+      grid-template-rows: 80px 1fr 60px;
+      height: 100%;
+      padding: 40px 60px;
+      gap: 20px;
+    }
+
+    /* 头部 */
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #e0e0e0;
+      padding-bottom: 20px;
+    }
+    
+    .title-group h1 {
+      font-size: 36px;
+      font-weight: 700;
+      color: #2c3e50;
+      letter-spacing: 1px;
+    }
+    
+    .title-group p {
+      font-size: 18px;
+      color: #7f8c8d;
+      margin-top: 5px;
+    }
+
+    .header-icon {
+      font-size: 40px;
+      color: #2c3e50;
+      opacity: 0.1;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+      align-items: stretch;
+    }
+
+    /* 左侧：对比卡片 */
+    .comparison-cards {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      justify-content: center;
+    }
+
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      position: relative;
+      overflow: hidden;
+      border-left: 6px solid transparent;
+    }
+
+    .card.self-built {
+      border-left-color: #00897B; /* Teal */
+    }
+
+    .card.third-party {
+      border-left-color: #E64A19; /* Deep Orange */
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+
+    .card-header i {
+      font-size: 24px;
+      margin-right: 12px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+    }
+
+    .self-built .card-header i {
+      background-color: #E0F2F1;
+      color: #00897B;
+    }
+
+    .third-party .card-header i {
+      background-color: #FBE9E7;
+      color: #E64A19;
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: #546E7A;
+      line-height: 1.4;
+    }
+
+    .feature-list li i {
+      margin-right: 10px;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .self-built .feature-list li i { color: #00897B; }
+    .third-party .feature-list li i { color: #E64A19; }
+
+    /* 右侧：图表区 */
+    .chart-container {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #37474F;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #radarChart {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 底部总结 */
+    .footer-summary {
+      background: linear-gradient(90deg, #37474F 0%, #455A64 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-size: 18px;
+      font-weight: 500;
+    }
+
+    .footer-summary i {
+      margin-right: 12px;
+      color: #FFD54F;
+    }
+
+    /* 标签 */
+    .tag {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-left: auto;
+    }
+    .tag.high-cost { background: #FFEBEE; color: #C62828; }
+    .tag.low-cost { background: #E8F5E9; color: #2E7D32; }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header style="border-bottom: none;">
+      <div class="title-group">
+        <h1>自建物流 vs 第三方物流 (3PL)</h1>
+        
+      </div>
+      
+    </header>
+
+    <!-- 主内容 -->
+    <div class="main-content">
+      
+      <!-- 左侧对比 -->
+      <div class="comparison-cards">
+        <!-- 自建物流卡片 -->
+        <div class="card self-built">
+          <div class="card-header">
+            <i class="fa-solid fa-warehouse"></i>
+            <span class="card-title">自建物流 (Self-built)</span>
+            <span class="tag high-cost">固定成本高</span>
+          </div>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> <strong>极高的掌控力：</strong> 完全控制配送流程与品牌形象</li>
+            <li><i class="fa-solid fa-check"></i> <strong>客户体验优：</strong> 响应速度快，服务标准统一</li>
+            <li><i class="fa-solid fa-minus"></i> <strong>重资产投入：</strong> 仓储、车队、人员初期投入巨大</li>
+            <li><i class="fa-solid fa-minus"></i> <strong>扩展性受限：</strong> 应对业务波峰波谷的弹性较差</li>
+          </ul>
+        </div>
+
+        <!-- 第三方物流卡片 -->
+        <div class="card third-party">
+          <div class="card-header">
+            <i class="fa-solid fa-truck-fast"></i>
+            <span class="card-title">第三方物流 (3PL)</span>
+            <span class="tag low-cost">固定成本低</span>
+          </div>
+          <ul class="feature-list">
+            <li><i class="fa-solid fa-check"></i> <strong>成本灵活：</strong> 按量付费，将固定成本转化为可变成本</li>
+            <li><i class="fa-solid fa-check"></i> <strong>高扩展性：</strong> 轻松应对大促等业务高峰期</li>
+            <li><i class="fa-solid fa-check"></i> <strong>专业聚焦：</strong> 利用3PL的规模效应与专业网络</li>
+            <li><i class="fa-solid fa-minus"></i> <strong>管控难度：</strong> 数据链路与服务质量监控相对较弱</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 右侧图表 -->
+      <div class="chart-container">
+        <div class="chart-title">五维度能力模型对比</div>
+        <div id="radarChart"></div>
+      </div>
+
+    </div>
+
+    <!-- 底部总结 -->
+    <div class="footer-summary">
+      <i class="fa-solid fa-lightbulb"></i>
+      决策建议：业务规模稳定且重体验选自建，业务波动大或初创期选 3PL
+    </div>
+  </div>
+
+  <script>
+    // 初始化 ECharts
+    var chartDom = document.getElementById('radarChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // 严格禁止动画
+      color: ['#00897B', '#E64A19'],
+      tooltip: {
+        trigger: 'item'
+      },
+      legend: {
+        bottom: '0',
+        data: ['自建物流', '第三方物流 (3PL)'],
+        textStyle: {
+          fontSize: 14,
+          color: '#546E7A'
+        }
+      },
+      radar: {
+        indicator: [
+          { name: '初始投入成本', max: 100 },
+          { name: '运营掌控力', max: 100 },
+          { name: '客户体验(CX)', max: 100 },
+          { name: '业务弹性(扩展性)', max: 100 },
+          { name: '覆盖范围广度', max: 100 }
+        ],
+        radius: '65%',
+        center: ['50%', '45%'],
+        splitNumber: 4,
+        axisName: {
+          color: '#37474F',
+          fontSize: 14,
+          fontWeight: 'bold',
+          padding: [3, 5]
+        },
+        splitArea: {
+          areaStyle: {
+            color: ['#F5F7FA', '#FFFFFF']
+          }
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#CFD8DC'
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: '#CFD8DC'
+          }
+        }
+      },
+      series: [
+        {
+          name: '物流模式对比',
+          type: 'radar',
+          data: [
+            {
+              value: [90, 95, 90, 40, 60],
+              name: '自建物流',
+              areaStyle: {
+                color: 'rgba(0, 137, 123, 0.2)'
+              },
+              lineStyle: {
+                width: 3
+              },
+              symbol: 'circle',
+              symbolSize: 6
+            },
+            {
+              value: [20, 50, 70, 95, 90],
+              name: '第三方物流 (3PL)',
+              areaStyle: {
+                color: 'rgba(230, 74, 25, 0.2)'
+              },
+              lineStyle: {
+                width: 3
+              },
+              symbol: 'circle',
+              symbolSize: 6
+            }
+          ]
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

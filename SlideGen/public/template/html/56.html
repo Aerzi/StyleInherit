@@ -1,0 +1,357 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #F3F4F6;
+        color: #1F2937;
+    }
+
+    /* 背景装饰 */
+    .bg-decoration {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 300px;
+        background: linear-gradient(135deg, #10B981 0%, #059669 100%);
+        z-index: -1;
+        clip-path: polygon(0 0, 100% 0, 100% 60%, 0 100%);
+    }
+
+    /* 主容器 */
+    .container {
+        width: 100%;
+        height: 100%;
+        padding: 40px 60px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 头部 */
+    header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+        color: white;
+    }
+
+    .header-left {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .icon-box {
+        width: 64px;
+        height: 64px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border-radius: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+
+    h1 {
+        font-size: 36px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .subtitle {
+        font-size: 16px;
+        opacity: 0.9;
+        font-weight: 400;
+        margin-top: 4px;
+    }
+
+    .date-badge {
+        background: rgba(255, 255, 255, 0.95);
+        color: #059669;
+        padding: 10px 24px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 18px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* 内容区域 */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 400px 1fr;
+        gap: 30px;
+        flex: 1;
+    }
+
+    /* 卡片通用样式 */
+    .card {
+        background: white;
+        border-radius: 20px;
+        padding: 25px;
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        border: 1px solid rgba(229, 231, 235, 0.5);
+    }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 2px solid #F3F4F6;
+    }
+
+    .card-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #374151;
+    }
+
+    .card-icon {
+        color: #059669;
+        font-size: 20px;
+    }
+
+    /* 图表容器 */
+    .chart-container {
+        flex: 1;
+        width: 100%;
+        height: 100%;
+        position: relative;
+    }
+
+    /* 关键指标摘要 (左侧卡片底部) */
+    .summary-stats {
+        margin-top: 20px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+
+    .stat-item {
+        background: #F9FAFB;
+        padding: 15px;
+        border-radius: 12px;
+        text-align: center;
+    }
+
+    .stat-value {
+        font-size: 24px;
+        font-weight: 900;
+        color: #059669;
+        margin-bottom: 4px;
+    }
+
+    .stat-label {
+        font-size: 12px;
+        color: #6B7280;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 背景装饰 -->
+  <div class="bg-decoration"></div>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header style="border-bottom: none;">
+        <div class="header-left">
+            
+            <div>
+                <h1>本月工单数据分析</h1>
+                
+            </div>
+        </div>
+        
+    </header>
+
+    <!-- 主要内容 -->
+    <div class="content-grid">
+        
+        <!-- 左侧：类型分布 -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-layer-group card-icon"></i>
+                <div class="card-title">工单类型分布</div>
+            </div>
+            <div id="chart-pie" class="chart-container"></div>
+            
+            <!-- 底部小统计 -->
+            <div class="summary-stats">
+                <div class="stat-item">
+                    <div class="stat-value">1,248</div>
+                    <div class="stat-label">工单总数</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value">98.5%</div>
+                    <div class="stat-label">结单率</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右侧：处理时长 -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fa-solid fa-stopwatch card-icon"></i>
+                <div class="card-title">各类工单平均处理时长 (小时)</div>
+            </div>
+            <div id="chart-bar" class="chart-container"></div>
+        </div>
+
+    </div>
+  </div>
+
+  <!-- ECharts 初始化 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script>
+    // 配色方案 - 专业、和谐的绿色/蓝绿色调 + 暖色点缀
+    const colorPalette = ['#10B981', '#3B82F6', '#F59E0B', '#6366F1', '#EC4899'];
+    
+    // 1. 饼图 - 工单类型分布
+    const pieChart = echarts.init(document.getElementById('chart-pie'));
+    const pieOption = {
+        animation: false, // 禁止动画
+        color: colorPalette,
+        tooltip: { trigger: 'item' },
+        legend: {
+            bottom: '0%',
+            left: 'center',
+            itemWidth: 12,
+            itemHeight: 12,
+            textStyle: { color: '#4B5563', fontSize: 12 }
+        },
+        series: [
+            {
+                name: '工单类型',
+                type: 'pie',
+                radius: ['45%', '70%'], // 环形图
+                center: ['50%', '45%'],
+                avoidLabelOverlap: false,
+                itemStyle: {
+                    borderRadius: 8,
+                    borderColor: '#fff',
+                    borderWidth: 2
+                },
+                label: {
+                    show: true,
+                    formatter: '{b}\n{d}%',
+                    color: '#374151',
+                    fontSize: 13,
+                    fontWeight: 'bold',
+                    lineHeight: 18
+                },
+                labelLine: {
+                    show: true,
+                    length: 15,
+                    length2: 10
+                },
+                data: [
+                    { value: 450, name: '产品咨询' },
+                    { value: 320, name: '技术故障' },
+                    { value: 240, name: '账号问题' },
+                    { value: 150, name: '财务支付' },
+                    { value: 88, name: '投诉建议' }
+                ]
+            }
+        ]
+    };
+    pieChart.setOption(pieOption);
+
+    // 2. 柱状图 - 平均处理时长
+    const barChart = echarts.init(document.getElementById('chart-bar'));
+    const barOption = {
+        animation: false, // 禁止动画
+        grid: {
+            top: '10%',
+            left: '3%',
+            right: '8%',
+            bottom: '5%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value',
+            name: '时长 (h)',
+            nameTextStyle: { color: '#9CA3AF', padding: [0, 0, 0, 10] },
+            axisLine: { show: false },
+            axisTick: { show: false },
+            splitLine: { 
+                lineStyle: { type: 'dashed', color: '#E5E7EB' } 
+            },
+            axisLabel: { color: '#6B7280' }
+        },
+        yAxis: {
+            type: 'category',
+            data: ['产品咨询', '账号问题', '财务支付', '投诉建议', '技术故障'],
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: { 
+                color: '#374151', 
+                fontWeight: 'bold', 
+                fontSize: 14,
+                margin: 15
+            }
+        },
+        series: [
+            {
+                name: '平均处理时长',
+                type: 'bar',
+                barWidth: '45%',
+                data: [1.2, 2.5, 3.8, 5.5, 8.2], // 数据对应y轴分类
+                itemStyle: {
+                    borderRadius: [0, 6, 6, 0],
+                    // 渐变色
+                    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                        { offset: 0, color: '#34D399' }, // 浅绿
+                        { offset: 1, color: '#059669' }  // 深绿
+                    ])
+                },
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: '{c} h',
+                    color: '#059669',
+                    fontWeight: 'bold',
+                    fontSize: 14,
+                    offset: [5, 0]
+                },
+                // 针对高耗时工单的特殊标记颜色（模拟逻辑）
+                data: [
+                    { value: 1.2, itemStyle: { color: '#34D399' } },
+                    { value: 2.5, itemStyle: { color: '#34D399' } },
+                    { value: 3.8, itemStyle: { color: '#60A5FA' } }, // 蓝色
+                    { value: 5.5, itemStyle: { color: '#F59E0B' } }, // 橙色警告
+                    { value: 8.2, itemStyle: { color: '#EF4444' } }  // 红色严重
+                ]
+            }
+        ]
+    };
+    barChart.setOption(barOption);
+
+    // 确保图表在容器大小变化时自适应（虽然本场景尺寸固定，但属最佳实践）
+    window.addEventListener('resize', function() {
+        pieChart.resize();
+        barChart.resize();
+    });
+  </script>
+
+</body></html>

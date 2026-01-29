@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>策略一：AI+协作双引擎战略深化</title>
+    <style>
+        :root {
+            --bg-dark: #1a1d21;
+            --card-bg: #2a2e35;
+            --primary-cyan: #40e0d0;
+            --text-white: #ffffff;
+            --text-gray: #a0a5ad;
+            --accent-cyan: rgba(64, 224, 208, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1280px;
+            height: 720px;
+            background-color: var(--bg-dark);
+            position: relative;
+            padding: 35px 50px;
+            display: flex;
+            flex-direction: column;
+            color: var(--text-white);
+            overflow: hidden;
+        }
+
+        .header {
+            margin-bottom: 25px;
+        }
+
+        .header-tag {
+            font-size: 13px;
+            color: var(--primary-cyan);
+            border-left: 3px solid var(--primary-cyan);
+            padding-left: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .main-title {
+            font-size: 38px;
+            font-weight: 800;
+            letter-spacing: 1.5px;
+        }
+
+        /* Top Grid */
+        .top-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 25px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card.active {
+            border: 1px solid rgba(64, 224, 208, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .icon-box {
+            font-size: 28px;
+            color: var(--primary-cyan);
+        }
+
+        .card-title-group h2 {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        .card-subtitle {
+            font-size: 13px;
+            color: var(--text-gray);
+        }
+
+        .check-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 20px;
+            flex-grow: 1;
+        }
+
+        .check-item {
+            display: flex;
+            gap: 12px;
+            font-size: 14.5px;
+            line-height: 1.5;
+        }
+
+        .check-icon {
+            color: var(--primary-cyan);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .item-text b { color: var(--text-white); }
+        .item-text span { color: var(--text-gray); }
+
+        .core-goal {
+            background-color: rgba(64, 224, 208, 0.08);
+            border-radius: 6px;
+            padding: 12px 15px;
+            font-size: 14px;
+            color: var(--primary-cyan);
+            font-weight: bold;
+        }
+
+        /* Bottom Grid */
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: 0.8fr 1fr 1.2fr;
+            gap: 25px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sub-card {
+            padding: 20px;
+        }
+
+        .sub-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Roadmap List */
+        .roadmap {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .roadmap-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .q-tag {
+            width: 32px;
+            height: 32px;
+            background-color: rgba(64, 224, 208, 0.1);
+            color: var(--primary-cyan);
+            border-radius: 6px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 13px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .q-info h4 { font-size: 14.5px; margin-bottom: 2px; }
+        .q-info p { font-size: 12px; color: var(--text-gray); }
+
+        /* Bullets */
+        .bullets {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .bullet-item {
+            position: relative;
+            padding-left: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: var(--text-gray);
+        }
+
+        .bullet-item::before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: var(--primary-cyan);
+            font-weight: bold;
+        }
+
+        .bullet-item b { color: var(--text-white); }
+
+        /* Advantage List */
+        .advantage-item {
+            margin-bottom: 12px;
+            font-size: 14px;
+        }
+
+        .adv-tag {
+            color: var(--primary-cyan);
+            font-weight: bold;
+            margin-right: 5px;
+        }
+
+        .adv-desc {
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-tag">STRATEGY 01 · AI + COLLABORATION</div>
+            <h1 class="main-title">策略一：AI+协作双引擎战略深化</h1>
+        </div>
+
+        <div class="top-grid">
+            <div class="card active">
+                <div class="card-header">
+                    <div class="icon-box">🧠</div>
+                    <div class="card-title-group">
+                        <h2>AI商业化加速</h2>
+                        <div class="card-subtitle">从功能辅助到智能伙伴</div>
+                    </div>
+                </div>
+                <ul class="check-list">
+                    <li class="check-item">
+                        <span class="check-icon">✓</span>
+                        <div class="item-text"><b>WPS AI 3.0发布:</b> <span>推出WPS灵犀、AI改文档、灵犀语音助手等创新功能</span></div>
+                    </li>
+                    <li class="check-item">
+                        <span class="check-icon">✓</span>
+                        <div class="item-text"><b>分级定价模式:</b> <span>探索token用量分级定价，平衡算力成本与用户体验</span></div>
+                    </li>
+                    <li class="check-item">
+                        <span class="check-icon">✓</span>
+                        <div class="item-text"><b>Agent能力深化:</b> <span>WPS AI向5.0、6.0版本迭代，实现全链路智能升级</span></div>
+                    </li>
+                </ul>
+                <div class="core-goal">核心目标：2025年AI月活用户突破3000万，AI功能成为核心付费驱动力</div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <div class="icon-box">👥</div>
+                    <div class="card-title-group">
+                        <h2>协作能力提升</h2>
+                        <div class="card-subtitle">一站式AI办公平台</div>
+                    </div>
+                </div>
+                <ul class="check-list">
+                    <li class="check-item">
+                        <span class="check-icon">✓</span>
+                        <div class="item-text"><b>三大能力打通:</b> <span>强化文档、协作、AI三大能力融合，提供一站式解决方案</span></div>
+                    </li>
+                    <li class="check-item">
+                        <span class="check-icon">✓</span>
+                        <div class="item-text"><b>企业大脑构建:</b> <span>WPS AI企业版通过智能基因、日常交流瓶、企业管理助理构建“企业大脑”</span></div>
+                    </li>
+                    <li class="check-item">
+                        <span class="check-icon">✓</span>
+                        <div class="item-text"><b>知识容器定位:</b> <span>协同办公软件变成“知识的容器”、“数字员工的载体”</span></div>
+                    </li>
+                </ul>
+                <div class="core-goal">核心目标：帮助企业和组织构建独有的"企业大脑"，实现高效协作</div>
+            </div>
+        </div>
+
+        <div class="bottom-grid">
+            <div class="card sub-card">
+                <div class="sub-title">🗺️ 产品路线图</div>
+                <div class="roadmap">
+                    <div class="roadmap-item">
+                        <div class="q-tag">Q1</div>
+                        <div class="q-info"><h4>WPS AI 3.0</h4><p>WPS灵犀发布</p></div>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="q-tag">Q2</div>
+                        <div class="q-info"><h4>WPS AI 4.0</h4><p>Agent能力深化</p></div>
+                    </div>
+                    <div class="roadmap-item">
+                        <div class="q-tag">Q3-Q4</div>
+                        <div class="q-info"><h4>WPS AI 5.0 / 6.0</h4><p>全链路智能升级</p></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card sub-card">
+                <div class="sub-title">💰 商业化策略</div>
+                <ul class="bullets">
+                    <li class="bullet-item"><b>基础AI功能免费:</b> 无差异化AI功能免费，提升用户渗透率</li>
+                    <li class="bullet-item"><b>高级AI功能收费:</b> 特有AI功能打包进高端会员套餐</li>
+                    <li class="bullet-item"><b>增值包模式:</b> token用量超出部分提供额外增值包</li>
+                </ul>
+            </div>
+
+            <div class="card sub-card">
+                <div class="sub-title">🏆 竞争优势</div>
+                <div class="advantage-item">
+                    <span class="adv-tag">场景化优势:</span>
+                    <span class="adv-desc">36年办公场景深耕，产品功能更贴合本土用户需求</span>
+                </div>
+                <div class="advantage-item">
+                    <span class="adv-tag">颗粒度优势:</span>
+                    <span class="adv-desc">AI功能颗粒度更细，导航功能帮助用户精确描述需求</span>
+                </div>
+                <div class="advantage-item">
+                    <span class="adv-tag">成本优势:</span>
+                    <span class="adv-desc">相比微软Copilot 30美元/月的定价，WPS AI更具价格竞争力</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

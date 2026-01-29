@@ -1,0 +1,464 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    /* Layout Structure */
+    .container {
+      display: grid;
+      grid-template-rows: 100px 1fr;
+      height: 100%;
+      padding: 40px 60px;
+      gap: 30px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e9ecef;
+      padding-bottom: 20px;
+    }
+    .title-group h1 {
+      font-size: 42px;
+      font-weight: 900;
+      color: #2c3e50;
+      letter-spacing: -1px;
+    }
+    .title-group p {
+      font-size: 18px;
+      color: #6c757d;
+      margin-top: 5px;
+    }
+    .header-icon {
+      font-size: 40px;
+      color: #adb5bd;
+    }
+
+    /* Main Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 3fr 1.2fr; /* Cards take more space, Chart on right */
+      gap: 40px;
+      height: 100%;
+    }
+
+    /* Cards Container */
+    .cards-wrapper {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 25px;
+    }
+
+    /* Individual Card Styling */
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      border-top: 6px solid transparent;
+    }
+
+    /* Card Variants */
+    .card.iaas { border-color: #00897B; }
+    .card.paas { border-color: #F57C00; }
+    .card.saas { border-color: #1565C0; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 15px;
+    }
+    .iaas .icon-box { background: #E0F2F1; color: #00897B; }
+    .paas .icon-box { background: #FFF3E0; color: #F57C00; }
+    .saas .icon-box { background: #E3F2FD; color: #1565C0; }
+
+    .card-title h2 { font-size: 24px; font-weight: 700; }
+    .card-title span { font-size: 12px; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+
+    .definition {
+      font-size: 14px;
+      line-height: 1.6;
+      color: #555;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .feature-list {
+      background: #f8f9fa;
+      border-radius: 8px;
+      padding: 15px;
+      margin-bottom: 20px;
+    }
+    .feature-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #adb5bd;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+    }
+    .feature-item {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      color: #495057;
+      margin-bottom: 6px;
+    }
+    .feature-item i { margin-right: 8px; font-size: 10px; }
+    .iaas .feature-item i { color: #00897B; }
+    .paas .feature-item i { color: #F57C00; }
+    .saas .feature-item i { color: #1565C0; }
+
+    .examples {
+      border-top: 1px solid #eee;
+      padding-top: 15px;
+    }
+    .examples h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: #333;
+    }
+    .logo-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+    }
+    .iaas .tag { background: #E0F2F1; color: #00695C; }
+    .paas .tag { background: #FFF3E0; color: #EF6C00; }
+    .saas .tag { background: #E3F2FD; color: #0D47A1; }
+
+    /* Chart Section */
+    .chart-section {
+      background: #fff;
+      border-radius: 16px;
+      padding: 25px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 5px;
+      text-align: center;
+    }
+    .chart-subtitle {
+      font-size: 12px;
+      color: #888;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+    #responsibility-chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Utility */
+    .highlight { font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Header -->
+    <header style="border-bottom: none;">
+      <div class="title-group">
+        <h1>云计算服务模式解析</h1>
+        
+      </div>
+      
+    </header>
+
+    <!-- Content -->
+    <div class="content-grid">
+      
+      <!-- Left: 3 Cards -->
+      <div class="cards-wrapper">
+        
+        <!-- IaaS Card -->
+        <div class="card iaas">
+          <div class="card-header">
+            <div class="icon-box"><i class="fa-solid fa-server"></i></div>
+            <div class="card-title">
+              <span>Infrastructure</span>
+              <h2>IaaS</h2>
+            </div>
+          </div>
+          <div class="definition">
+            <strong>基础设施即服务。</strong>提供虚拟化的计算资源（服务器、网络、存储）。就像租用“毛坯房”，你需要自己装修和维护内部设施。
+          </div>
+          <div class="feature-list">
+            <div class="feature-title">用户管理范围</div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> 操作系统 (O/S)</div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> 中间件与运行环境</div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> 数据与应用程序</div>
+          </div>
+          <div class="examples">
+            <h3>典型应用</h3>
+            <div class="logo-row">
+              <span class="tag">AWS EC2</span>
+              <span class="tag">阿里云 ECS</span>
+              <span class="tag">Google CE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- PaaS Card -->
+        <div class="card paas">
+          <div class="card-header">
+            <div class="icon-box"><i class="fa-solid fa-code"></i></div>
+            <div class="card-title">
+              <span>Platform</span>
+              <h2>PaaS</h2>
+            </div>
+          </div>
+          <div class="definition">
+            <strong>平台即服务。</strong>提供开发、运行和管理应用的平台。就像租用“酒店式公寓”，设施齐全，你只需带上行李（代码）入住。
+          </div>
+          <div class="feature-list">
+            <div class="feature-title">用户管理范围</div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> 应用程序 (App)</div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> 数据 (Data)</div>
+            <div class="feature-item" style="color: #adb5bd; text-decoration: line-through;"><i class="fa-solid fa-xmark"></i> 操作系统/底层硬件</div>
+          </div>
+          <div class="examples">
+            <h3>典型应用</h3>
+            <div class="logo-row">
+              <span class="tag">Heroku</span>
+              <span class="tag">Google App Engine</span>
+              <span class="tag">Red Hat OpenShift</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SaaS Card -->
+        <div class="card saas">
+          <div class="card-header">
+            <div class="icon-box"><i class="fa-solid fa-laptop-code"></i></div>
+            <div class="card-title">
+              <span>Software</span>
+              <h2>SaaS</h2>
+            </div>
+          </div>
+          <div class="definition">
+            <strong>软件即服务。</strong>通过互联网提供完整的软件应用。就像“叫外卖”，你不需要做饭也不需要提供厨房，直接享用服务。
+          </div>
+          <div class="feature-list">
+            <div class="feature-title">用户管理范围</div>
+            <div class="feature-item"><i class="fa-solid fa-check"></i> 仅需配置账户权限</div>
+            <div class="feature-item" style="color: #adb5bd; text-decoration: line-through;"><i class="fa-solid fa-xmark"></i> 应用程序维护</div>
+            <div class="feature-item" style="color: #adb5bd; text-decoration: line-through;"><i class="fa-solid fa-xmark"></i> 底层架构</div>
+          </div>
+          <div class="examples">
+            <h3>典型应用</h3>
+            <div class="logo-row">
+              <span class="tag">Salesforce</span>
+              <span class="tag">Microsoft 365</span>
+              <span class="tag">Zoom</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right: Chart -->
+      <div class="chart-section">
+        <div class="chart-title">责任共担模型</div>
+        <div class="chart-subtitle">蓝色：用户管理 | 灰色：云厂商管理</div>
+        <div id="responsibility-chart"></div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Initialize ECharts
+    var chartDom = document.getElementById('responsibility-chart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    // Data for the stacked bar chart
+    // Layers from bottom to top
+    const layers = ['网络 (Networking)', '存储 (Storage)', '服务器 (Servers)', '虚拟化 (Virtualization)', '操作系统 (O/S)', '中间件 (Middleware)', '运行环境 (Runtime)', '数据 (Data)', '应用 (Applications)'];
+    
+    // 0 = Vendor Managed (Gray), 1 = User Managed (Color)
+    // IaaS: Vendor manages bottom 4. User manages top 5.
+    // PaaS: Vendor manages bottom 7. User manages top 2.
+    // SaaS: Vendor manages all 9. User manages 0 (conceptually, mostly config).
+    
+    // To visualize this nicely, we will use a stacked bar where each segment represents a layer.
+    // But a simpler way for a slide is to show the proportion.
+    // Let's create a custom series to draw the "Stack".
+
+    option = {
+      animation: false, // STRICTLY NO ANIMATION
+      grid: {
+        top: '5%',
+        bottom: '5%',
+        left: '25%',
+        right: '5%'
+      },
+      xAxis: {
+        type: 'value',
+        show: false,
+        max: 3
+      },
+      yAxis: {
+        type: 'category',
+        data: layers,
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          fontSize: 11,
+          color: '#666',
+          fontWeight: 'bold'
+        }
+      },
+      series: [
+        // IaaS Column
+        {
+          name: 'IaaS User',
+          type: 'bar',
+          stack: 'IaaS',
+          data: [0, 0, 0, 0, 1, 1, 1, 1, 1], // Top layers
+          itemStyle: { color: '#00897B' },
+          barWidth: 40,
+          label: { show: false }
+        },
+        {
+          name: 'IaaS Vendor',
+          type: 'bar',
+          stack: 'IaaS',
+          data: [1, 1, 1, 1, 0, 0, 0, 0, 0], // Bottom layers
+          itemStyle: { color: '#e0e0e0' },
+          barWidth: 40
+        },
+        
+        // PaaS Column (We need to shift x-axis visually, but ECharts categories are usually Y. 
+        // Let's switch to a simpler visualization: 3 separate bars showing "User Control Level")
+      ]
+    };
+
+    // Re-designing chart for better clarity on the slide format
+    // Using a heatmap-style or simple stacked bar to show "Who manages what" across the 3 models
+    
+    option = {
+      animation: false,
+      tooltip: { show: false },
+      legend: {
+        data: ['用户管理 (User)', '云厂商管理 (Vendor)'],
+        bottom: 0,
+        itemWidth: 12,
+        itemHeight: 12
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '10%',
+        top: '5%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: ['IaaS', 'PaaS', 'SaaS'],
+        axisTick: { show: false },
+        axisLine: { show: false },
+        axisLabel: {
+          fontSize: 14,
+          fontWeight: 'bold',
+          color: '#333',
+          margin: 15
+        }
+      },
+      yAxis: {
+        type: 'value',
+        show: false
+      },
+      series: [
+        {
+          name: '云厂商管理 (Vendor)',
+          type: 'bar',
+          stack: 'total',
+          barWidth: '50%',
+          itemStyle: {
+            color: '#e9ecef'
+          },
+          label: {
+            show: true,
+            position: 'inside',
+            formatter: function(params) {
+              if(params.dataIndex === 0) return '硬件\n虚拟化';
+              if(params.dataIndex === 1) return '硬件\n系统\n运行环境';
+              if(params.dataIndex === 2) return '全托管';
+              return '';
+            },
+            color: '#6c757d',
+            fontSize: 11
+          },
+          data: [40, 80, 100] // Approximate percentage of stack managed by vendor
+        },
+        {
+          name: '用户管理 (User)',
+          type: 'bar',
+          stack: 'total',
+          barWidth: '50%',
+          label: {
+            show: true,
+            position: 'inside',
+            formatter: function(params) {
+              if(params.dataIndex === 0) return '系统\n数据\n应用';
+              if(params.dataIndex === 1) return '数据\n应用';
+              if(params.dataIndex === 2) return '配置';
+              return '';
+            },
+            color: '#fff',
+            fontSize: 11
+          },
+          data: [
+            {value: 60, itemStyle: {color: '#00897B'}}, // IaaS User
+            {value: 20, itemStyle: {color: '#F57C00'}}, // PaaS User
+            {value: 5, itemStyle: {color: '#1565C0'}}   // SaaS User (Small config)
+          ]
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

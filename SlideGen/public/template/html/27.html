@@ -1,0 +1,313 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f4f7f9;
+      color: #333;
+    }
+
+    /* 布局容器：减少内边距以适应高度 */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 25px 40px;
+    }
+
+    /* 头部区域：紧凑化处理 */
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e1e4e8;
+      flex-shrink: 0; /* 防止头部被压缩 */
+    }
+
+    .title-group h1 {
+      font-size: 28px; /* 减小字号 */
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 4px;
+      letter-spacing: 1px;
+    }
+
+    .title-group p {
+      font-size: 16px; /* 减小字号 */
+      color: #7f8c8d;
+      font-weight: 500;
+    }
+
+    .header-icon {
+      font-size: 32px; /* 减小图标 */
+      color: #3498db;
+      background: #eaf6fd;
+      width: 64px; /* 减小尺寸 */
+      height: 64px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* 主内容区：确保不溢出 */
+    .content-wrapper {
+      display: flex;
+      flex: 1;
+      gap: 30px;
+      min-height: 0; /* 关键：允许Flex子项收缩 */
+      overflow: hidden;
+    }
+
+    /* 左侧：关键洞察 */
+    .insights-panel {
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px; /* 减少间距 */
+      overflow-y: auto; /* 极端情况下允许滚动，但设计上应避免 */
+    }
+
+    .insight-card {
+      background: #fff;
+      padding: 20px; /* 减少内边距 */
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+      border-left: 5px solid transparent;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      flex: 1; /* 均匀分布高度 */
+    }
+
+    .insight-card.primary { border-left-color: #3498db; }
+    .insight-card.success { border-left-color: #2ecc71; }
+    .insight-card.warning { border-left-color: #f1c40f; }
+
+    .insight-card h3 {
+      font-size: 16px;
+      color: #2c3e50;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .insight-card p {
+      font-size: 13px;
+      color: #636e72;
+      line-height: 1.5;
+    }
+
+    .stat-number {
+      font-size: 24px;
+      font-weight: 700;
+      margin-top: 8px;
+      color: #2c3e50;
+    }
+
+    /* 右侧：图表区域 */
+    .chart-container {
+      flex: 1;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.04);
+      padding: 15px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #mainChart {
+      width: 100%;
+      flex: 1; /* 填满容器 */
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 头部 -->
+    <div class="header" style="border-bottom: none;">
+      <div class="title-group">
+        <h1>用户消费偏好分析</h1>
+        
+      </div>
+      
+    </div>
+
+    <!-- 内容区 -->
+    <div class="content-wrapper">
+      
+      <!-- 左侧洞察卡片 -->
+      <div class="insights-panel">
+        <div class="insight-card primary">
+          <h3>
+            <i class="fa-solid fa-gamepad" style="color: #3498db;"></i>
+            年轻群体 (18-25)
+          </h3>
+          <p>休闲娱乐与数码产品占据主导地位，显示出强烈的体验型消费倾向。</p>
+          <div class="stat-number">42% <span style="font-size:12px; color:#999; font-weight:400;">娱乐占比</span></div>
+        </div>
+
+        <div class="insight-card success">
+          <h3>
+            <i class="fa-solid fa-shirt" style="color: #2ecc71;"></i>
+            中坚力量 (26-35)
+          </h3>
+          <p>服饰美妆消费达到峰值，同时保持较高的数码产品更新频率。</p>
+          <div class="stat-number">35% <span style="font-size:12px; color:#999; font-weight:400;">服饰占比</span></div>
+        </div>
+
+        <div class="insight-card warning">
+          <h3>
+            <i class="fa-solid fa-basket-shopping" style="color: #f1c40f;"></i>
+            成熟群体 (36+)
+          </h3>
+          <p>食品生鲜与家庭开支显著增加，消费结构趋于务实和家庭导向。</p>
+          <div class="stat-number">45% <span style="font-size:12px; color:#999; font-weight:400;">生鲜占比</span></div>
+        </div>
+      </div>
+
+      <!-- 右侧图表 -->
+      <div class="chart-container">
+        <div id="mainChart"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 初始化 ECharts 实例
+    var chartDom = document.getElementById('mainChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    // 数据配置
+    option = {
+      animation: false,
+      color: ['#3498db', '#2ecc71', '#f1c40f', '#e74c3c'],
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'shadow' },
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        textStyle: { color: '#333' },
+        extraCssText: 'box-shadow: 0 2px 10px rgba(0,0,0,0.1); border-radius: 8px;'
+      },
+      legend: {
+        data: ['休闲娱乐', '数码产品', '服饰美妆', '食品生鲜'],
+        bottom: '0%',
+        icon: 'circle',
+        itemGap: 20, // 减小图例间距
+        textStyle: {
+          fontSize: 13,
+          color: '#666',
+          fontFamily: 'Noto Sans SC'
+        }
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '12%', // 增加底部空间防止遮挡
+        top: '10%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: ['18-25岁', '26-35岁', '36-45岁', '45岁+'],
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: {
+          fontSize: 14, // 稍微减小
+          fontWeight: 'bold',
+          color: '#2c3e50',
+          margin: 15,
+          fontFamily: 'Noto Sans SC'
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '消费占比 (%)',
+        nameTextStyle: {
+          color: '#999',
+          padding: [0, 0, 0, 20]
+        },
+        splitLine: {
+          lineStyle: {
+            type: 'dashed',
+            color: '#eee'
+          }
+        },
+        axisLabel: {
+          color: '#999',
+          fontSize: 12
+        }
+      },
+      series: [
+        {
+          name: '休闲娱乐',
+          type: 'bar',
+          stack: 'total',
+          barWidth: '40%', // 稍微减小柱宽
+          data: [42, 25, 15, 10],
+          itemStyle: { borderRadius: [0, 0, 0, 0] }
+        },
+        {
+          name: '数码产品',
+          type: 'bar',
+          stack: 'total',
+          data: [30, 25, 15, 10]
+        },
+        {
+          name: '服饰美妆',
+          type: 'bar',
+          stack: 'total',
+          data: [18, 35, 25, 15]
+        },
+        {
+          name: '食品生鲜',
+          type: 'bar',
+          stack: 'total',
+          data: [10, 15, 45, 65],
+          itemStyle: { borderRadius: [6, 6, 0, 0] },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: '{c}%',
+            color: '#666',
+            fontSize: 12,
+            distance: 5,
+            formatter: function(params) {
+                var total = 0;
+                var dataIndex = params.dataIndex;
+                var d1 = [42, 25, 15, 10];
+                var d2 = [30, 25, 15, 10];
+                var d3 = [18, 35, 25, 15];
+                var d4 = [10, 15, 45, 65];
+                total = d1[dataIndex] + d2[dataIndex] + d3[dataIndex] + d4[dataIndex];
+                return '100%';
+            }
+          }
+        }
+      ]
+    };
+
+    option && myChart.setOption(option);
+    
+    // 监听窗口大小变化，确保图表自适应
+    window.addEventListener('resize', function() {
+      myChart.resize();
+    });
+  </script>
+
+</body></html>

@@ -1,0 +1,379 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f4f6f8;
+        color: #333;
+    }
+
+    /* 背景装饰 */
+    .bg-shape {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 600px;
+        height: 400px;
+        background: linear-gradient(135deg, #e0f2f1 0%, #f4f6f8 100%);
+        border-bottom-left-radius: 100%;
+        z-index: 0;
+    }
+
+    /* 布局容器 */
+    .container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        padding: 40px 60px;
+        display: flex;
+        flex-direction: column;
+        z-index: 1;
+    }
+
+    /* 标题区域 */
+    .header {
+        margin-bottom: 30px;
+        border-left: 8px solid #00897b;
+        padding-left: 24px;
+    }
+
+    .header h1 {
+        font-size: 42px;
+        font-weight: 900;
+        color: #263238;
+        letter-spacing: 1px;
+        margin-bottom: 8px;
+    }
+
+    .header p {
+        font-size: 20px;
+        color: #546e7a;
+        font-weight: 500;
+    }
+
+    /* 卡片容器 */
+    .cards-container {
+        display: flex;
+        justify-content: space-between;
+        gap: 24px;
+        margin-bottom: 20px;
+        flex-grow: 1;
+    }
+
+    /* 单个阶段卡片 */
+    .card {
+        flex: 1;
+        background: white;
+        border-radius: 16px;
+        padding: 24px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        border-top: 6px solid transparent;
+    }
+
+    /* 阶段特定样式 */
+    .card.junior { border-top-color: #26a69a; }
+    .card.mid { border-top-color: #00897b; }
+    .card.senior { border-top-color: #f9a825; }
+    .card.expert { border-top-color: #d84315; }
+
+    .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+    }
+
+    .icon-box {
+        width: 48px;
+        height: 48px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        color: white;
+        margin-right: 16px;
+    }
+
+    .junior .icon-box { background: linear-gradient(135deg, #4db6ac, #26a69a); }
+    .mid .icon-box { background: linear-gradient(135deg, #26a69a, #00897b); }
+    .senior .icon-box { background: linear-gradient(135deg, #fbc02d, #f9a825); }
+    .expert .icon-box { background: linear-gradient(135deg, #ff7043, #d84315); }
+
+    .stage-title {
+        font-size: 20px;
+        font-weight: 700;
+        color: #37474f;
+    }
+
+    .stage-subtitle {
+        font-size: 14px;
+        color: #78909c;
+        margin-top: 2px;
+    }
+
+    .card-content ul {
+        list-style: none;
+    }
+
+    .card-content li {
+        font-size: 15px;
+        color: #455a64;
+        margin-bottom: 12px;
+        padding-left: 20px;
+        position: relative;
+        line-height: 1.5;
+    }
+
+    .card-content li::before {
+        content: "\f00c";
+        font-family: "Font Awesome 6 Free";
+        font-weight: 900;
+        position: absolute;
+        left: 0;
+        top: 2px;
+        font-size: 12px;
+    }
+
+    .junior li::before { color: #26a69a; }
+    .mid li::before { color: #00897b; }
+    .senior li::before { color: #f9a825; }
+    .expert li::before { color: #d84315; }
+
+    /* 底部图表区域 */
+    .chart-section {
+        height: 220px;
+        width: 100%;
+        background: white;
+        border-radius: 16px;
+        padding: 20px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+        display: flex;
+    }
+
+    .chart-info {
+        width: 250px;
+        padding-right: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .chart-info h3 {
+        font-size: 18px;
+        color: #37474f;
+        margin-bottom: 10px;
+    }
+
+    .chart-info p {
+        font-size: 14px;
+        color: #78909c;
+        line-height: 1.6;
+    }
+
+    #growthChart {
+        flex-grow: 1;
+        height: 100%;
+    }
+
+    /* 标签 */
+    .tag {
+        display: inline-block;
+        padding: 4px 8px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        margin-top: auto;
+        text-align: center;
+        width: fit-content;
+    }
+    .junior .tag { background: #e0f2f1; color: #00695c; }
+    .mid .tag { background: #e0f2f1; color: #004d40; }
+    .senior .tag { background: #fff9c4; color: #f57f17; }
+    .expert .tag { background: #fbe9e7; color: #bf360c; }
+
+  </style>
+</head>
+<body>
+
+  <div class="bg-shape"></div>
+
+  <div class="container">
+    <!-- 头部 -->
+    <div class="header" style="border-bottom: none;">
+        <h1>个人职业发展路径规划</h1>
+        
+    </div>
+
+    <!-- 核心卡片区 -->
+    <div class="cards-container">
+        <!-- 初级阶段 -->
+        <div class="card junior">
+            <div class="card-header">
+                <div class="icon-box"><i class="fa-solid fa-seedling"></i></div>
+                <div>
+                    <div class="stage-title">初级阶段</div>
+                    <div class="stage-subtitle">0-3 年</div>
+                </div>
+            </div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>基础夯实：</strong>掌握核心技能与工具</li>
+                    <li><strong>执行力：</strong>按时保质完成分配任务</li>
+                    <li><strong>学习心态：</strong>建立良好的职业习惯</li>
+                </ul>
+            </div>
+            <div class="tag">关注点：执行与学习</div>
+        </div>
+
+        <!-- 中级阶段 -->
+        <div class="card mid">
+            <div class="card-header">
+                <div class="icon-box"><i class="fa-solid fa-layer-group"></i></div>
+                <div>
+                    <div class="stage-title">中级阶段</div>
+                    <div class="stage-subtitle">3-5 年</div>
+                </div>
+            </div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>独立担当：</strong>独立负责模块或项目</li>
+                    <li><strong>问题解决：</strong>处理复杂业务场景</li>
+                    <li><strong>经验沉淀：</strong>开始输出方法论</li>
+                </ul>
+            </div>
+            <div class="tag">关注点：独立与专精</div>
+        </div>
+
+        <!-- 高级阶段 -->
+        <div class="card senior">
+            <div class="card-header">
+                <div class="icon-box"><i class="fa-solid fa-chess-knight"></i></div>
+                <div>
+                    <div class="stage-title">高级阶段</div>
+                    <div class="stage-subtitle">5-8 年</div>
+                </div>
+            </div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>架构思维：</strong>系统性规划与设计</li>
+                    <li><strong>团队赋能：</strong>指导新人，技术分享</li>
+                    <li><strong>攻坚克难：</strong>解决关键性技术瓶颈</li>
+                </ul>
+            </div>
+            <div class="tag">关注点：体系与传承</div>
+        </div>
+
+        <!-- 专家/管理阶段 -->
+        <div class="card expert">
+            <div class="card-header">
+                <div class="icon-box"><i class="fa-solid fa-crown"></i></div>
+                <div>
+                    <div class="stage-title">专家/管理</div>
+                    <div class="stage-subtitle">8年+</div>
+                </div>
+            </div>
+            <div class="card-content">
+                <ul>
+                    <li><strong>战略规划：</strong>制定长远技术/业务方向</li>
+                    <li><strong>决策力：</strong>在不确定性中做正确决策</li>
+                    <li><strong>影响力：</strong>跨部门协调与行业影响</li>
+                </ul>
+            </div>
+            <div class="tag">关注点：战略与影响</div>
+        </div>
+    </div>
+
+    <!-- 底部图表区 -->
+    <div class="chart-section">
+        <div class="chart-info">
+            <h3>能力成长曲线</h3>
+            <p>随着职业阶段的提升，<strong>技术深度</strong>与<strong>业务/管理广度</strong>的权重将发生变化，综合影响力呈指数级增长。</p>
+        </div>
+        <div id="growthChart"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script>
+    // 初始化 ECharts
+    var chartDom = document.getElementById('growthChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+        animation: false, // 严格禁止动画
+        grid: {
+            top: '15%',
+            left: '3%',
+            right: '4%',
+            bottom: '10%',
+            containLabel: true
+        },
+        legend: {
+            data: ['专业技能深度', '管理与影响力'],
+            right: 10,
+            top: 0,
+            textStyle: { color: '#546e7a' }
+        },
+        xAxis: {
+            type: 'category',
+            boundaryGap: false,
+            data: ['入职', '初级', '中级', '高级', '专家/管理'],
+            axisLine: { lineStyle: { color: '#cfd8dc' } },
+            axisLabel: { color: '#546e7a', fontWeight: 'bold' }
+        },
+        yAxis: {
+            type: 'value',
+            splitLine: { lineStyle: { type: 'dashed', color: '#eceff1' } },
+            axisLabel: { show: false }
+        },
+        series: [
+            {
+                name: '专业技能深度',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+                itemStyle: { color: '#00897b' },
+                lineStyle: { width: 4 },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(0, 137, 123, 0.3)' },
+                        { offset: 1, color: 'rgba(0, 137, 123, 0.05)' }
+                    ])
+                },
+                data: [10, 40, 75, 90, 95]
+            },
+            {
+                name: '管理与影响力',
+                type: 'line',
+                smooth: true,
+                symbol: 'circle',
+                symbolSize: 8,
+                itemStyle: { color: '#f9a825' },
+                lineStyle: { width: 4 },
+                areaStyle: {
+                    color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                        { offset: 0, color: 'rgba(249, 168, 37, 0.3)' },
+                        { offset: 1, color: 'rgba(249, 168, 37, 0.05)' }
+                    ])
+                },
+                data: [5, 15, 30, 60, 95]
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>
