@@ -611,9 +611,14 @@
       <!-- 预览模态框 -->
       <div v-if="showBatchPreview" class="preview-modal" @click="showBatchPreview = false">
         <div class="preview-content" @click.stop>
-          <button class="close-preview" @click="showBatchPreview = false">×</button>
-          <iframe v-if="batchPreviewHtml" :srcdoc="batchPreviewHtml" frameborder="0" class="preview-iframe"></iframe>
-          <img v-if="batchPreviewImage" :src="batchPreviewImage" class="preview-image-full" />
+          <div class="preview-header">
+            <h3>生成预览</h3>
+            <button class="close-preview" @click="showBatchPreview = false">×</button>
+          </div>
+          <div class="preview-body">
+            <iframe v-if="batchPreviewHtml" :srcdoc="batchPreviewHtml" frameborder="0" class="preview-iframe"></iframe>
+            <img v-if="batchPreviewImage" :src="batchPreviewImage" class="preview-image-full" />
+          </div>
         </div>
       </div>
     </div>
@@ -1048,6 +1053,7 @@ async function handleExtractOnly() {
       }
       
       const beforeContent = extractStreamContent.value;
+      const startTime = Date.now();
       
       const style = await extractStyleFromImage(
         {
@@ -1079,6 +1085,10 @@ async function handleExtractOnly() {
           },
         }
       );
+      
+      const endTime = Date.now();
+      const duration = ((endTime - startTime) / 1000).toFixed(2);
+      extractStreamContent.value += `\n\n⏱️ 视觉提取耗时: ${duration}s`;
       
       // 保存最后一次的结果
       if (i === loopCount - 1) {
@@ -1128,6 +1138,8 @@ async function handleGenerateOnly() {
     );
   }
 
+  const startTime = Date.now();
+
   try {
     // 如果选择了HTML模板，确保模板已加载
     if (outputType.value === 'html') {
@@ -1170,6 +1182,21 @@ async function handleGenerateOnly() {
       }
     );
     result.value = generateResult;
+
+    const endTime = Date.now();
+    const duration = ((endTime - startTime) / 1000).toFixed(2);
+    
+    if (outputType.value === 'html') {
+        generateStreamContent.value += `\n\n⏱️ HTML生成耗时: ${duration}s`;
+    } else {
+        generateStreamContent.value += `\n\n⏱️ 图片生成耗时: ${duration}s`;
+    }
+
+    if (generateResult.success) {
+      generateStreamContent.value += '\n\n✅ 生成完成！';
+    } else {
+      generateStreamContent.value += `\n\n❌ 生成失败`;
+    }
   } catch (error) {
     console.error('生成出错:', error);
     const errMsg = error instanceof Error ? error.message : String(error);
@@ -1243,6 +1270,7 @@ async function handleGenerateAll() {
   // 第二阶段：生成结果
   isGenerating.value = true;
   currentStage.value = 'generating';
+  const startTime = Date.now();
 
       // 根据输出类型设置不同的宽高
       // HTML: 1280x720, 图片: 3600x2025
@@ -1299,6 +1327,21 @@ async function handleGenerateAll() {
       }
     );
     result.value = generateResult;
+
+    const endTime = Date.now();
+    const duration = ((endTime - startTime) / 1000).toFixed(2);
+    
+    if (outputType.value === 'html') {
+        generateStreamContent.value += `\n\n⏱️ HTML生成耗时: ${duration}s`;
+    } else {
+        generateStreamContent.value += `\n\n⏱️ 图片生成耗时: ${duration}s`;
+    }
+
+    if (generateResult.success) {
+      generateStreamContent.value += '\n\n✅ 生成完成！';
+    } else {
+      generateStreamContent.value += `\n\n❌ 生成失败`;
+    }
   } catch (error) {
     console.error('生成出错:', error);
     const errMsg = error instanceof Error ? error.message : String(error);
@@ -2062,18 +2105,33 @@ async function handleStartTest() {
     const themeCol = findColumnIndex(sheet, '主题');
     const extractModelCol = findColumnIndex(sheet, '风格提取模型');
     const extractTextCol = findColumnIndex(sheet, '风格提取文本');
+    let extractTimeCol = findColumnIndex(sheet, '视觉提取耗时');
     const htmlModelCol = findColumnIndex(sheet, 'html使用模型');
     const htmlImageCol = findColumnIndex(sheet, 'html生成');
+    let htmlTimeCol = findColumnIndex(sheet, 'HTML生成耗时');
     const htmlSourceCol = findColumnIndex(sheet, 'html源码');
     const imageModelCol = findColumnIndex(sheet, '图片使用模型');
     const imageGenCol = findColumnIndex(sheet, '图片生成');
+
+    // 自动添加缺失的时间列
+    const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+    let nextCol = range.e.c + 1;
+
+    if (extractTimeCol === null) {
+      extractTimeCol = nextCol++;
+      writeTextToExcel(0, extractTimeCol, '视觉提取耗时');
+    }
+    if (htmlTimeCol === null) {
+      htmlTimeCol = nextCol++;
+      writeTextToExcel(0, htmlTimeCol, 'HTML生成耗时');
+    }
 
     if (bodyPageCol === null || themeCol === null) {
       throw new Error('Excel文件中未找到"正文页"或"主题"列');
     }
 
     // 获取数据范围，遍历所有行
-    const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
+    // const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1'); // range已在上面定义
     const totalRows = range.e.r;
     
     testLog.value += `找到 ${totalRows} 行数据，开始遍历处理...\n\n`;
@@ -2254,6 +2312,7 @@ async function handleStartTest() {
              styleDescription = resultItem.styleDescription;
              testLog.value += `使用已提取的样式描述\n`;
           } else {
+              const extractStartTime = Date.now();
               const styleResult = await extractStyleFromImage(
                 {
                   imageBase64s: imageBase64s,
@@ -2267,6 +2326,9 @@ async function handleStartTest() {
                   },
                 }
               );
+              const extractDuration = ((Date.now() - extractStartTime) / 1000).toFixed(2);
+              if (extractTimeCol !== null) writeTextToExcel(rowIndex, extractTimeCol, `${extractDuration}s`);
+              
               styleDescription = styleResult.styleDescription;
               resultItem.styleDescription = styleDescription;
           }
@@ -2287,6 +2349,7 @@ async function handleStartTest() {
           }
           const htmlTemplate = getHtmlTemplate();
           
+          const htmlStartTime = Date.now();
           const htmlGenerateResult = await generateSlide(
             {
               styleDescription: styleDescription, // 明确传递样式描述
@@ -2303,6 +2366,8 @@ async function handleStartTest() {
               onError(error) { testLog.value += `HTML生成错误: ${error}\n`; }
             }
           );
+          const htmlDuration = ((Date.now() - htmlStartTime) / 1000).toFixed(2);
+          if (htmlTimeCol !== null) writeTextToExcel(rowIndex, htmlTimeCol, `${htmlDuration}s`);
 
           if (htmlGenerateResult.success && htmlGenerateResult.html) {
              resultItem.html = htmlGenerateResult.html;
@@ -3281,19 +3346,43 @@ onMounted(async () => {
 
 .preview-content {
   background: white;
-  padding: 20px;
   border-radius: 8px;
   position: relative;
-  max-width: 90%;
-  max-height: 90%;
-  overflow: auto;
+  max-width: 95%;
+  max-height: 95%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
+.preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  border-bottom: 1px solid #eee;
+  background: #fff;
+  flex-shrink: 0;
+}
+
+.preview-header h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.preview-body {
+  padding: 20px;
+  overflow: auto;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  background: #f8fafc;
+}
+
 .close-preview {
-  position: absolute;
-  top: 10px;
-  right: 10px;
   background: #f1f1f1;
   border: none;
   width: 30px;
@@ -3304,7 +3393,11 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 10;
+  transition: background 0.2s;
+}
+
+.close-preview:hover {
+  background: #e2e2e2;
 }
 
 .preview-iframe {
