@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import AIGenerateIntentConfirm from './AIGenerateIntentConfirm.vue';
+import AIGenerateProcess from './AIGenerateProcess.vue';
 import { generateIntentQuestions, type IntentQuestion } from '../../services/customAiService';
-import { extractStyleFromImage } from '../../keepstyle/extractStyleService';
-import { generateSlide } from '../../keepstyle/generateService';
 
 const props = defineProps<{
   modelValue: boolean;
@@ -19,10 +18,11 @@ const emit = defineEmits<{
 const prompt = ref('');
 const isGenerating = ref(false);
 const isConfirming = ref(false); // New state for intent confirmation
+const isProcessing = ref(false); // New state for process visualization
 const isThinking = ref(false); // State for analyzing intent
 const thinkingTime = ref(0);
 const intentQuestions = ref<IntentQuestion[]>([]);
-const selectedMode = ref('base'); // base, web, pro, style-inherit
+const selectedMode = ref('base'); // base, web, pro
 const selectedLayout = ref('smart'); // smart, left-img, multi-col, etc.
 
 // Confirmation Form Data
@@ -53,16 +53,6 @@ const modes = computed(() => {
       image: 'https://ai-webwpp.ks3-cn-beijing.ksyuncs.com/banana/generate-slide/20251230/tab-image.png'
     }
   ];
-
-  if (props.currentSlideImage) {
-    baseModes.push({
-      id: 'style-inherit',
-      title: '样式保持',
-      desc: '基于当前选中幻灯片样式的风格迁移与内容生成',
-      icon: 'fa-solid fa-wand-magic-sparkles',
-      image: props.currentSlideImage.url
-    });
-  }
 
   return baseModes;
 });
@@ -116,102 +106,22 @@ watch(selectedMode, (newMode) => {
   }
 });
 
-// Helper to convert URL to Base64
-async function urlToBase64(url: string): Promise<string> {
-  const response = await fetch(url);
-  const blob = await response.blob();
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      resolve(reader.result as string);
-    };
-    reader.onerror = reject;
-    reader.readAsDataURL(blob);
-  });
-}
-
 async function handleGenerateClick() {
   if (!prompt.value.trim()) return;
   
-  // Style Preservation Mode: Bypass Intent Confirmation and run direct generation
-  if (selectedMode.value === 'style-inherit' && props.currentSlideImage) {
-    await handleStyleInheritGeneration();
-    return;
-  }
-  
-  // Start thinking process and switch view IMMEDIATELY
-  isThinking.value = true;
-  isConfirming.value = true; // Show confirm screen immediately with loading state
-  intentQuestions.value = []; // Clear previous questions
-  const startTime = Date.now();
-  
-  thinkingTime.value = 0;
-  thinkingTimer = setInterval(() => {
-    thinkingTime.value++;
-  }, 1000);
-
-  try {
-    let imagesForIntent: string[] | undefined = undefined;
-    
-    // Call AI to generate clarifying questions
-    const response = await generateIntentQuestions(prompt.value, imagesForIntent);
-    
-    // Calculate actual duration
-    const endTime = Date.now();
-    thinkingTime.value = Math.round((endTime - startTime) / 1000); // Update with actual duration in seconds
-    if (thinkingTime.value < 1) thinkingTime.value = 1; // Minimum 1s
-
-    if (response && response.questions && response.questions.length > 0) {
-      intentQuestions.value = response.questions;
-    } else {
-      // Fallback if no questions generated, just generate the slide
-      handleConfirmAndGenerate({}); 
-    }
-  } catch (error) {
-    console.error('Intent recognition failed:', error);
-    // Fallback: Just generate directly if intent recognition fails
-    handleConfirmAndGenerate({});
-  } finally {
-    isThinking.value = false;
-    if (thinkingTimer) clearInterval(thinkingTimer);
-  }
+  // Directly start processing visualization (Bypassing Intent Confirmation for now)
+  isProcessing.value = true;
 }
 
-async function handleStyleInheritGeneration() {
-  isGenerating.value = true;
-  
-  try {
-    if (!props.currentSlideImage) throw new Error('No image selected');
-    
-    // 1. Get Image Base64
-    const base64 = await urlToBase64(props.currentSlideImage.url);
-    
-    // 2. Extract Style (using KeepStyle logic)
-    // prompt.value is passed as userPrompt to guide extraction if needed (e.g. specific color overrides mentioned in prompt)
-    const styleResult = await extractStyleFromImage({
-      imageBase64s: [base64],
-      userPrompt: prompt.value 
-    });
-    
-    // 3. Generate Slide (using KeepStyle logic)
-    const generateResult = await generateSlide({
-      styleDescription: styleResult.styleDescription,
-      userPrompt: prompt.value,
-      outputType: 'html',
-      width: 1280,
-      height: 720
-    });
-    
-    emit('generated-result', generateResult);
-    emit('generate', prompt.value);
-    emit('update:modelValue', false);
-    
-  } catch (e) {
-    console.error('Style inherit generation failed:', e);
-    alert('生成失败: ' + (e instanceof Error ? e.message : String(e)));
-  } finally {
-    isGenerating.value = false;
-  }
+function handleProcessComplete() {
+  // Animation done, emit generate
+  emit('generate', prompt.value);
+  emit('update:modelValue', false);
+  isProcessing.value = false;
+}
+
+function handleProcessCancel() {
+  isProcessing.value = false;
 }
 
 async function handleConfirmAndGenerate(data: any) {
@@ -252,6 +162,38 @@ function handleClose() {
 <template>
   <div v-if="modelValue" class="modal-overlay" @click.self="handleClose">
     <div class="modal-container">
+      <!-- Background Blobs -->
+      <div class="modal-bg">
+        <svg xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" viewBox="0 0 1048 602" fill="none" preserveAspectRatio="none">
+          <g opacity="0.3" filter="url(#filter0_f)">
+            <path d="M-26 202.337C-26 61.2284 88.3913 -53.1628 229.5 -53.1628H282.5C423.609 -53.1628 538 61.2284 538 202.337C538 343.446 423.609 457.837 282.5 457.837H229.5C88.3913 457.837 -26 343.446 -26 202.337Z" fill="#BEDBFF" fill-opacity="0.4"/>
+          </g>
+          <g opacity="0.3" filter="url(#filter1_f)">
+            <path d="M427 558.837C427 427.946 533.109 321.837 664 321.837H865C995.891 321.837 1102 427.946 1102 558.837C1102 689.729 995.891 795.837 865 795.837H664C533.109 795.837 427 689.729 427 558.837Z" fill="#E9D4FF" fill-opacity="0.4"/>
+          </g>
+          <g opacity="0.3" filter="url(#filter2_f)">
+            <path d="M470 223.837C470 128.292 547.455 50.8372 643 50.8372H810C905.545 50.8372 983 128.292 983 223.837C983 319.382 905.545 396.837 810 396.837H643C547.455 396.837 470 319.382 470 223.837Z" fill="#FCE7F3" fill-opacity="0.4"/>
+          </g>
+          <defs>
+            <filter id="filter0_f" x="-226" y="-253.163" width="964" height="911" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+              <feGaussianBlur stdDeviation="100" result="effect1_foregroundBlur"/>
+            </filter>
+            <filter id="filter1_f" x="227" y="121.837" width="1075" height="874" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+              <feGaussianBlur stdDeviation="100" result="effect1_foregroundBlur"/>
+            </filter>
+            <filter id="filter2_f" x="310" y="-109.163" width="833" height="666" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
+              <feFlood flood-opacity="0" result="BackgroundImageFix"/>
+              <feBlend mode="normal" in="SourceGraphic" in2="BackgroundImageFix" result="shape"/>
+              <feGaussianBlur stdDeviation="80" result="effect1_foregroundBlur"/>
+            </filter>
+          </defs>
+        </svg>
+      </div>
+
       <!-- Close Button -->
       <button class="close-btn" @click="handleClose">
         <i class="fa-solid fa-xmark"></i>
@@ -262,24 +204,24 @@ function handleClose() {
         <h2>灵感瞬间生成，细节随心修改</h2>
       </div>
 
-      <!-- Main Input Area (Hidden when confirming) -->
-      <div v-if="!isConfirming" class="input-section">
+      <!-- Main Input Area (Hidden when confirming or processing) -->
+      <div v-if="!isConfirming && !isProcessing" class="input-section">
         <div class="input-wrapper">
           <textarea 
-            v-model="prompt" 
+            v-model="prompt"  
             placeholder="请输入幻灯片正文页主题或粘贴大纲内容"
             class="main-textarea"
           ></textarea>
           
           <div class="input-footer">
-            <div class="footer-tools">
+            <div class="footer-tools" v-if="!['web', 'pro'].includes(selectedMode)">
               <button class="tool-btn"><i class="fa-solid fa-globe"></i> 联网搜索</button>
               <button class="tool-btn"><i class="fa-solid fa-brain"></i> 深度思考</button>
               <button class="tool-btn lang-btn"><i class="fa-solid fa-language"></i> 中文 <i class="fa-solid fa-chevron-down"></i></button>
             </div>
             
-            <div class="footer-actions">
-              <div class="page-count">
+            <div class="footer-actions" style="margin-left: auto">
+              <div class="page-count" v-if="!['web', 'pro'].includes(selectedMode)">
                 生成 1 页 <i class="fa-solid fa-chevron-down"></i>
               </div>
               <button 
@@ -299,17 +241,24 @@ function handleClose() {
         </div>
       </div>
 
+      <!-- Process Visualization Section -->
+      <AIGenerateProcess 
+        v-else-if="isProcessing"
+        @cancel="handleProcessCancel"
+        @complete="handleProcessComplete"
+      />
+
       <!-- Intent Confirmation Section (Shown when confirming) -->
       <AIGenerateIntentConfirm 
-        v-else 
+        v-else-if="isConfirming"
         :questions="intentQuestions"
         :is-thinking="isThinking"
         :thinking-duration="thinkingTime"
         @confirm="handleConfirmAndGenerate"
       />
 
-      <!-- Settings Section (Only show when not confirming) -->
-      <div v-if="!isConfirming" class="settings-section">
+      <!-- Settings Section (Only show when not confirming or processing) -->
+      <div v-if="!isConfirming && !isProcessing" class="settings-section">
         <!-- Modes -->
         <div class="setting-group">
           <h3 class="group-title">选择生成模式</h3>
@@ -389,18 +338,35 @@ function handleClose() {
 
 .modal-container {
   background: #fff;
-  width: 1100px;
+  width: 1048px;
   max-width: 95vw;
-  height: 820px;
+  height: auto;
+  min-height: 600px;
   max-height: 88vh;
   border-radius: 20px;
   box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
   padding: 40px;
   position: relative;
-  overflow-y: auto;
+  overflow: hidden;
   animation: modalScaleIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
   flex-direction: column;
+}
+
+.modal-bg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.8;
+}
+
+.modal-header, .input-section, .settings-section, .close-btn {
+  position: relative;
+  z-index: 1;
 }
 
 .input-section, .settings-section {
@@ -445,13 +411,14 @@ function handleClose() {
 
 /* Input Section */
 .input-wrapper {
-  background: #fff;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid #e0e0e0;
   border-radius: 16px;
   padding: 20px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
   margin-bottom: 30px;
   transition: all 0.3s;
+  backdrop-filter: blur(10px);
 }
 
 .input-wrapper:focus-within {
@@ -469,6 +436,7 @@ function handleClose() {
   outline: none;
   color: #333;
   font-family: inherit;
+  background: transparent;
 }
 
 .main-textarea::placeholder {
@@ -489,21 +457,22 @@ function handleClose() {
 }
 
 .tool-btn {
-  background: none;
-  border: none;
+  background: #f5f5f5;
+  border: 1px solid transparent;
   color: #666;
   font-size: 14px;
   cursor: pointer;
   display: flex;
   align-items: center;
   gap: 6px;
-  padding: 6px 10px;
-  border-radius: 6px;
+  padding: 8px 16px;
+  border-radius: 8px;
   transition: all 0.2s;
+  font-weight: 500;
 }
 
 .tool-btn:hover {
-  background: #f5f5f5;
+  background: #e0e0e0;
   color: #333;
 }
 
@@ -564,15 +533,16 @@ function handleClose() {
 
 /* Modes */
 .mode-list {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  display: flex;
   gap: 16px;
+  margin-bottom: 24px;
 }
 
 .mode-item {
+  flex: 1;
   border: 1px solid #e0e0e0;
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -581,52 +551,68 @@ function handleClose() {
   background: #fff;
   position: relative;
   overflow: hidden;
-}
-
-.mode-item:hover {
-  border-color: #2979ff; /* Blue hover like screenshot */
-  background: #f0f7ff;
-}
-
-.mode-item.active {
-  border-color: #2979ff;
-  background: #e3f2fd;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.02);
 }
 
 .mode-info {
   flex: 1;
-  padding-right: 10px;
-  z-index: 2;
+  padding-right: 16px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 
 .mode-header {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 6px;
+  margin-bottom: 8px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 16px;
   color: #333;
 }
 
+.mode-header i {
+  font-size: 18px;
+  color: #555;
+}
+
 .mode-desc {
-  font-size: 12px;
-  color: #666; /* Darker text for readability */
-  line-height: 1.4;
+  font-size: 13px;
+  color: #888;
+  line-height: 1.5;
 }
 
 .mode-img {
-  width: 80px;
+  width: 60px;
   height: 60px;
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 }
 
 .mode-img img {
   max-width: 100%;
   max-height: 100%;
   object-fit: contain;
+}
+
+.mode-item:hover {
+  border-color: #2979ff;
+  background: #f5f9ff;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(41, 121, 255, 0.1);
+}
+
+.mode-item.active {
+  border-color: #2979ff;
+  background: #f0f7ff;
+  box-shadow: 0 0 0 1px #2979ff inset;
+}
+
+.mode-item.active .mode-header i {
+  color: #2979ff;
 }
 
 /* Layouts */

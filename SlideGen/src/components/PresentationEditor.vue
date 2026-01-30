@@ -1,19 +1,31 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch } from 'vue';
+import { ref } from 'vue';
 import AIGenerateModal from './AIGeneration/AIGenerateModal.vue';
-import JSZip from 'jszip';
 
-interface Slide {
-  id: string;
-  thumbnailUrl: string; // Base64 or URL
-  type: 'image' | 'pptx';
-  content?: string; // OOXML content or extra data
-  timestamp: number;
-}
+const images = [
+  '低对比度样张.png',
+  '低对比度样张2.png',
+  '星空正文总分页.png',
+  '灰绿色正文页.png',
+  '灰绿色饼状图正文页.png',
+  '白底黑字——极简场景.png',
+  '简单色彩样张.png',
+  '粉紫色鱼骨图正文页.png',
+  '红色正文图文页.png',
+  '红色正文过渡页.png',
+  '绿色正文分栏页.png',
+  '蓝白色正文页.png',
+  '蓝色SWOT正文页.png',
+  '蓝色正文数据页.png',
+  '蓝色正文页.png',
+  '黑底白字——极简场景.png'
+].map(name => ({
+  id: name,
+  url: `/assets/images/${name}`,
+  name: name.replace('.png', '')
+}));
 
-// State
-const slides = ref<Slide[]>([]);
-const activeSlide = ref<Slide | null>(null);
+const activeImage = ref(images[0]);
 const zoomLevel = ref(100);
 
 // AI Modal State
@@ -21,208 +33,12 @@ const showAiModal = ref(false);
 const previewHtml = ref('');
 const showPreviewModal = ref(false);
 
-// Storage Keys
-const STORAGE_KEY = 'presentation_editor_slides';
-
-// Load from LocalStorage
-function loadFromStorage() {
-  try {
-    const data = localStorage.getItem(STORAGE_KEY);
-    if (data) {
-      slides.value = JSON.parse(data);
-      if (slides.value.length > 0) {
-        activeSlide.value = slides.value[0];
-      }
-    }
-  } catch (e) {
-    console.error('Failed to load slides from storage:', e);
-  }
-}
-
-// Save to LocalStorage
-function saveToStorage() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(slides.value));
-  } catch (e) {
-    console.error('Failed to save slides to storage (quota exceeded?):', e);
-    alert('存储空间不足，无法保存更多内容');
-  }
-}
-
-// Watch changes to save
-watch(slides, () => {
-  saveToStorage();
-}, { deep: true });
-
-// Helper to extract text from PPTX slide XML
-async function extractSlideText(xmlContent: string): Promise<string> {
-  const parser = new DOMParser();
-  const xmlDoc = parser.parseFromString(xmlContent, "text/xml");
-  const textNodes = xmlDoc.getElementsByTagName("a:t");
-  let text = "";
-  for (let i = 0; i < textNodes.length; i++) {
-    text += textNodes[i].textContent + "\n";
-  }
-  return text;
-}
-
-// Helper to extract content from PPTX
-async function parsePptx(file: File): Promise<{ thumbnail: string | null; slidesData: any[] }> {
-  const result = { thumbnail: null as string | null, slidesData: [] as any[] };
-  
-  try {
-    const zip = await JSZip.loadAsync(file);
-    
-    // 1. Try to find the thumbnail
-    const thumbFile = zip.file('docProps/thumbnail.jpeg');
-    if (thumbFile) {
-      const blob = await thumbFile.async('blob');
-      result.thumbnail = URL.createObjectURL(blob);
-    }
-
-    // 2. Parse slides to get text content
-    // Find all slide XML files
-    const slideFiles = Object.keys(zip.files).filter(name => 
-      name.startsWith('ppt/slides/slide') && name.endsWith('.xml')
-    );
-    
-    // Sort by number (slide1.xml, slide2.xml, ...)
-    slideFiles.sort((a, b) => {
-      const numA = parseInt(a.match(/slide(\d+)\.xml/)?.[1] || '0');
-      const numB = parseInt(b.match(/slide(\d+)\.xml/)?.[1] || '0');
-      return numA - numB;
-    });
-
-    for (const fileName of slideFiles) {
-        const fileData = await zip.file(fileName)?.async('string');
-        if (fileData) {
-            const text = await extractSlideText(fileData);
-            result.slidesData.push({
-                fileName,
-                text: text.trim()
-            });
-        }
-    }
-
-  } catch (e) {
-    console.error('Failed to parse PPTX:', e);
-  }
-  return result;
-}
-
-async function processFile(file: File) {
-    if (file.name.endsWith('.pptx')) {
-        const { thumbnail, slidesData } = await parsePptx(file);
-        
-        // If we found slides, add them. If it's a single file view, maybe we just add the file as one item?
-        // The user wants to "open" it.
-        // Current design treats "slides" list as pages. 
-        // If we extracted multiple slides from the PPTX, we should probably add them all?
-        // But the user might expect the "file" to be the unit if they are pasting files.
-        // However, "Opening" a PPTX usually means seeing its slides.
-        
-        if (slidesData.length > 0) {
-            // Add each slide found in the PPTX
-            slidesData.forEach((slideData, index) => {
-                addSlide({
-                    id: Date.now().toString() + index,
-                    thumbnailUrl: index === 0 && thumbnail ? thumbnail : '', // Only first slide gets the file thumbnail for now, unless we can render
-                    type: 'pptx',
-                    content: slideData.text || (index === 0 ? file.name : `幻灯片 ${index + 1}`),
-                    timestamp: Date.now()
-                });
-            });
-        } else {
-             // Fallback if no slides found or parsing failed
-            addSlide({
-                id: Date.now().toString(),
-                thumbnailUrl: thumbnail || '', 
-                type: 'pptx',
-                content: file.name,
-                timestamp: Date.now()
-            });
-        }
-
-    } else if (file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const base64 = e.target?.result as string;
-            addSlide({
-                id: Date.now().toString(),
-                thumbnailUrl: base64,
-                type: 'image',
-                timestamp: Date.now()
-            });
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-// Handle Paste Event
-async function handlePaste(event: ClipboardEvent) {
-  const items = event.clipboardData?.items;
-  if (!items) return;
-
-  // Check if we have a pptx file
-  for (const item of items) {
-      if (item.kind === 'file' && (item.type.includes('presentation') || item.getAsFile()?.name.endsWith('.pptx'))) {
-          const file = item.getAsFile();
-          if (file) {
-             await processFile(file);
-             event.preventDefault();
-             return;
-          }
-      }
-  }
-  
-  // Fallback to Image
-  for (const item of items) {
-     if (item.type.indexOf('image') !== -1) {
-         const file = item.getAsFile();
-         if (file) {
-             await processFile(file);
-             event.preventDefault();
-             return;
-         }
-     }
-  }
-}
-
-// Add Slide
-function addSlide(slide: Slide) {
-  slides.value.push(slide);
-  activeSlide.value = slide;
-}
-
-// Delete Slide
-function deleteSlide(index: number) {
-  slides.value.splice(index, 1);
-  if (slides.value.length === 0) {
-    activeSlide.value = null;
-  } else if (activeSlide.value && !slides.value.find(s => s.id === activeSlide.value!.id)) {
-    activeSlide.value = slides.value[Math.max(0, index - 1)];
-  }
-}
-
-// Lifecycle
-onMounted(() => {
-  loadFromStorage();
-  window.addEventListener('paste', handlePaste);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('paste', handlePaste);
-});
-
 const toolbarTabs = [
   '开始', '插入', '审阅', '视图', '播放', '效率', 'WPS AI'
 ];
 const activeTab = ref('开始');
 
-const fileInput = ref<HTMLInputElement | null>(null);
-
 const tools = [
-  { icon: 'fa-regular fa-folder-open', name: '打开', action: () => fileInput.value?.click() },
   { icon: 'fa-regular fa-clipboard', name: '粘贴' },
   { icon: 'fa-solid fa-scissors', name: '剪切' },
   { icon: 'fa-regular fa-copy', name: '复制' },
@@ -260,14 +76,9 @@ function handleAiResult(result: any) {
       previewHtml.value = result.html;
       showPreviewModal.value = true;
     } else if (result.imageUrl) {
-        // Add generated image as a new slide
-        addSlide({
-            id: Date.now().toString(),
-            thumbnailUrl: result.imageUrl,
-            type: 'image',
-            timestamp: Date.now()
-        });
+      window.open(result.imageUrl, '_blank');
     }
+    // alert('AI 生成成功！');
   } else {
     alert(`AI 生成失败: ${result.error}`);
   }
@@ -299,7 +110,7 @@ function closePreview() {
         <template v-if="activeTab !== 'WPS AI'">
           <div v-for="(tool, index) in tools" :key="index" class="tool-item">
             <div v-if="tool.separator" class="separator"></div>
-            <button v-else class="tool-btn" :title="tool.name" @click="tool.action && tool.action()">
+            <button v-else class="tool-btn" :title="tool.name">
               <span class="icon"><i :class="tool.icon"></i></span>
               <!-- <span class="label">{{ tool.name }}</span> -->
             </button>
@@ -316,30 +127,21 @@ function closePreview() {
           </div>
         </template>
       </div>
-      <input type="file" ref="fileInput" style="display: none" accept=".pptx,image/*" @change="handleFileInput" />
     </header>
 
     <div class="main-container">
       <!-- Left Sidebar: Slides -->
       <aside class="sidebar-left">
-        <div v-if="slides.length === 0" class="empty-sidebar">
-            <p>暂无幻灯片</p>
-            <p class="sub-text">Ctrl+V 粘贴图片</p>
-        </div>
         <div 
-          v-for="(slide, index) in slides" 
-          :key="slide.id"
+          v-for="(img, index) in images" 
+          :key="img.id"
           class="slide-thumbnail"
-          :class="{ active: activeSlide?.id === slide.id }"
-          @click="activeSlide = slide"
+          :class="{ active: activeImage.id === img.id }"
+          @click="activeImage = img"
         >
           <div class="slide-number">{{ index + 1 }}</div>
           <div class="thumbnail-preview">
-            <img v-if="slide.type === 'image' || slide.thumbnailUrl" :src="slide.thumbnailUrl" class="preview-img" loading="lazy" />
-            <div v-else class="preview-file-icon">
-                <i class="fa-regular fa-file-powerpoint"></i>
-            </div>
-            <button class="delete-btn" @click.stop="deleteSlide(index)" title="删除">×</button>
+            <img :src="img.url" :alt="img.name" class="preview-img" loading="lazy" />
           </div>
         </div>
       </aside>
@@ -348,22 +150,8 @@ function closePreview() {
       <main class="canvas-area">
         <div class="canvas-wrapper">
           <div class="slide-canvas" :style="{ transform: `scale(${zoomLevel / 100})` }">
-            <template v-if="activeSlide">
-                <img v-if="activeSlide.type === 'image' || activeSlide.thumbnailUrl" :src="activeSlide.thumbnailUrl" class="main-img" />
-                <div v-else-if="activeSlide.type === 'pptx'" class="pptx-placeholder slide-text-content">
-                    <div v-if="activeSlide.thumbnailUrl" class="slide-bg-thumb">
-                        <img :src="activeSlide.thumbnailUrl" />
-                    </div>
-                    <div class="slide-text-overlay">
-                        <i class="fa-regular fa-file-powerpoint watermark"></i>
-                        <pre>{{ activeSlide.content }}</pre>
-                    </div>
-                </div>
-            </template>
-            <div v-else class="empty-state">
-                <i class="fa-regular fa-image" style="font-size: 48px; margin-bottom: 16px;"></i>
-                <p>请粘贴 (Ctrl+V) 幻灯片截图或图片</p>
-            </div>
+            <img v-if="activeImage" :src="activeImage.url" :alt="activeImage.name" class="main-img" />
+            <div v-else class="empty-state">请选择一张图片</div>
           </div>
         </div>
       </main>
@@ -385,7 +173,7 @@ function closePreview() {
     <!-- Bottom Status Bar -->
     <footer class="status-bar">
       <div class="left-status">
-        幻灯片 {{ activeSlide ? slides.findIndex(s => s.id === activeSlide?.id) + 1 : 0 }} / {{ slides.length }}
+        幻灯片 {{ images.findIndex(s => s.id === activeImage.id) + 1 }} / {{ images.length }}
       </div>
       <div class="right-status">
         <button class="status-btn"><i class="fa-solid fa-stop"></i></button>
@@ -631,48 +419,8 @@ function closePreview() {
   transition: all 0.2s;
 }
 
-.empty-sidebar {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: #999;
-  font-size: 14px;
-}
-
-.empty-sidebar .sub-text {
-  font-size: 12px;
-  color: #bbb;
-  margin-top: 4px;
-}
-
-.delete-btn {
-  position: absolute;
-  top: 4px;
-  right: 4px;
-  background: rgba(0, 0, 0, 0.5);
-  color: white;
-  border: none;
-  border-radius: 50%;
-  width: 18px;
-  height: 18px;
-  font-size: 12px;
-  line-height: 1;
-  cursor: pointer;
-  opacity: 0;
-  transition: opacity 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.slide-thumbnail:hover .delete-btn {
-  opacity: 1;
-}
-
-.delete-btn:hover {
-  background: rgba(200, 0, 0, 0.8);
+.slide-thumbnail:hover .thumbnail-preview {
+  border-color: #aaa;
 }
 
 .slide-thumbnail.active .thumbnail-preview {
@@ -690,15 +438,11 @@ function closePreview() {
   background: #f0f0f0;
 }
 
-.preview-file-icon {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 32px;
-  color: #d24726;
-  background: #fdfdfd;
+.preview-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  display: block;
 }
 
 .main-img {
@@ -711,12 +455,10 @@ function closePreview() {
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
   color: #999;
   font-size: 16px;
-  background: #fff;
 }
 
 /* Canvas Area */
@@ -731,9 +473,7 @@ function closePreview() {
 }
 
 .canvas-wrapper {
-  margin: auto;
   padding: 40px;
-  flex-shrink: 0;
 }
 
 .slide-canvas {
@@ -828,60 +568,9 @@ function closePreview() {
   text-align: center;
 }
 
-.slide-text-content {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  overflow: hidden;
-  background: #fff;
-}
-
-.slide-bg-thumb {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  opacity: 0.1;
-  pointer-events: none;
-}
-
-.slide-bg-thumb img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.slide-text-overlay {
-  position: relative;
-  z-index: 2;
-  padding: 40px;
-  height: 100%;
-  overflow-y: auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  text-align: left;
-}
-
-.watermark {
-  position: absolute;
-  bottom: 20px;
-  right: 20px;
-  font-size: 80px;
-  color: #d24726;
-  opacity: 0.1;
-  pointer-events: none;
-}
-
-.slide-text-overlay pre {
-  font-family: 'Segoe UI', sans-serif;
-  font-size: 14px;
-  color: #333;
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  line-height: 1.6;
-  margin: 0;
+.zoom-val {
+  min-width: 40px;
+  text-align: center;
 }
 
 /* Modal Styles */

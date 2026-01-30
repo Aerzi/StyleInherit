@@ -53,7 +53,7 @@
               >
                 <div class="upload-placeholder">
                   <i class="upload-icon">📷</i>
-                  <p>点击、拖拽或粘贴上传图片（支持多张）</p>
+                  <p>点击或拖拽上传图片（支持多张）</p>
                 </div>
               </div>
               <div v-else class="images-preview-container">
@@ -96,28 +96,56 @@
 
           <!-- 配置区域 -->
           <div class="config-section">
+            <!-- 阶段一配置 -->
             <div class="config-group">
+              <h3 class="config-title">阶段一：分析图片</h3>
               
-              <!-- 用户输入 -->
+              <div class="form-field">
+                <label class="form-label">分析模型</label>
+                <select
+                  v-model="selectedModel"
+                  class="model-select"
+                  :disabled="isProcessing"
+                >
+                  <option value="">使用默认模型</option>
+                  <option v-for="model in filteredModelList" :key="model.id" :value="model.id">
+                    {{ model.id }}
+                  </option>
+                </select>
+              </div>
+
               <div class="form-field">
                 <label class="form-label">
-                  用户输入
-                  <span class="hint">（如："创建一个关于产品介绍的幻灯片"）</span>
+                  系统提示词
+                  <span class="hint">（可选，留空使用默认提示词）</span>
                 </label>
                 <textarea
-                  v-model="generateUserPrompt"
+                  v-model="extractSystemPrompt"
                   class="prompt-input"
-                  placeholder="请输入生成指令或主题..."
-                  rows="4"
+                  placeholder="留空使用默认的视觉风格提取策略逻辑"
+                  rows="3"
                   :disabled="isProcessing"
                 ></textarea>
               </div>
 
-              <!-- 调用次数 -->
               <div class="form-field">
                 <label class="form-label">
-                  调用生成次数
-                  <span class="hint">（样式提取迭代次数）</span>
+                  用户输入
+                  <span class="hint">（用户指令，如"我要一张红色的封面"）</span>
+                </label>
+                <textarea
+                  v-model="extractUserInput"
+                  class="prompt-input"
+                  placeholder="例如：我要一张红色的封面"
+                  rows="3"
+                  :disabled="isProcessing"
+                ></textarea>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">
+                  调用次数
+                  <span class="hint">（连续调用n次，结果会追加显示）</span>
                 </label>
                 <input
                   v-model.number="extractLoopCount"
@@ -128,10 +156,14 @@
                   :disabled="isProcessing"
                 />
               </div>
+            </div>
 
-              <!-- 生成模式 -->
+            <!-- 阶段二配置 -->
+            <div class="config-group">
+              <h3 class="config-title">阶段二：生成结果</h3>
+              
               <div class="form-field">
-                <label class="form-label">生成模式</label>
+                <label class="form-label">输出类型</label>
                 <div class="radio-group">
                   <label class="radio-item">
                     <input
@@ -154,84 +186,188 @@
                 </div>
               </div>
 
-              <!-- HTML模板 (HTML Only) -->
+              <!-- HTML生成模型选择 -->
               <div v-if="outputType === 'html'" class="form-field">
-                <label class="form-label">
-                  HTML参考模板
-                </label>
+                <label class="form-label">HTML生成模型</label>
                 <select
-                  v-model="selectedHtmlTemplateId"
+                  v-model="selectedHtmlModel"
                   class="model-select"
                   :disabled="isProcessing"
-                  @change="handleTemplateSelect"
                 >
-                  <option value="">不使用模板</option>
-                  <option
-                    v-for="template in htmlTemplates"
-                    :key="template.id"
-                    :value="template.id"
-                    :disabled="template.is_blacklist"
-                  >
-                    {{ template.label.logical_relation }} - {{ template.label.chart_type }}
-                    {{ template.is_blacklist ? '(已禁用)' : '' }}
+                  <option value="">使用默认模型</option>
+                  <option v-for="model in modelList" :key="model.id" :value="model.id">
+                    {{ model.id }}
                   </option>
                 </select>
               </div>
 
-              <!-- 图片参考图 (Image Only) -->
-              <div v-if="outputType === 'image'" class="form-field">
+              <!-- HTML模板选择 -->
+              <div v-if="outputType === 'html'" class="form-field">
                 <label class="form-label">
-                  图片参考图
-                  <span class="hint">（Picture Reference Map）</span>
+                  HTML模板
+                  <span class="hint">（可选，选择模板或输入自定义HTML）</span>
                 </label>
-                <div class="upload-section">
-                  <input
-                    ref="refImageInput"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    style="display: none"
-                    @change="handleRefImageSelect"
-                  />
-                  <div
-                    v-if="refImagePreviews.length === 0"
-                    class="upload-area"
-                    @click="triggerRefImageSelect"
-                    @mouseenter="isHoveringRefUpload = true"
-                    @mouseleave="isHoveringRefUpload = false"
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+                  <select
+                    v-model="selectedHtmlTemplateId"
+                    class="model-select"
+                    :disabled="isProcessing || useCustomHtmlTemplate"
+                    @change="handleTemplateSelect"
                   >
-                    <div class="upload-placeholder">
-                      <i class="upload-icon">🖼️</i>
-                      <p>点击或粘贴参考图</p>
-                    </div>
-                  </div>
-                  <div v-else class="images-preview-container"
-                    @mouseenter="isHoveringRefUpload = true"
-                    @mouseleave="isHoveringRefUpload = false"
-                  >
-                    <div
-                      v-for="(preview, index) in refImagePreviews"
-                      :key="index"
-                      class="image-preview-item"
+                    <option value="">不使用模板</option>
+                    <option
+                      v-for="template in htmlTemplates"
+                      :key="template.id"
+                      :value="template.id"
+                      :disabled="template.is_blacklist"
                     >
-                      <img :src="preview" alt="预览" class="preview-image" />
-                      <button
-                        class="remove-image-btn"
-                        @click="removeRefImage(index)"
-                        title="移除图片"
+                      {{ template.label.logical_relation }} - {{ template.label.chart_type }}
+                      {{ template.is_blacklist ? '(已禁用)' : '' }}
+                    </option>
+                  </select>
+                  
+                  <div class="form-field" style="margin: 0;">
+                    <label class="form-label" style="font-size: 0.9rem;">
+                      <input
+                        type="checkbox"
+                        v-model="useCustomHtmlTemplate"
+                        :disabled="isProcessing"
+                        style="margin-right: 8px;"
+                      />
+                      使用自定义HTML模板
+                    </label>
+                  </div>
+                  
+                  <textarea
+                    v-if="useCustomHtmlTemplate"
+                    v-model="customHtmlTemplate"
+                    class="prompt-input"
+                    placeholder="请输入自定义HTML模板代码..."
+                    rows="8"
+                    :disabled="isProcessing"
+                  ></textarea>
+                  
+                  <div v-if="selectedHtmlTemplateId && !useCustomHtmlTemplate" class="template-preview">
+                    <p v-if="isTemplateLoading" style="font-size: 0.85rem; color: var(--accent-color); margin-bottom: 4px;">
+                      ⏳ 正在加载模板...
+                    </p>
+                    <div v-else>
+                      <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 4px;">
+                        已选择模板: {{ getSelectedTemplateInfo() }}
+                        <span v-if="selectedHtmlTemplateContent" style="color: var(--success-color);">✓ 已加载</span>
+                        <span v-else style="color: var(--error-color);">✗ 加载失败</span>
+                      </p>
+                      <a
+                        v-if="getSelectedTemplateUrl()"
+                        :href="getSelectedTemplateUrl()"
+                        target="_blank"
+                        style="font-size: 0.85rem; color: var(--accent-color);"
                       >
-                        ×
-                      </button>
-                      <div class="image-index">{{ index + 1 }}</div>
+                        预览模板 →
+                      </a>
                     </div>
                   </div>
                 </div>
               </div>
+
+              <!-- 图片生成专用配置 -->
+              <div v-if="outputType === 'image'" class="form-field">
+                <label class="form-label">图片生成模型</label>
+                <select
+                  v-model="selectedImageModel"
+                  class="model-select"
+                  :disabled="isProcessing || isLoadingImageModels"
+                >
+                  <option v-if="isLoadingImageModels" value="">加载中...</option>
+                  <option v-else-if="imageModelList.length === 0" :value="selectedImageModel">
+                    {{ selectedImageModel || '默认模型' }}
+                  </option>
+                  <option v-else value="">使用默认模型</option>
+                  <option
+                    v-for="model in imageModelList"
+                    :key="model.id || model"
+                    :value="model.id || model"
+                  >
+                    {{ model.id || model }}
+                  </option>
+                </select>
+              </div>
+
+              <div v-if="outputType === 'image'" class="form-field">
+                <label class="form-label">图片尺寸</label>
+                <select
+                  v-model="imageSize"
+                  class="model-select"
+                  :disabled="isProcessing"
+                >
+                  <option value="1K">1K (1024x1024)</option>
+                  <option value="2K">2K (2048x2048)</option>
+                  <option value="4K">4K (4096x4096)</option>
+                </select>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">
+                  系统提示词
+                  <span class="hint">（可选，留空使用默认提示词）</span>
+                </label>
+                <textarea
+                  v-model="generateSystemPrompt"
+                  class="prompt-input"
+                  :placeholder="outputType === 'html' ? '例如：你是一个专业的全栈前端开发者，擅长根据设计风格创建高质量的HTML幻灯片（留空使用默认提示词）' : '例如：请根据以下设计风格和用户需求生成一张高质量的幻灯片图片（留空使用默认提示词）'"
+                  rows="3"
+                  :disabled="isProcessing"
+                ></textarea>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">
+                  用户主题
+                  <span class="hint">（用于生成内容的主题）</span>
+                </label>
+                <textarea
+                  v-model="generateUserPrompt"
+                  class="prompt-input"
+                  :placeholder="outputType === 'html' ? '例如：创建一个关于产品介绍的幻灯片，包含标题、三个特点介绍和底部联系方式' : '例如：跨境电商行业发展前景'"
+                  rows="3"
+                  :disabled="isProcessing"
+                ></textarea>
+              </div>
+
+              <div class="form-field">
+                <label class="form-label">
+                  <input
+                    type="checkbox"
+                    v-model="sendImagesToStage2"
+                    :disabled="isProcessing || imageFiles.length === 0"
+                    style="margin-right: 8px;"
+                  />
+                  发送图片到阶段二
+                  <span class="hint">（将阶段一上传的图片一并发送给模型）</span>
+                </label>
+              </div>
+
             </div>
           </div>
 
           <!-- 操作按钮组 -->
           <div class="button-group">
+            <button
+              class="generate-btn stage-btn"
+              :disabled="imageFiles.length === 0 || isExtracting"
+              @click="handleExtractOnly"
+            >
+              <span v-if="isExtracting" class="loading-spinner"></span>
+              {{ isExtracting ? '分析中...' : '阶段一：分析图片' }}
+            </button>
+            <button
+              class="generate-btn stage-btn"
+              :disabled="isGenerating"
+              @click="handleGenerateOnly"
+            >
+              <span v-if="isGenerating" class="loading-spinner"></span>
+              {{ isGenerating ? '生成中...' : '阶段二：生成结果' }}
+            </button>
             <button
               class="generate-btn primary-btn"
               :disabled="imageFiles.length === 0 || isProcessing"
@@ -239,166 +375,12 @@
             >
               <span v-if="isProcessing" class="loading-spinner"></span>
               <span v-if="isProcessing">
-                {{ currentStage === 'extracting' ? '提取样式中...' : '生成中...' }}
+                {{ currentStage === 'extracting' ? '分析中...' : '生成中...' }}
               </span>
-              <span v-else>开始生成 (提取 + 生成)</span>
+              <span v-else>一键生成（阶段一+二）</span>
             </button>
           </div>
 
-        </div>
-      </div>
-
-      <!-- 右侧预览区域 -->
-      <div class="right-panel">
-        <div v-if="!isProcessing && !extractedStyle && !result" class="empty-state">
-          <div class="empty-icon">🎨</div>
-          <h3>准备就绪</h3>
-          <p>上传图片并点击"开始生成"以查看结果</p>
-        </div>
-
-        <div v-else class="preview-container">
-          <!-- 阶段一结果展示 -->
-          <div v-if="extractStreamContent || extractedStyle" class="stage-result">
-             <!-- 样式详情收缩面板 (优化版) -->
-             <div class="style-details">
-                <div class="style-details-header">
-                    <span class="style-title">🎨 样式提取结果</span>
-                    <div class="style-actions">
-                         <span class="style-length" v-if="extractedStyle">{{ extractedStyle.styleDescription.length }} chars</span>
-                         <button class="copy-style-btn" @click="copyToClipboard(extractedStyle ? extractedStyle.styleDescription : extractStreamContent)">复制</button>
-                    </div>
-                </div>
-                <div class="style-content-wrapper">
-                    <pre class="style-content">{{ extractedStyle ? extractedStyle.styleDescription : extractStreamContent }}</pre>
-                </div>
-             </div>
-          </div>
-
-          <!-- 阶段二结果展示 -->
-          <div v-if="result || generateStreamContent" class="stage-result">
-            <h3 class="stage-title">
-              <span class="stage-icon">🖼️</span>
-              生成结果
-              <span v-if="isGenerating" class="loading-dot">...</span>
-            </h3>
-            
-            <div class="result-display">
-              <!-- HTML 预览 -->
-              <div v-if="outputType === 'html'" class="html-preview-wrapper" ref="htmlPreviewWrapper">
-                <div 
-                  v-if="result?.html" 
-                  class="iframe-scale-container"
-                  :style="{ 
-                    transform: `translate(-50%, -50%) scale(${scale})`
-                  }"
-                >
-                  <iframe 
-                    :srcdoc="result.html" 
-                    class="preview-iframe"
-                    frameborder="0"
-                  ></iframe>
-                </div>
-                <div v-else class="loading-placeholder">
-                  <pre class="stream-content">{{ generateStreamContent }}</pre>
-                </div>
-              </div>
-
-              <!-- 图片预览 -->
-              <div v-if="outputType === 'image'" class="image-preview-wrapper">
-                <img 
-                  v-if="result?.imageUrl" 
-                  :src="result.imageUrl" 
-                  class="preview-image"
-                />
-                <div v-else class="loading-placeholder">
-                   <pre class="stream-content">{{ generateStreamContent }}</pre>
-                </div>
-              </div>
-            </div>
-
-            <!-- 操作按钮 -->
-            <div v-if="result" class="result-actions">
-              <button class="action-btn" @click="handleAudit" :disabled="isAuditing">
-                <span v-if="isAuditing" class="loading-spinner small"></span>
-                {{ isAuditing ? '对比分析中...' : '样式对比审计' }}
-              </button>
-              <button class="action-btn" @click="outputType === 'html' ? downloadHtml() : downloadImage()">
-                下载{{ outputType === 'html' ? 'HTML' : '图片' }}
-              </button>
-              <button v-if="outputType === 'html'" class="action-btn secondary" @click="copyToClipboard(result.html)">
-                复制HTML代码
-              </button>
-            </div>
-          </div>
-
-          <!-- 阶段三：样式对比结果 -->
-          <div v-if="auditResult" class="stage-result">
-            <h3 class="stage-title">
-              <span class="stage-icon">⚖️</span>
-              样式对比报告
-              <span class="score-badge" :style="{ background: getScoreColor(auditResult.matchScore) }">
-                {{ auditResult.matchScore }}分
-              </span>
-            </h3>
-
-            <div class="audit-content">
-              <div class="score-section">
-                <div class="score-circle" :style="getScoreCircleStyle(auditResult.matchScore)">
-                  <div class="score-inner">
-                    <span class="score-value">{{ auditResult.matchScore }}%</span>
-                    <span class="score-label">一致性系数</span>
-                  </div>
-                </div>
-                <p class="score-desc">基于 V6.2 协议的多维加权评估</p>
-              </div>
-
-              <div class="gene-table-section">
-                <h4>基因差异对照表</h4>
-                <div class="gene-grid">
-                  <div class="gene-item">
-                    <div class="gene-icon">🎨</div>
-                    <div class="gene-info">
-                      <span class="gene-label">背景纯度</span>
-                      <span class="gene-value">{{ auditResult.geneTable.backgroundColor }}</span>
-                    </div>
-                  </div>
-                  <div class="gene-item">
-                    <div class="gene-icon">✨</div>
-                    <div class="gene-info">
-                      <span class="gene-label">强调色系</span>
-                      <span class="gene-value">{{ auditResult.geneTable.accentColor }}</span>
-                    </div>
-                  </div>
-                  <div class="gene-item">
-                    <div class="gene-icon">A</div>
-                    <div class="gene-info">
-                      <span class="gene-label">字体色/对比</span>
-                      <span class="gene-value">{{ auditResult.geneTable.fontColor }}</span>
-                    </div>
-                  </div>
-                  <div class="gene-item">
-                    <div class="gene-icon">💎</div>
-                    <div class="gene-info">
-                      <span class="gene-label">材质/圆角/投影</span>
-                      <span class="gene-value">{{ auditResult.geneTable.materialTexture }}</span>
-                    </div>
-                  </div>
-                  <div class="gene-item">
-                    <div class="gene-icon">📐</div>
-                    <div class="gene-info">
-                      <span class="gene-label">布局/锚点一致性</span>
-                      <span class="gene-value">{{ auditResult.geneTable.layout }}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div class="audit-advice">
-              <h4>💡 修改建议</h4>
-              <p>{{ auditResult.exportAdvice }}</p>
-            </div>
-          </div>
         </div>
       </div>
       </div>
@@ -592,15 +574,9 @@
                   <!-- 样式详情收缩面板 -->
                   <div v-if="item.showStyle && item.styleDescription" class="style-details">
                     <div class="style-details-header">
-                        <span class="style-title">🎨 样式数据</span>
-                        <div class="style-actions">
-                            <span class="style-length">{{ item.styleDescription.length }} chars</span>
-                            <button class="copy-style-btn" @click="copyToClipboard(item.styleDescription)">复制</button>
-                        </div>
+                        <span>样式提取结果 ({{ item.styleDescription.length }} chars)</span>
                     </div>
-                    <div class="style-content-wrapper">
-                        <pre class="style-content">{{ item.styleDescription }}</pre>
-                    </div>
+                    <pre class="style-content">{{ item.styleDescription }}</pre>
                   </div>
                 </div>
              </div>
@@ -611,14 +587,9 @@
       <!-- 预览模态框 -->
       <div v-if="showBatchPreview" class="preview-modal" @click="showBatchPreview = false">
         <div class="preview-content" @click.stop>
-          <div class="preview-header">
-            <h3>生成预览</h3>
-            <button class="close-preview" @click="showBatchPreview = false">×</button>
-          </div>
-          <div class="preview-body">
-            <iframe v-if="batchPreviewHtml" :srcdoc="batchPreviewHtml" frameborder="0" class="preview-iframe"></iframe>
-            <img v-if="batchPreviewImage" :src="batchPreviewImage" class="preview-image-full" />
-          </div>
+          <button class="close-preview" @click="showBatchPreview = false">×</button>
+          <iframe v-if="batchPreviewHtml" :srcdoc="batchPreviewHtml" frameborder="0" class="preview-iframe"></iframe>
+          <img v-if="batchPreviewImage" :src="batchPreviewImage" class="preview-image-full" />
         </div>
       </div>
     </div>
@@ -626,12 +597,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, nextTick, watch, computed } from 'vue';
+import { ref, onMounted, nextTick, watch, computed } from 'vue';
 import { fetchModels, type ModelInfo } from '../services/llmService';
 import { extractStyleFromImage } from '../keepstyle/extractStyleService';
 import { generateSlide } from '../keepstyle/generateService';
 import { fetchImageModels } from '../keepstyle/imageGenerateService';
-import { performPPTAudit, type AuditResult } from '../keepstyle/styleAuditService';
 import { fileToBase64 } from '../keepstyle/utils';
 import type { StyleExtractResult, GenerateResult } from '../keepstyle/types';
 import * as XLSX from 'xlsx';
@@ -643,10 +613,6 @@ const activeTab = ref<'single' | 'batch'>('single');
 const imageInput = ref<HTMLInputElement | null>(null);
 const imageFiles = ref<File[]>([]); // 支持多张图片
 const imagePreviews = ref<string[]>([]); // 多张图片预览
-const refImageInput = ref<HTMLInputElement | null>(null);
-const refImageFiles = ref<File[]>([]); // 阶段二图片参考图
-const refImagePreviews = ref<string[]>([]); // 阶段二图片参考图预览
-const isHoveringRefUpload = ref(false); // 是否悬停在参考图上传区域
 const extractSystemPrompt = ref(''); // 阶段一：系统提示词（可选，留空使用默认）
 const extractUserInput = ref(''); // 阶段一：用户输入（用户指令）
 const generateSystemPrompt = ref(''); // 阶段二：系统提示词（可选，留空使用默认）
@@ -736,51 +702,14 @@ const filteredModelList = computed(() => {
 
 const isExtracting = ref(false);
 const isGenerating = ref(false);
-const isAuditing = ref(false);
-const currentStage = ref<'extracting' | 'generating' | 'auditing' | ''>(''); // 当前阶段
+const currentStage = ref<'extracting' | 'generating' | ''>(''); // 当前阶段
 const extractedStyle = ref<StyleExtractResult | null>(null);
 const result = ref<GenerateResult | null>(null);
-const auditResult = ref<AuditResult | null>(null);
 const extractStreamContent = ref('');
 const generateStreamContent = ref('');
 const extractStreamTextareaRef = ref<HTMLTextAreaElement | null>(null);
 const generateStreamTextareaRef = ref<HTMLTextAreaElement | null>(null);
-const htmlPreviewWrapper = ref<HTMLElement | null>(null);
-const scale = ref(1);
 const isDragging = ref(false);
-
-// 监听窗口大小变化以更新缩放比例
-const updateScale = () => {
-  if (htmlPreviewWrapper.value) {
-    const containerWidth = htmlPreviewWrapper.value.clientWidth;
-    const containerHeight = htmlPreviewWrapper.value.clientHeight;
-    
-    // 计算宽和高的缩放比例，取较小值以适应容器
-    const scaleX = containerWidth / 1280;
-    const scaleY = containerHeight / 720;
-    
-    scale.value = Math.min(scaleX, scaleY) * 0.95; // 留一点边距
-  }
-};
-
-onMounted(() => {
-  window.addEventListener('paste', handlePaste);
-  window.addEventListener('resize', updateScale);
-  // 初始计算
-  nextTick(updateScale);
-});
-
-onUnmounted(() => {
-  window.removeEventListener('paste', handlePaste);
-  window.removeEventListener('resize', updateScale);
-});
-
-// 监听 result 变化，当有结果时重新计算 scale
-watch(result, () => {
-  if (result.value?.html) {
-    nextTick(updateScale);
-  }
-});
 
 // 最终发送给模型的提示词
 const extractFinalPrompt = ref('');
@@ -894,82 +823,6 @@ async function loadImageFiles(files: File[]) {
   imagePreviews.value.push(...newPreviews);
 }
 
-// 监听粘贴事件
-function handlePaste(event: ClipboardEvent) {
-  // 如果是在输入框中粘贴，忽略
-  const target = event.target as HTMLElement;
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') {
-    return;
-  }
-
-  const items = event.clipboardData?.items;
-  if (!items) return;
-
-  const files: File[] = [];
-  for (const item of items) {
-    if (item.type.startsWith('image/')) {
-      const file = item.getAsFile();
-      if (file) {
-        files.push(file);
-      }
-    }
-  }
-
-  if (files.length > 0) {
-    // 如果悬停在“图片参考图”区域且处于图片生成模式，则粘贴到该区域
-    if (isHoveringRefUpload.value && outputType.value === 'image') {
-      loadRefImageFiles(files);
-    } else {
-      // 否则粘贴到主参考图区域
-      loadImageFiles(files);
-    }
-  }
-}
-
-
-// 触发参考图选择
-function triggerRefImageSelect() {
-  refImageInput.value?.click();
-}
-
-// 处理参考图选择
-async function handleRefImageSelect(event: Event) {
-  const target = event.target as HTMLInputElement;
-  const files = Array.from(target.files || []);
-  if (files.length === 0) return;
-  await loadRefImageFiles(files);
-}
-
-async function loadRefImageFiles(files: File[]) {
-  const newFiles: File[] = [];
-  const newPreviews: string[] = [];
-  
-  for (const file of files) {
-    if (file.type.startsWith('image/')) {
-      newFiles.push(file);
-      const base64 = await fileToBase64(file);
-      newPreviews.push(base64);
-    }
-  }
-  
-  refImageFiles.value.push(...newFiles);
-  refImagePreviews.value.push(...newPreviews);
-}
-
-// 移除参考图
-function removeRefImage(index?: number) {
-  if (index !== undefined) {
-    refImageFiles.value.splice(index, 1);
-    refImagePreviews.value.splice(index, 1);
-  } else {
-    refImageFiles.value = [];
-    refImagePreviews.value = [];
-    if (refImageInput.value) {
-      refImageInput.value.value = '';
-    }
-  }
-}
-
 // 移除图片
 function removeImage(index?: number) {
   if (index !== undefined) {
@@ -982,7 +835,6 @@ function removeImage(index?: number) {
     imagePreviews.value = [];
     extractedStyle.value = null;
     result.value = null;
-    auditResult.value = null;
     extractStreamContent.value = '';
     generateStreamContent.value = '';
     extractFinalPrompt.value = '';
@@ -1053,7 +905,6 @@ async function handleExtractOnly() {
       }
       
       const beforeContent = extractStreamContent.value;
-      const startTime = Date.now();
       
       const style = await extractStyleFromImage(
         {
@@ -1085,10 +936,6 @@ async function handleExtractOnly() {
           },
         }
       );
-      
-      const endTime = Date.now();
-      const duration = ((endTime - startTime) / 1000).toFixed(2);
-      extractStreamContent.value += `\n\n⏱️ 视觉提取耗时: ${duration}s`;
       
       // 保存最后一次的结果
       if (i === loopCount - 1) {
@@ -1138,8 +985,6 @@ async function handleGenerateOnly() {
     );
   }
 
-  const startTime = Date.now();
-
   try {
     // 如果选择了HTML模板，确保模板已加载
     if (outputType.value === 'html') {
@@ -1154,7 +999,7 @@ async function handleGenerateOnly() {
         styleDescription: extractedStyle.value?.styleDescription || '请根据用户需求生成一张高质量的幻灯片。',
         systemPrompt: generateSystemPrompt.value.trim() || undefined,
         userPrompt: generateUserPrompt.value.trim() || undefined,
-        // imageBase64s: imageBase64s, // 单页生成也不传原图，避免干扰模型
+        imageBase64s: imageBase64s,
         model: outputType.value === 'html' 
           ? (selectedHtmlModel.value || selectedModel.value || undefined)
           : undefined,
@@ -1182,21 +1027,6 @@ async function handleGenerateOnly() {
       }
     );
     result.value = generateResult;
-
-    const endTime = Date.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-    
-    if (outputType.value === 'html') {
-        generateStreamContent.value += `\n\n⏱️ HTML生成耗时: ${duration}s`;
-    } else {
-        generateStreamContent.value += `\n\n⏱️ 图片生成耗时: ${duration}s`;
-    }
-
-    if (generateResult.success) {
-      generateStreamContent.value += '\n\n✅ 生成完成！';
-    } else {
-      generateStreamContent.value += `\n\n❌ 生成失败`;
-    }
   } catch (error) {
     console.error('生成出错:', error);
     const errMsg = error instanceof Error ? error.message : String(error);
@@ -1270,18 +1100,17 @@ async function handleGenerateAll() {
   // 第二阶段：生成结果
   isGenerating.value = true;
   currentStage.value = 'generating';
-  const startTime = Date.now();
 
       // 根据输出类型设置不同的宽高
       // HTML: 1280x720, 图片: 3600x2025
       const width = outputType.value === 'html' ? 1280 : 3600;
       const height = outputType.value === 'html' ? 720 : 2025;
 
-      // 准备图片的 base64 数组 (仅图片生成模式且有参考图时)
+      // 如果选择了发送图片，准备图片的 base64 数组
       let imageBase64s: string[] | undefined = undefined;
-      if (outputType.value === 'image' && refImageFiles.value.length > 0) {
+      if (sendImagesToStage2.value && imageFiles.value.length > 0) {
         imageBase64s = await Promise.all(
-          refImageFiles.value.map((file: File) => fileToBase64(file))
+          imageFiles.value.map((file: File) => fileToBase64(file))
         );
       }
 
@@ -1327,21 +1156,6 @@ async function handleGenerateAll() {
       }
     );
     result.value = generateResult;
-
-    const endTime = Date.now();
-    const duration = ((endTime - startTime) / 1000).toFixed(2);
-    
-    if (outputType.value === 'html') {
-        generateStreamContent.value += `\n\n⏱️ HTML生成耗时: ${duration}s`;
-    } else {
-        generateStreamContent.value += `\n\n⏱️ 图片生成耗时: ${duration}s`;
-    }
-
-    if (generateResult.success) {
-      generateStreamContent.value += '\n\n✅ 生成完成！';
-    } else {
-      generateStreamContent.value += `\n\n❌ 生成失败`;
-    }
   } catch (error) {
     console.error('生成出错:', error);
     const errMsg = error instanceof Error ? error.message : String(error);
@@ -1353,106 +1167,6 @@ async function handleGenerateAll() {
   } finally {
     isGenerating.value = false;
     currentStage.value = '';
-  }
-}
-
-// 阶段三：样式对比审计
-async function handleAudit() {
-  if (!result.value) return;
-  if (imagePreviews.value.length === 0) {
-    alert('需要原始参考图片进行对比');
-    return;
-  }
-  
-  isAuditing.value = true;
-  currentStage.value = 'auditing';
-  auditResult.value = null;
-  
-  console.log('开始样式对比...');
-  
-  try {
-    const originalImage = imagePreviews.value[0]; // 使用第一张参考图作为基准
-    let generatedImage = '';
-    
-    if (outputType.value === 'image' && result.value.imageUrl) {
-        console.log('使用生成的图片进行对比');
-        generatedImage = result.value.imageUrl;
-    } else if (outputType.value === 'html' && result.value.html) {
-        console.log('准备截取 HTML 预览...');
-        // 对于 HTML，尝试从 iframe 截图
-            // 使用 ref 获取 iframe 元素，更可靠
-        let iframe: HTMLIFrameElement | null = null;
-        if (htmlPreviewWrapper.value) {
-            iframe = htmlPreviewWrapper.value.querySelector('iframe');
-        } else {
-            iframe = document.querySelector('.preview-iframe');
-        }
-
-        if (iframe) {
-             // 检查 iframe 是否加载完成
-             if (!iframe.contentDocument || iframe.contentDocument.readyState !== 'complete') {
-                console.log('iframe 尚未加载完成，等待中...');
-                await new Promise(resolve => {
-                    iframe!.onload = resolve;
-                    // 超时保护
-                    setTimeout(resolve, 3000);
-                });
-             }
-
-             if (iframe.contentWindow && iframe.contentDocument) {
-                 try {
-                    console.log('调用 html2canvas...', { 
-                        bodyWidth: iframe.contentDocument.body.scrollWidth,
-                        bodyHeight: iframe.contentDocument.body.scrollHeight
-                    });
-                    
-                    const canvas = await html2canvas(iframe.contentDocument.body, {
-                        width: 1280,
-                        height: 720,
-                        useCORS: true, // 允许跨域图片
-                        logging: true,  // 开启日志以便调试
-                        allowTaint: true, // 允许被污染
-                        window: iframe.contentWindow, // 指定 iframe 的 window 上下文
-                        x: 0,
-                        y: 0,
-                        scale: 1, // 强制 1:1 截图
-                        backgroundColor: '#ffffff' // 确保有背景色
-                    } as any);
-                    
-                    generatedImage = canvas.toDataURL('image/png');
-                    console.log('截图成功，数据长度:', generatedImage.length);
-                 } catch (e) {
-                     console.error('截图失败:', e);
-                     alert('无法截取HTML预览进行对比，请检查是否跨域或稍后重试');
-                     throw e;
-                 }
-             } else {
-                 throw new Error('无法访问 iframe 内容 (可能受同源策略限制)');
-             }
-        } else {
-            console.error('找不到HTML预览元素或内容未加载');
-            alert('找不到HTML预览元素，无法进行对比');
-            throw new Error('Preview element not found');
-        }
-    } else {
-        alert('没有生成结果可供对比');
-        return;
-    }
-    
-    if (!generatedImage || generatedImage.length < 100) {
-        throw new Error('生成的图像数据无效或为空');
-    }
-    
-    console.log('调用审计服务...');
-    const res = await performPPTAudit(originalImage, generatedImage, selectedModel.value);
-    console.log('审计完成:', res);
-    auditResult.value = res;
-    
-  } catch (error) {
-    console.error('样式对比失败:', error);
-    alert(`样式对比失败: ${error instanceof Error ? error.message : String(error)}`);
-  } finally {
-    isAuditing.value = false;
   }
 }
 
@@ -1514,19 +1228,6 @@ async function copyToClipboard(text: string) {
   } catch (err) {
     console.error('复制失败:', err);
   }
-}
-
-// 辅助函数
-function getScoreColor(score: number) {
-  if (score >= 90) return '#10b981';
-  if (score >= 70) return '#f59e0b';
-  return '#ef4444';
-}
-
-function getScoreCircleStyle(score: number) {
-  return {
-    background: `conic-gradient(var(--accent-color) ${score * 3.6}deg, #e2e8f0 0deg)`
-  };
 }
 
 // 触发Excel文件选择
@@ -2105,33 +1806,18 @@ async function handleStartTest() {
     const themeCol = findColumnIndex(sheet, '主题');
     const extractModelCol = findColumnIndex(sheet, '风格提取模型');
     const extractTextCol = findColumnIndex(sheet, '风格提取文本');
-    let extractTimeCol = findColumnIndex(sheet, '视觉提取耗时');
     const htmlModelCol = findColumnIndex(sheet, 'html使用模型');
     const htmlImageCol = findColumnIndex(sheet, 'html生成');
-    let htmlTimeCol = findColumnIndex(sheet, 'HTML生成耗时');
     const htmlSourceCol = findColumnIndex(sheet, 'html源码');
     const imageModelCol = findColumnIndex(sheet, '图片使用模型');
     const imageGenCol = findColumnIndex(sheet, '图片生成');
-
-    // 自动添加缺失的时间列
-    const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
-    let nextCol = range.e.c + 1;
-
-    if (extractTimeCol === null) {
-      extractTimeCol = nextCol++;
-      writeTextToExcel(0, extractTimeCol, '视觉提取耗时');
-    }
-    if (htmlTimeCol === null) {
-      htmlTimeCol = nextCol++;
-      writeTextToExcel(0, htmlTimeCol, 'HTML生成耗时');
-    }
 
     if (bodyPageCol === null || themeCol === null) {
       throw new Error('Excel文件中未找到"正文页"或"主题"列');
     }
 
     // 获取数据范围，遍历所有行
-    // const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1'); // range已在上面定义
+    const range = XLSX.utils.decode_range(sheet['!ref'] || 'A1');
     const totalRows = range.e.r;
     
     testLog.value += `找到 ${totalRows} 行数据，开始遍历处理...\n\n`;
@@ -2312,7 +1998,6 @@ async function handleStartTest() {
              styleDescription = resultItem.styleDescription;
              testLog.value += `使用已提取的样式描述\n`;
           } else {
-              const extractStartTime = Date.now();
               const styleResult = await extractStyleFromImage(
                 {
                   imageBase64s: imageBase64s,
@@ -2326,9 +2011,6 @@ async function handleStartTest() {
                   },
                 }
               );
-              const extractDuration = ((Date.now() - extractStartTime) / 1000).toFixed(2);
-              if (extractTimeCol !== null) writeTextToExcel(rowIndex, extractTimeCol, `${extractDuration}s`);
-              
               styleDescription = styleResult.styleDescription;
               resultItem.styleDescription = styleDescription;
           }
@@ -2349,10 +2031,9 @@ async function handleStartTest() {
           }
           const htmlTemplate = getHtmlTemplate();
           
-          const htmlStartTime = Date.now();
           const htmlGenerateResult = await generateSlide(
             {
-              styleDescription: styleDescription, // 明确传递样式描述
+              styleDescription: styleDescription,
               systemPrompt: undefined,
               userPrompt: (themeValue as string) || undefined,
               model: batchHtmlModel,
@@ -2366,8 +2047,6 @@ async function handleStartTest() {
               onError(error) { testLog.value += `HTML生成错误: ${error}\n`; }
             }
           );
-          const htmlDuration = ((Date.now() - htmlStartTime) / 1000).toFixed(2);
-          if (htmlTimeCol !== null) writeTextToExcel(rowIndex, htmlTimeCol, `${htmlDuration}s`);
 
           if (htmlGenerateResult.success && htmlGenerateResult.html) {
              resultItem.html = htmlGenerateResult.html;
@@ -2490,7 +2169,7 @@ async function manualGenerateHtml(item: any) {
     
     const htmlResult = await generateSlide(
         {
-            styleDescription: item.styleDescription, // 明确传递样式描述
+            styleDescription: item.styleDescription,
             userPrompt: item.theme || undefined,
             model: 'doubao-seed-1.8',
             outputType: 'html',
@@ -2696,351 +2375,7 @@ onMounted(async () => {
   border-bottom-color: var(--accent-color);
 }
 
-.single-mode-container {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  height: 100%;
-}
-
-.left-panel {
-  width: 400px;
-  flex-shrink: 0;
-  border-right: 1px solid var(--border-color);
-  background: var(--main-bg);
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.form-section {
-  flex: 1;
-  overflow-y: auto;
-  padding: 24px;
-}
-
-.right-panel {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  background: var(--bg-secondary);
-  overflow: hidden;
-  padding: 24px;
-}
-
-.empty-state {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-tertiary);
-  gap: 16px;
-}
-
-.empty-icon {
-  font-size: 3rem;
-  opacity: 0.5;
-}
-
-.preview-container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  overflow-y: auto;
-  max-width: 1200px;
-  margin: 0 auto;
-  width: 100%;
-}
-
-.stage-result {
-  background: var(--card-bg);
-  border-radius: 12px;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
-  border: 1px solid var(--border-color);
-}
-
-.stage-title {
-  padding: 16px;
-  border-bottom: 1px solid var(--border-color);
-  font-size: 1.1rem;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0,0,0,0.02);
-}
-
-.result-display {
-  padding: 0;
-  background: #f8fafc;
-  min-height: 400px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.html-preview-wrapper {
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  position: relative;
-  overflow: hidden;
-  background: #f8fafc;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.iframe-scale-container {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 1280px;
-  height: 720px;
-  transform-origin: center center;
-  /* transform will be applied inline: translate(-50%, -50%) scale(...) */
-  background: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.image-preview-wrapper {
-  width: 100%;
-  height: 100%;
-  min-height: 500px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.preview-iframe {
-  width: 100%;
-  height: 720px; /* Fixed height for 16:9 aspect ratio context */
-  border: none;
-  background: white;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.preview-image {
-  max-width: 100%;
-  max-height: 600px;
-  object-fit: contain;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.loading-placeholder {
-  width: 100%;
-  height: 100%;
-  padding: 24px;
-  display: flex;
-}
-
-.stream-content {
-  width: 100%;
-  height: 100%;
-  background: #1e1e1e;
-  color: #d4d4d4;
-  padding: 16px;
-  border-radius: 8px;
-  font-family: 'Menlo', monospace;
-  font-size: 0.85rem;
-  overflow: auto;
-  white-space: pre-wrap;
-}
-
-.result-actions {
-  padding: 16px;
-  border-top: 1px solid var(--border-color);
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  background: white;
-}
-
-.action-btn {
-  padding: 8px 16px;
-  border-radius: 6px;
-  border: none;
-  background: var(--accent-color);
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.action-btn:hover {
-  filter: brightness(1.1);
-}
-
-.action-btn.secondary {
-  background: transparent;
-  border: 1px solid var(--border-color);
-  color: var(--text-secondary);
-}
-
-.action-btn.secondary:hover {
-  border-color: var(--accent-color);
-  color: var(--accent-color);
-}
-
-.score-badge {
-  font-size: 0.8rem;
-  padding: 2px 8px;
-  border-radius: 12px;
-  color: white;
-  margin-left: auto;
-}
-
-.audit-content {
-  display: flex;
-  padding: 24px;
-  gap: 32px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.score-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 200px;
-  flex-shrink: 0;
-}
-
-.score-circle {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  margin-bottom: 12px;
-}
-
-.score-inner {
-  width: 100px;
-  height: 100px;
-  background: white;
-  border-radius: 50%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
-
-.score-value {
-  font-size: 1.8rem;
-  font-weight: 800;
-  color: var(--text-primary);
-  line-height: 1;
-}
-
-.score-label {
-  font-size: 0.7rem;
-  color: var(--text-tertiary);
-  margin-top: 4px;
-  font-weight: 600;
-}
-
-.score-desc {
-  font-size: 0.75rem;
-  color: var(--text-tertiary);
-  font-style: italic;
-  text-align: center;
-}
-
-.gene-table-section {
-  flex: 1;
-}
-
-.gene-table-section h4, .audit-advice h4 {
-  font-size: 0.95rem;
-  margin-bottom: 12px;
-  color: var(--text-primary);
-  font-weight: 600;
-}
-
-.gene-grid {
-  display: grid;
-  gap: 12px;
-}
-
-.gene-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 10px;
-  background: var(--input-bg);
-  border-radius: 8px;
-  border: 1px solid transparent;
-  transition: all 0.2s;
-}
-
-.gene-item:hover {
-  border-color: var(--border-color);
-  background: white;
-}
-
-.gene-icon {
-  width: 32px;
-  height: 32px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: white;
-  border-radius: 6px;
-  border: 1px solid var(--border-color);
-  font-size: 1.2rem;
-}
-
-.gene-info {
-  flex: 1;
-}
-
-.gene-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 700;
-  color: var(--text-tertiary);
-  text-transform: uppercase;
-  margin-bottom: 2px;
-}
-
-.gene-value {
-  font-size: 0.9rem;
-  color: var(--text-secondary);
-  line-height: 1.4;
-}
-
-.audit-advice {
-  padding: 24px;
-  background: linear-gradient(to right bottom, #1e293b, #0f172a);
-  color: white;
-}
-
-.audit-advice h4 {
-  color: white;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.audit-advice p {
-  font-size: 0.95rem;
-  line-height: 1.6;
-  color: #cbd5e1;
-  white-space: pre-wrap;
-  margin: 0;
-}
-
-.loading-spinner.small {
-  width: 14px;
-  height: 14px;
-  border-width: 2px;
-  margin-right: 6px;
-}
-
+/* 批量运行面板样式 */
 .batch-panel {
   display: flex;
   flex: 1;
@@ -3243,72 +2578,33 @@ onMounted(async () => {
 
 .style-details {
   margin-top: 12px;
-  background: var(--card-bg);
+  background: var(--input-bg);
   border: 1px solid var(--border-color);
-  border-radius: 8px;
+  border-radius: 4px;
   overflow: hidden;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
   animation: slideDown 0.3s ease-out;
 }
 
 .style-details-header {
-  padding: 8px 16px;
+  padding: 6px 12px;
   background: rgba(0,0,0,0.03);
   border-bottom: 1px solid var(--border-color);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.style-title {
-  font-weight: 600;
-  color: var(--text-primary);
-  font-size: 0.9rem;
-}
-
-.style-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.style-length {
   font-size: 0.8rem;
-  color: var(--text-tertiary);
-}
-
-.copy-style-btn {
-  background: transparent;
-  border: 1px solid var(--border-color);
+  font-weight: 600;
   color: var(--text-secondary);
-  font-size: 0.75rem;
-  padding: 2px 8px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.copy-style-btn:hover {
-  background: rgba(0,0,0,0.05);
-  color: var(--text-primary);
-  border-color: var(--text-tertiary);
-}
-
-.style-content-wrapper {
-  max-height: 400px;
-  overflow-y: auto;
-  background: var(--input-bg);
 }
 
 .style-content {
-  padding: 16px;
+  padding: 12px;
   margin: 0;
   white-space: pre-wrap;
   word-wrap: break-word;
-  font-family: 'Menlo', 'Monaco', 'Courier New', monospace;
+  font-family: 'Consolas', 'Monaco', monospace;
   font-size: 0.85rem;
-  line-height: 1.6;
+  line-height: 1.5;
   color: var(--text-primary);
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 @keyframes slideDown {
@@ -3346,43 +2642,19 @@ onMounted(async () => {
 
 .preview-content {
   background: white;
+  padding: 20px;
   border-radius: 8px;
   position: relative;
-  max-width: 95%;
-  max-height: 95%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+  max-width: 90%;
+  max-height: 90%;
+  overflow: auto;
   box-shadow: 0 4px 20px rgba(0,0,0,0.5);
 }
 
-.preview-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 20px;
-  border-bottom: 1px solid #eee;
-  background: #fff;
-  flex-shrink: 0;
-}
-
-.preview-header h3 {
-  margin: 0;
-  font-size: 1.1rem;
-  color: #333;
-  font-weight: 600;
-}
-
-.preview-body {
-  padding: 20px;
-  overflow: auto;
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  background: #f8fafc;
-}
-
 .close-preview {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   background: #f1f1f1;
   border: none;
   width: 30px;
@@ -3393,11 +2665,7 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: background 0.2s;
-}
-
-.close-preview:hover {
-  background: #e2e2e2;
+  z-index: 10;
 }
 
 .preview-iframe {
@@ -3555,287 +2823,99 @@ onMounted(async () => {
   font-size: 3rem;
 }
 
-
-.compact-sidebar {
-  display: flex;
-  flex-direction: column;
-  height: 100%;
-  background: white;
-  border-right: 1px solid var(--border-color);
-  width: 320px; /* Slightly narrower */
+.images-preview-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
 }
 
-.sidebar-header {
-  padding: 16px 20px;
-  border-bottom: 1px solid var(--border-color);
-  background: #f8fafc;
-}
-
-.sidebar-header h2 {
-  margin: 0;
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.compact-form {
-  flex: 1;
-  overflow-y: auto;
-  padding: 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.compact-group {
-  margin-bottom: 12px;
-}
-
-.compact-label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  margin-bottom: 6px;
-}
-
-.upload-section.compact {
-  height: auto;
-}
-
-.upload-area.compact {
-  padding: 12px;
-  min-height: 80px;
-  border: 1px dashed var(--border-color);
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #f9fafb;
-}
-
-.upload-area.compact.has-images {
-  justify-content: flex-start;
-  padding: 8px;
-  background: white;
-  border-style: solid;
-}
-
-.upload-placeholder.compact {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
-  font-size: 0.85rem;
-}
-
-.upload-icon.small {
-  font-size: 1.2rem;
-}
-
-.images-preview-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  width: 100%;
-}
-
-.mini-thumb {
-  width: 60px;
-  height: 40px;
-  border-radius: 4px;
-  overflow: hidden;
+.image-preview-item {
   position: relative;
-  border: 1px solid #e2e8f0;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  background: var(--input-bg);
 }
 
-.mini-thumb img {
+.preview-image {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  display: block;
 }
 
-.mini-remove {
+.remove-image-btn {
   position: absolute;
-  top: 0;
-  right: 0;
-  width: 16px;
-  height: 16px;
-  background: rgba(0,0,0,0.5);
+  top: 8px;
+  right: 8px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.6);
   color: white;
   border: none;
-  font-size: 12px;
-  line-height: 1;
+  font-size: 20px;
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: background 0.2s;
+  z-index: 10;
 }
 
-.add-more-btn {
-  width: 60px;
-  height: 40px;
-  border: 1px dashed #cbd5e1;
+.remove-image-btn:hover {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+.image-index {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  padding: 4px 8px;
   border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #94a3b8;
-  font-size: 1.2rem;
-  cursor: pointer;
-}
-
-.add-more-btn:hover {
-  background: #f1f5f9;
-  color: var(--accent-color);
-  border-color: var(--accent-color);
-}
-
-.config-row {
-  display: flex;
-  gap: 12px;
-  margin-bottom: 12px;
-}
-
-.config-col {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.config-col.full-width {
-  flex: 100%;
-}
-
-.compact-radio-group {
-  display: flex;
-  background: #f1f5f9;
-  border-radius: 6px;
-  padding: 2px;
-}
-
-.compact-radio-group label {
-  flex: 1;
-  text-align: center;
-  padding: 6px 0;
-  font-size: 0.8rem;
-  border-radius: 4px;
-  cursor: pointer;
-  color: var(--text-secondary);
-  transition: all 0.2s;
-}
-
-.compact-radio-group label.active {
-  background: white;
-  color: var(--accent-color);
+  font-size: 0.75rem;
   font-weight: 600;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 
-.compact-radio-group input {
-  display: none;
-}
-
-.compact-select {
-  width: 100%;
-  padding: 6px 8px;
-  font-size: 0.85rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  background-color: white;
-}
-
-.compact-textarea {
-  width: 100%;
-  padding: 8px 10px;
-  font-size: 0.85rem;
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  resize: none;
-  min-height: 80px;
-  font-family: inherit;
-}
-
-.compact-textarea.small {
-  min-height: 50px;
-}
-
-.advanced-details {
-  border-top: 1px solid var(--border-color);
-  margin-top: 8px;
-  padding-top: 12px;
-}
-
-.advanced-details summary {
-  font-size: 0.8rem;
-  color: var(--accent-color);
-  cursor: pointer;
-  user-select: none;
-  margin-bottom: 8px;
-  font-weight: 500;
-}
-
-.advanced-content {
+.image-controls {
+  position: absolute;
+  top: 8px;
+  left: 8px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  background: #f8fafc;
-  padding: 12px;
-  border-radius: 8px;
+  gap: 4px;
+  z-index: 10;
 }
 
-.compact-input {
-  width: 100%;
-  padding: 6px 8px;
-  border: 1px solid var(--border-color);
+.move-btn {
+  width: 28px;
+  height: 28px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: none;
   border-radius: 4px;
-  font-size: 0.8rem;
-}
-
-.sidebar-footer {
-  padding: 16px;
-  border-top: 1px solid var(--border-color);
-  background: white;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-}
-
-.full-width {
-  width: 100%;
-  padding: 12px;
-  font-size: 1rem;
-}
-
-.sub-actions {
-  display: flex;
-  gap: 12px;
-  font-size: 0.8rem;
-  color: var(--text-tertiary);
-}
-
-.sub-actions span {
+  font-size: 0.9rem;
   cursor: pointer;
-  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+  user-select: none;
 }
 
-.sub-actions span:hover:not(.disabled) {
-  color: var(--accent-color);
-  text-decoration: underline;
+.move-btn:hover:not(:disabled) {
+  background: rgba(0, 0, 0, 0.8);
 }
 
-.sub-actions .divider {
-  color: #cbd5e1;
-  cursor: default;
-  text-decoration: none !important;
-}
-
-.sub-actions span.disabled {
-  opacity: 0.5;
+.move-btn:disabled {
+  opacity: 0.3;
   cursor: not-allowed;
 }
-
 
 .number-input {
   width: 100%;
