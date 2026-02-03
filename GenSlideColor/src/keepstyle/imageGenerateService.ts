@@ -8,8 +8,9 @@ import type { GenerateRequest, GenerateCallbacks } from './types';
 import { generateWithCustomModel } from '../services/customAiService';
 import { 
   IMAGE_REFERENCE_IMAGE_PROMPT,
-  TEXT_ONLY_IMAGE_PROMPT 
-} from '../assets/prompts/image-reference-prompt';
+  TEXT_ONLY_IMAGE_PROMPT,
+  STYLE_EXTRACT_IMAGE_PROMPT
+} from '../assets/prompts';
 
 // 从环境变量或默认值获取配置
 function getImageApiConfig() {
@@ -88,65 +89,26 @@ function buildImagePrompt(request: GenerateRequest): string {
 }
 
 /**
- * 样式提取模式的图片生成提示词（原有逻辑）
+ * 样式提取模式的图片生成提示词
+ * 使用 src/assets/prompts/image-gen-prompt.ts 中的 STYLE_EXTRACT_IMAGE_PROMPT
  */
 function buildStyleExtractImagePrompt(request: GenerateRequest): string {
-  // 如果用户提供了系统提示词，则完全使用用户提供的（全替换）
-  // 如果用户没有提供，则使用默认提示词 + 固定的任务说明
-  let prompt: string;
+  const width = request.width || 3600;
+  const height = request.height || 2025;
+  const styleDescription = request.styleDescription || '';
+  const userPrompt = request.userPrompt || '根据设计风格生成一张专业的幻灯片图片';
   
+  // 如果用户提供了系统提示词，优先使用
   if (request.systemPrompt && request.systemPrompt.trim()) {
-    // 用户提供了系统提示词，直接使用，不再添加任何固定内容
-    prompt = request.systemPrompt.trim();
-  } else {
-    // 用户没有提供系统提示词，使用默认提示词 + 固定任务说明
-    const systemPrompt = '你是世界一流的演示文稿设计师。请根据提取的设计风格和用户主题，生成一张高质量的幻灯片图片。';
-    
-    // 获取尺寸，固定为 3600x2025
-    const width = request.width || 3600;
-    const height = request.height || 2025;
-
-    prompt = `${systemPrompt}
-
-## 核心要求
-- 只生成一张图片，尺寸为 16:9 比例（${width}x${height}）
-- 必须全屏，不得有任何白边
-- 严格遵循提取的设计风格中的 Desc 部分（材质、光影、氛围描述）
-- 如果风格描述中包含复杂纹理或特殊材质，请准确还原
-
-## 设计限制
-- 禁止使用：霓虹灯效果、发光效果、立体效果、3D效果、蓝紫色系
-- 禁止使用：渐变、阴影（除非风格描述中明确要求）
-- **不得在图片中包含具体色值描述文字**（如不要在图片上显示 "#2d3748" 这样的色值代码）
-- 不得包含具体人名、联系方式、网站、二维码等个人信息
-
-## 布局要求
-- 布局方式要丰富多样，避免单调
-- 文字清晰可读，排版美观
-- 专业、现代的设计风格
-- 基于风格描述的详细布局要求：包括大的版式，每一块的内容组织方式
-- 布局方式尽可能丰富多样，不要使用单调重复的布局
-
-## 提取的设计风格（必须严格遵循）
-${request.styleDescription}
-
-**重要说明**：
-- 上述风格描述包含两部分：Spec（规格参数，包含 HEX 色值、尺寸等）和 Desc（描述信息，包含材质、光影、氛围等）
-- 请严格按照 Desc 部分生成画面，使用 Spec 部分提供的颜色值
-- 确保生成的图片与提取的风格完全一致
-
-## 用户主题
-${request.userPrompt || '根据设计风格生成一张专业的幻灯片图片'}
-
-## 输出要求
-- 尺寸：${width}x${height}（16:9 比例）
-- 全屏设计，无白边
-- 严格遵循提取的设计风格
-- 高质量、专业、现代的设计
-- 清晰可读的文字内容`;
+    return request.systemPrompt.trim();
   }
   
-  return prompt;
+  // 使用统一管理的默认提示词
+  return STYLE_EXTRACT_IMAGE_PROMPT
+    .replace(/\{\^width\^\}/g, String(width))
+    .replace(/\{\^height\^\}/g, String(height))
+    .replace(/\{\^styleDescription\^\}/g, styleDescription)
+    .replace(/\{\^userPrompt\^\}/g, userPrompt);
 }
 
 /**
@@ -169,19 +131,20 @@ async function submitImageTask(
   const isGemini = modelId === 'gemini-3-pro-image-preview';
   
   // 根据模型类型设置默认参数
-  // Doubao: 3600x2025 (16:9)
-  // Gemini: 1024x1024 (1:1 正方形)
+  // Doubao: 3600x2025 (16:9), image_size=2K
+  // Gemini: 1024x1024 (1:1 正方形), image_size=1K
   const defaultWidth = isGemini ? 1024 : 3600;
   const defaultHeight = isGemini ? 1024 : 2025;
+  const defaultImageSize = isGemini ? '1K' : '2K';
   const provider = isGemini ? 'google' : 'doubao';
   const model = modelId || 'Doubao-image-seedream-v4.5';
   
   // 构建请求体，严格按照 curl 格式
-  // Doubao: {"prompt", "image_size", "model", "provider", "width", "height"} - 不含 input_images
-  // Gemini: {"prompt", "image_size", "model", "provider", "width", "height", "input_images"?}
+  // Doubao: {"prompt", "image_size": "2K", "model", "provider", "width": 3600, "height": 2025}
+  // Gemini: {"prompt", "image_size": "1K", "model", "provider", "width": 1024, "height": 1024}
   const body: Record<string, unknown> = {
     prompt: promptText,
-    image_size: imageSize,
+    image_size: imageSize || defaultImageSize,
     model: model,
     provider: provider,
     width: width || defaultWidth,
@@ -333,8 +296,11 @@ export async function generateImageByApi(
       }
   }
 
-  // 图片尺寸，默认为 1K
-  const imageSize = request.imageSize || '1K';
+  // 图片尺寸，根据模型类型设置默认值
+  // Doubao: 2K (高分辨率)
+  // Gemini: 1K
+  const isGeminiModel = request.imageModel === 'gemini-3-pro-image-preview';
+  const imageSize = request.imageSize || (isGeminiModel ? '1K' : '2K');
 
   try {
     // 准备参考图片（如果有）

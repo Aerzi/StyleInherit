@@ -5,6 +5,7 @@ import { fetchModels, type ModelInfo } from '../../services/llmService';
 import { fileToBase64 } from '../../keepstyle/utils';
 import type { StyleExtractResult, GenerateResult } from '../../keepstyle/types';
 import { getTemplateList, loadTemplateById, type HtmlTemplateInfo } from '../../assets/template/templateLoader';
+import { BatchProcessor } from '../BatchProcessor';
 
 // 预填内容选项
 const PRESET_PROMPTS = [
@@ -1008,11 +1009,8 @@ const StyleInheritance: React.FC = () => {
           </div>
         </div>
       ) : (
-        <div className="flex items-center justify-center h-full text-slate-400">
-          <div className="text-center">
-            <p className="text-xl font-medium mb-2">🚧 批量模式开发中</p>
-            <p className="text-sm">Coming Soon...</p>
-          </div>
+        <div className="flex-1 overflow-hidden">
+          <BatchProcessor onClose={() => setActiveTab('single')} />
         </div>
       )}
 

@@ -6,57 +6,139 @@
   <link rel="stylesheet" href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/html-slides/static/font-awesome/css/all.min.css">
   <link href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/slide_res/20241121/css2/css2.css" rel="stylesheet">
   <style>
-    /* === 基础约束（必须保留） === */
+    /* ============================================================
+       无样式时间轴模板 - AI 样式填充指南
+       ============================================================
+       
+       【模板用途】
+       此模板用于展示时间线/里程碑，AI 需要根据样式描述填充所有视觉样式。
+       
+       【防爆版规则 - CRITICAL】
+       1. 页面尺寸固定为 1280x720px，禁止任何滚动条
+       2. 时间节点最多 5 个，超过需调整布局或分页
+       3. 每个节点卡片内容限制 2-3 行文字
+       4. 所有容器有 max-height 和 overflow: hidden 限制
+       
+       【样式填充位置指南】
+       PPT 装饰元素通常分布在四个角落：
+       - 左上角：适合放置渐变光晕、几何圆形
+       - 右上角：适合放置装饰线条、小型图案
+       - 左下角：适合放置不规则形状、波浪纹
+       - 右下角：适合放置点缀元素、品牌装饰
+       
+       【层级规范】
+       - z-index: 0  → 背景色/背景图
+       - z-index: 1  → 角落装饰元素
+       - z-index: 2  → 时间轴连接线
+       - z-index: 5  → 容器
+       - z-index: 10 → 节点卡片、核心内容
+       
+       ============================================================ */
+
+    /* === 基础约束（禁止修改） === */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { 
       width: 1280px; 
       height: 720px; 
       overflow: hidden !important;
       font-family: 'Noto Sans SC', sans-serif;
+      /* AI填充: background-color 或 background (渐变) */
     }
 
-    /* === 布局结构 === */
+    /* === 四角装饰容器 === */
+    .decor-top-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 200px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 渐变光晕、几何圆形等 */
+    }
+    
+    .decor-top-right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 180px;
+      height: 180px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 装饰线条、小型图案 */
+    }
+    
+    .decor-bottom-left {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 160px;
+      height: 160px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 不规则形状、波浪纹 */
+    }
+    
+    .decor-bottom-right {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 点缀元素、品牌装饰 */
+    }
+
+    /* === 主容器 === */
     .container {
       width: 100%;
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 40px 60px;
+      padding: 36px 60px;
       position: relative;
-      z-index: 1;
+      z-index: 5;
     }
 
-    /* 背景装饰层 */
-    .bg-decoration {
-      position: absolute;
-      z-index: 0;
-    }
-
-    /* 头部区域 */
+    /* === 头部区域（固定高度） === */
     header {
       flex-shrink: 0;
-      margin-bottom: 30px;
+      height: 80px;
+      max-height: 80px;
+      margin-bottom: 24px;
       text-align: center;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
     }
 
     h1 {
+      font-size: 32px;
+      font-weight: 700;
       display: inline-flex;
       align-items: center;
       gap: 12px;
-      /* AI填充: 字号、颜色 */
+      /* AI填充: color */
     }
 
     .subtitle {
+      font-size: 16px;
       margin-top: 8px;
-      /* AI填充: 副标题样式 */
+      opacity: 0.8;
+      /* AI填充: color */
     }
 
-    /* 时间轴主体 */
+    /* === 时间轴主体（限制高度） === */
     main {
       flex: 1;
       position: relative;
       display: flex;
       align-items: center;
+      min-height: 0;
+      max-height: 420px;
+      overflow: hidden;
+      z-index: 10;
     }
 
     /* 时间轴容器 */
@@ -73,16 +155,16 @@
     .timeline::before {
       content: '';
       position: absolute;
-      top: 40px;
-      left: 60px;
-      right: 60px;
+      top: 50px;
+      left: 80px;
+      right: 80px;
       height: 4px;
       border-radius: 2px;
-      z-index: 1;
-      /* AI填充: 线条颜色 */
+      z-index: 2;
+      /* AI填充: background-color 或 background (渐变) */
     }
 
-    /* 时间节点 */
+    /* 时间节点（最多 5 个） */
     .milestone {
       flex: 1;
       display: flex;
@@ -90,71 +172,88 @@
       align-items: center;
       position: relative;
       z-index: 10;
-      max-width: 200px;
+      max-width: 180px;
+      min-width: 0;
     }
 
     /* 时间标签 */
     .time-label {
+      font-size: 14px;
       font-weight: 700;
-      margin-bottom: 12px;
-      padding: 6px 16px;
-      border-radius: 20px;
-      /* AI填充: 时间标签样式 */
+      margin-bottom: 10px;
+      padding: 6px 14px;
+      border-radius: 16px;
+      white-space: nowrap;
+      /* AI填充: background-color, color */
     }
 
     /* 节点圆点 */
     .node-dot {
-      width: 24px;
-      height: 24px;
+      width: 28px;
+      height: 28px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       position: relative;
-      z-index: 2;
-      /* AI填充: 圆点样式 */
+      z-index: 10;
+      flex-shrink: 0;
+      /* AI填充: background-color, box-shadow, border */
     }
 
     .node-dot i {
       font-size: 12px;
-      /* AI填充: 图标颜色 */
+      /* AI填充: color */
     }
 
     /* 内容卡片 */
     .milestone-card {
       width: 100%;
-      padding: 16px;
+      padding: 14px 16px;
       border-radius: 12px;
       text-align: center;
-      position: relative;
-      z-index: 10;
-      /* AI填充: 卡片样式 */
+      overflow: hidden;
+      /* AI填充: background-color, box-shadow, border */
     }
 
     .milestone-title {
+      font-size: 15px;
       font-weight: 600;
       margin-bottom: 8px;
-      /* AI填充: 标题样式 */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* AI填充: color */
     }
 
     .milestone-desc {
+      font-size: 13px;
       line-height: 1.5;
-      /* AI填充: 描述样式 */
+      /* 限制最多 3 行 */
+      display: -webkit-box;
+      -webkit-line-clamp: 3;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+      /* AI填充: color */
     }
 
-    /* 底部区域 */
+    /* === 底部区域（固定高度） === */
     footer {
       flex-shrink: 0;
-      margin-top: 30px;
+      height: 70px;
+      max-height: 70px;
+      margin-top: 24px;
       text-align: center;
-      /* AI填充: 底部样式 */
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
     }
 
     .footer-stats {
       display: flex;
       justify-content: center;
-      gap: 40px;
+      gap: 50px;
     }
 
     .stat-item {
@@ -164,26 +263,35 @@
     }
 
     .stat-value {
+      font-size: 24px;
       font-weight: 700;
-      /* AI填充: 数值样式 */
+      /* AI填充: color */
     }
 
     .stat-label {
-      /* AI填充: 标签样式 */
+      font-size: 13px;
+      margin-top: 4px;
+      opacity: 0.8;
+      /* AI填充: color */
     }
   </style>
 </head>
 <body>
-  <div class="bg-decoration"></div>
+  <!-- 四角装饰（z-index: 1，最底层） -->
+  <div class="decor-top-left"></div>
+  <div class="decor-top-right"></div>
+  <div class="decor-bottom-left"></div>
+  <div class="decor-bottom-right"></div>
 
+  <!-- 核心内容区（z-index: 10，最顶层） -->
   <div class="container">
-    <!-- 头部 -->
+    <!-- 头部（最大高度 80px） -->
     <header>
       <h1><i class="fa-solid fa-timeline"></i> 发展历程</h1>
       <p class="subtitle">从创立到未来的关键里程碑</p>
     </header>
 
-    <!-- 时间轴主体 -->
+    <!-- 时间轴主体（最大高度 420px，最多 5 个节点） -->
     <main>
       <div class="timeline">
         <!-- 节点1 -->
@@ -248,7 +356,7 @@
       </div>
     </main>
 
-    <!-- 底部统计 -->
+    <!-- 底部统计（固定高度 70px） -->
     <footer>
       <div class="footer-stats">
         <div class="stat-item">
@@ -268,4 +376,3 @@
   </div>
 </body>
 </html>
-

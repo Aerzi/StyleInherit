@@ -6,16 +6,96 @@
   <link rel="stylesheet" href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/html-slides/static/font-awesome/css/all.min.css">
   <link href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/slide_res/20241121/css2/css2.css" rel="stylesheet">
   <style>
-    /* === 基础约束（必须保留） === */
+    /* ============================================================
+       无样式文本模板 - AI 样式填充指南
+       ============================================================
+       
+       【模板用途】
+       此模板提供纯布局结构，AI 需要根据用户提供的样式描述填充所有视觉样式。
+       
+       【防爆版规则 - CRITICAL】
+       1. 页面尺寸固定为 1280x720px，禁止任何滚动条
+       2. 所有文本容器都有 max-height 和 overflow: hidden 限制
+       3. 如果内容过多，必须减小字号（最小 12px）或精简文字
+       4. 严禁通过增加高度解决溢出问题
+       
+       【样式填充位置指南】
+       PPT 装饰元素通常分布在四个角落，中心区域保持简洁：
+       - 左上角：适合放置渐变光晕、几何圆形
+       - 右上角：适合放置装饰线条、小型图案
+       - 左下角：适合放置不规则形状、波浪纹
+       - 右下角：适合放置点缀元素、品牌装饰
+       
+       【层级规范】
+       - z-index: 0  → 背景色/背景图
+       - z-index: 1  → 角落装饰元素
+       - z-index: 5  → 容器/卡片
+       - z-index: 10 → 核心内容（标题、正文、数据）
+       
+       ============================================================ */
+
+    /* === 基础约束（禁止修改） === */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { 
       width: 1280px; 
       height: 720px; 
       overflow: hidden !important;
       font-family: 'Noto Sans SC', sans-serif;
+      /* AI填充: background-color 或 background (渐变) */
     }
 
-    /* === 布局结构（保留结构，样式由AI填充） === */
+    /* === 背景装饰容器（四角装饰） === */
+    
+    /* 左上角装饰 */
+    .decor-top-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 200px;
+      height: 200px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 渐变光晕、几何圆形、模糊效果等 */
+      /* 示例: background: radial-gradient(circle, rgba(主色,0.3) 0%, transparent 70%); */
+    }
+    
+    /* 右上角装饰 */
+    .decor-top-right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 180px;
+      height: 180px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 装饰线条、小型图案、几何形状 */
+    }
+    
+    /* 左下角装饰 */
+    .decor-bottom-left {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 160px;
+      height: 160px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 不规则形状、波浪纹、渐变块 */
+    }
+    
+    /* 右下角装饰 */
+    .decor-bottom-right {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 200px;
+      height: 200px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 点缀元素、品牌装饰、几何图案 */
+    }
+
+    /* === 主容器（核心内容区） === */
     .container {
       width: 100%;
       height: 100%;
@@ -23,110 +103,202 @@
       flex-direction: column;
       padding: 40px 60px;
       position: relative;
-      z-index: 1;
+      z-index: 5;
     }
 
-    /* 背景装饰层（z-index最低） */
-    .bg-decoration {
-      position: absolute;
-      z-index: 0;
-      /* AI填充: 背景装饰样式 */
-    }
-
-    /* 头部区域 */
+    /* === 头部区域（固定高度防溢出） === */
     header {
       flex-shrink: 0;
-      margin-bottom: 30px;
+      height: 80px;        /* 固定高度，防止标题过长导致溢出 */
+      max-height: 80px;
+      overflow: hidden;
+      margin-bottom: 24px;
+      position: relative;
+      z-index: 10;
     }
 
     h1 {
-      /* AI填充: 字号、颜色、字重 */
+      font-size: 36px;     /* 主标题最大字号 */
+      font-weight: 700;
+      line-height: 1.3;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      /* 防止文字溢出 */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 100%;
+      /* AI填充: color, text-shadow（可选） */
     }
 
     .subtitle {
-      /* AI填充: 副标题样式 */
+      font-size: 16px;
+      margin-top: 8px;
+      opacity: 0.8;
+      /* 限制副标题长度 */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* AI填充: color */
     }
 
-    /* 主体内容区 */
+    /* === 主体内容区（弹性高度，自动适配） === */
     main {
       flex: 1;
       display: flex;
-      gap: 30px;
+      gap: 24px;
+      min-height: 0;       /* 允许 flex 子项收缩 */
+      max-height: 480px;   /* 限制最大高度防止溢出 */
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
     }
 
-    /* 左侧主要内容 */
+    /* 左侧主要内容（2/3 宽度） */
     .content-primary {
       flex: 2;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
     }
 
-    /* 右侧辅助内容 */
+    /* 右侧辅助内容（1/3 宽度） */
     .content-secondary {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
+      min-height: 0;
+      overflow: hidden;
     }
 
-    /* 内容卡片 */
+    /* === 内容卡片（核心内容载体） === */
     .card {
-      padding: 24px;
+      padding: 20px 24px;
       border-radius: 12px;
       position: relative;
       z-index: 10;
-      /* AI填充: 背景色、阴影、边框 */
+      flex-shrink: 1;      /* 允许卡片收缩 */
+      min-height: 0;
+      overflow: hidden;    /* 防止内容溢出 */
+      /* AI填充: background-color, box-shadow, border */
+      /* 建议: 使用半透明背景 rgba() 让装饰元素若隐若现 */
     }
 
     .card-title {
+      font-size: 18px;
+      font-weight: 600;
       margin-bottom: 12px;
       display: flex;
       align-items: center;
       gap: 10px;
-      /* AI填充: 字号、颜色 */
+      flex-shrink: 0;
+      /* AI填充: color */
+    }
+
+    .card-title i {
+      font-size: 20px;
+      /* AI填充: color (图标颜色，建议使用强调色) */
     }
 
     .card-content {
-      /* AI填充: 正文样式 */
+      font-size: 14px;
+      line-height: 1.6;
+      overflow: hidden;
+      /* AI填充: color */
     }
 
-    /* 列表样式 */
+    /* === 列表项（固定结构） === */
     .list-item {
       display: flex;
       align-items: flex-start;
-      gap: 12px;
-      margin-bottom: 12px;
+      gap: 10px;
+      margin-bottom: 10px;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .list-item:last-child {
+      margin-bottom: 0;
     }
 
     .list-item i {
       flex-shrink: 0;
-      /* AI填充: 图标样式 */
+      margin-top: 4px;
+      font-size: 12px;
+      /* AI填充: color (建议使用强调色或渐变相关色) */
     }
 
-    /* 底部区域 */
+    .list-item span {
+      flex: 1;
+      /* 限制文字行数防止溢出 */
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+      overflow: hidden;
+    }
+
+    /* === 底部区域（固定高度） === */
     footer {
       flex-shrink: 0;
+      height: 40px;
+      max-height: 40px;
       margin-top: 20px;
-      padding-top: 20px;
-      /* AI填充: 边框、背景 */
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      /* AI填充: border-top, color */
+    }
+
+    footer p {
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    footer i {
+      font-size: 14px;
+      /* AI填充: color */
     }
   </style>
 </head>
 <body>
-  <!-- 背景装饰（AI可添加渐变、图形等，z-index必须最低） -->
-  <div class="bg-decoration"></div>
+  <!-- ============================================================
+       装饰元素区（z-index: 1，位于最底层）
+       AI 应根据样式描述在这四个角落添加装饰效果：
+       - 可使用 CSS 渐变、伪元素、SVG 等
+       - 颜色应与整体配色方案协调
+       - 装饰不得遮挡核心内容
+       ============================================================ -->
+  <div class="decor-top-left"></div>
+  <div class="decor-top-right"></div>
+  <div class="decor-bottom-left"></div>
+  <div class="decor-bottom-right"></div>
 
+  <!-- ============================================================
+       核心内容区（z-index: 10，位于最顶层）
+       此区域的内容始终可见，不受装饰元素影响
+       ============================================================ -->
   <div class="container">
-    <!-- 头部：仅主标题 -->
+    <!-- 头部：主标题 + 副标题（最大高度 80px） -->
     <header>
       <h1><i class="fa-solid fa-file-lines"></i> 主标题文本</h1>
       <p class="subtitle">副标题说明文字</p>
     </header>
 
-    <!-- 主体内容 -->
+    <!-- 主体内容（最大高度 480px，超出自动隐藏） -->
     <main>
-      <!-- 左侧主要内容区 -->
+      <!-- 左侧主要内容区（占 2/3 宽度） -->
       <div class="content-primary">
         <div class="card">
           <div class="card-title">
@@ -160,7 +332,7 @@
         </div>
       </div>
 
-      <!-- 右侧辅助内容区 -->
+      <!-- 右侧辅助内容区（占 1/3 宽度） -->
       <div class="content-secondary">
         <div class="card">
           <div class="card-title">
@@ -184,11 +356,10 @@
       </div>
     </main>
 
-    <!-- 底部总结 -->
+    <!-- 底部总结（固定高度 40px） -->
     <footer>
       <p><i class="fa-solid fa-circle-info"></i> 底部总结或备注信息</p>
     </footer>
   </div>
 </body>
 </html>
-

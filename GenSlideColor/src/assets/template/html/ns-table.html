@@ -6,59 +6,144 @@
   <link rel="stylesheet" href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/html-slides/static/font-awesome/css/all.min.css">
   <link href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/slide_res/20241121/css2/css2.css" rel="stylesheet">
   <style>
-    /* === 基础约束（必须保留） === */
+    /* ============================================================
+       无样式表格模板 - AI 样式填充指南
+       ============================================================
+       
+       【模板用途】
+       此模板用于展示多维度数据表格，AI 需要根据样式描述填充所有视觉样式。
+       
+       【防爆版规则 - CRITICAL】
+       1. 页面尺寸固定为 1280x720px，禁止任何滚动条
+       2. 表格最多显示 6 行数据 + 1 行表头（含脚注则为 5 行）
+       3. 列数建议 5-7 列，过多列需减小字号或合并
+       4. 表格容器有 max-height 限制，超出内容会被隐藏
+       
+       【样式填充位置指南】
+       PPT 装饰元素通常分布在四个角落：
+       - 左上角：适合放置渐变光晕、几何圆形
+       - 右上角：适合放置装饰线条、小型图案
+       - 左下角：适合放置不规则形状、波浪纹
+       - 右下角：适合放置点缀元素、品牌装饰
+       
+       【层级规范】
+       - z-index: 0  → 背景色/背景图
+       - z-index: 1  → 角落装饰元素
+       - z-index: 5  → 容器
+       - z-index: 10 → 表格、核心内容
+       
+       ============================================================ */
+
+    /* === 基础约束（禁止修改） === */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { 
       width: 1280px; 
       height: 720px; 
       overflow: hidden !important;
       font-family: 'Noto Sans SC', sans-serif;
+      /* AI填充: background-color 或 background (渐变) */
     }
 
-    /* === 布局结构 === */
+    /* === 四角装饰容器 === */
+    .decor-top-left {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 180px;
+      height: 180px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 渐变光晕、几何圆形等 */
+    }
+    
+    .decor-top-right {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 160px;
+      height: 160px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 装饰线条、小型图案 */
+    }
+    
+    .decor-bottom-left {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 150px;
+      height: 150px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 不规则形状、波浪纹 */
+    }
+    
+    .decor-bottom-right {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      width: 180px;
+      height: 180px;
+      z-index: 1;
+      pointer-events: none;
+      /* AI填充: 点缀元素、品牌装饰 */
+    }
+
+    /* === 主容器 === */
     .container {
       width: 100%;
       height: 100%;
       display: flex;
       flex-direction: column;
-      padding: 40px 50px;
+      padding: 36px 50px;
       position: relative;
-      z-index: 1;
+      z-index: 5;
     }
 
-    /* 背景装饰层 */
-    .bg-decoration {
-      position: absolute;
-      z-index: 0;
-    }
-
-    /* 头部区域 */
+    /* === 头部区域（固定高度） === */
     header {
       flex-shrink: 0;
-      margin-bottom: 24px;
+      height: 60px;
+      max-height: 60px;
+      margin-bottom: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
     }
 
     h1 {
+      font-size: 28px;
+      font-weight: 700;
       display: flex;
       align-items: center;
       gap: 12px;
-      /* AI填充: 字号、颜色 */
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* AI填充: color */
     }
 
     .header-meta {
-      /* AI填充: 日期/版本等元信息样式 */
+      font-size: 14px;
+      opacity: 0.8;
+      white-space: nowrap;
+      /* AI填充: color */
     }
 
-    /* 主体内容区 */
+    /* === 主体内容区（表格） === */
     main {
       flex: 1;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 16px;
       min-height: 0;
+      max-height: 520px;
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
     }
 
     /* 表格容器 */
@@ -66,9 +151,8 @@
       flex: 1;
       border-radius: 12px;
       overflow: hidden;
-      position: relative;
-      z-index: 10;
-      /* AI填充: 背景、阴影、边框 */
+      min-height: 0;
+      /* AI填充: background-color, box-shadow, border */
     }
 
     /* 表格结构 */
@@ -79,37 +163,44 @@
 
     /* 表头 */
     thead tr {
-      /* AI填充: 表头背景色 */
+      /* AI填充: background-color */
     }
 
     th {
-      padding: 16px 20px;
+      padding: 14px 16px;
       text-align: left;
+      font-size: 14px;
       font-weight: 600;
-      /* AI填充: 字号、颜色、边框 */
+      white-space: nowrap;
+      /* AI填充: color, border-bottom */
     }
 
     th:first-child {
-      /* AI填充: 首列特殊样式 */
+      padding-left: 20px;
     }
 
     /* 表体 */
     tbody tr {
-      /* AI填充: 行背景、hover效果 */
+      /* AI填充: background-color */
     }
 
     tbody tr:nth-child(even) {
-      /* AI填充: 斑马纹 */
+      /* AI填充: 斑马纹背景 */
     }
 
     td {
-      padding: 14px 20px;
-      /* AI填充: 字号、颜色、边框 */
+      padding: 12px 16px;
+      font-size: 14px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 200px;
+      /* AI填充: color, border-bottom */
     }
 
     td:first-child {
+      padding-left: 20px;
       font-weight: 500;
-      /* AI填充: 首列特殊样式 */
     }
 
     /* 数据单元格类型 */
@@ -119,36 +210,43 @@
     }
 
     .cell-positive {
-      /* AI填充: 正向数据样式（如绿色） */
+      font-weight: 500;
+      /* AI填充: color (如绿色 #10b981) */
     }
 
     .cell-negative {
-      /* AI填充: 负向数据样式（如红色） */
+      font-weight: 500;
+      /* AI填充: color (如红色 #ef4444) */
     }
 
     .cell-highlight {
       font-weight: 600;
-      /* AI填充: 高亮单元格样式 */
+      /* AI填充: color, background-color */
     }
 
     /* 表格脚注 */
     tfoot tr {
-      /* AI填充: 脚注行背景 */
+      /* AI填充: background-color (通常比表头深) */
     }
 
     tfoot td {
       font-weight: 600;
-      /* AI填充: 合计行样式 */
+      /* AI填充: color */
     }
 
-    /* 底部区域 */
+    /* === 底部区域（固定高度） === */
     footer {
       flex-shrink: 0;
+      height: 44px;
+      max-height: 44px;
       margin-top: 16px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      /* AI填充: 备注样式 */
+      overflow: hidden;
+      position: relative;
+      z-index: 10;
+      /* AI填充: border-top, color */
     }
 
     .legend {
@@ -160,6 +258,7 @@
       display: flex;
       align-items: center;
       gap: 6px;
+      font-size: 13px;
     }
 
     .legend-dot {
@@ -167,13 +266,23 @@
       height: 12px;
       border-radius: 50%;
     }
+
+    footer > span {
+      font-size: 12px;
+      opacity: 0.7;
+    }
   </style>
 </head>
 <body>
-  <div class="bg-decoration"></div>
+  <!-- 四角装饰（z-index: 1，最底层） -->
+  <div class="decor-top-left"></div>
+  <div class="decor-top-right"></div>
+  <div class="decor-bottom-left"></div>
+  <div class="decor-bottom-right"></div>
 
+  <!-- 核心内容区（z-index: 10，最顶层） -->
   <div class="container">
-    <!-- 头部 -->
+    <!-- 头部（最大高度 60px） -->
     <header>
       <h1><i class="fa-solid fa-table"></i> 数据分析报表</h1>
       <div class="header-meta">
@@ -181,7 +290,7 @@
       </div>
     </header>
 
-    <!-- 主体：表格 -->
+    <!-- 主体：表格（最大高度 520px，最多 5-6 行数据） -->
     <main>
       <div class="table-wrapper">
         <table>
@@ -247,7 +356,7 @@
       </div>
     </main>
 
-    <!-- 底部 -->
+    <!-- 底部（固定高度 44px） -->
     <footer>
       <div class="legend">
         <div class="legend-item">
@@ -264,4 +373,3 @@
   </div>
 </body>
 </html>
-
