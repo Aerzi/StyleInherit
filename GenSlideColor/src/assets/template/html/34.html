@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 
+    排版紧凑，无动画，尺寸合规。
+    */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 24px;
+    }
+
+    /* 头部设计 */
+    header {
+      height: 70px; /* 固定高度 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 20px;
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+      flex-shrink: 0;
+    }
+
+    header h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: #1a1a1a;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, #333, #666);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* 主体网格布局 */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      flex-grow: 1; /* 填满剩余空间 */
+      height: calc(100% - 90px); /* 减去header和margin */
+    }
+
+    /* 季节卡片通用样式 */
+    .season-card {
+      border-radius: 16px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border: 1px solid rgba(255,255,255,0.5);
+    }
+
+    /* 季节卡片头部 */
+    .season-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      border-bottom: 2px solid rgba(0,0,0,0.05);
+      padding-bottom: 8px;
+    }
+
+    .season-title {
+      font-size: 24px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .season-bg-icon {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      font-size: 180px;
+      opacity: 0.08;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    /* 目的地列表容器 */
+    .destinations {
+      display: flex;
+      gap: 16px;
+      flex-grow: 1;
+      z-index: 1;
+    }
+
+    /* 单个目的地 */
+    .dest-item {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(5px);
+      border-radius: 10px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .dest-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 8px;
+    }
+
+    .dest-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2c3e50;
+    }
+
+    .dest-country {
+      font-size: 12px;
+      background: #333;
+      color: #fff;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .dest-desc {
+      font-size: 13px;
+      line-height: 1.5;
+      color: #555;
+      flex-grow: 1;
+      margin-bottom: 10px;
+      text-align: justify;
+    }
+
+    .dest-features {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-size: 11px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    /* 季节特定配色 */
+    /* 春 */
+    .spring {
+      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      color: #1b5e20;
+    }
+    .spring .tag { background: #a5d6a7; color: #1b5e20; }
+    
+    /* 夏 */
+    .summer {
+      background: linear-gradient(135deg, #fff8e1 0%, #ffe0b2 100%);
+      color: #e65100;
+    }
+    .summer .tag { background: #ffcc80; color: #e65100; }
+
+    /* 秋 */
+    .autumn {
+      background: linear-gradient(135deg, #fbe9e7 0%, #ffccbc 100%);
+      color: #bf360c;
+    }
+    .autumn .tag { background: #ffab91; color: #bf360c; }
+
+    /* 冬 */
+    .winter {
+      background: linear-gradient(135deg, #e3f2fd 0%, #b3e5fc 100%);
+      color: #01579b;
+    }
+    .winter .tag { background: #81d4fa; color: #01579b; }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>年度全球旅行计划推荐</h1>
+  </header>
+
+  <div class="main-grid">
+    <!-- 春季 -->
+    <div class="season-card spring">
+      <i class="fa-solid fa-seedling season-bg-icon"></i>
+      <div class="season-header">
+        <div class="season-title"><i class="fa-solid fa-leaf"></i> 春季 SPRING</div>
+        <div style="font-size: 14px; font-weight: 500; opacity: 0.8;">3月 - 5月</div>
+      </div>
+      <div class="destinations">
+        <!-- 目的地 1 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">京都</div>
+            <span class="dest-country">日本</span>
+          </div>
+          <div class="dest-desc">
+            漫步于哲学之道，沉浸在粉色樱花海洋中。探访千年古刹，感受传统茶道文化与春日静谧。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-camera"></i> 樱花盛典</span>
+            <span class="tag"><i class="fa-solid fa-torii-gate"></i> 文化遗产</span>
+          </div>
+        </div>
+        <!-- 目的地 2 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">林芝</div>
+            <span class="dest-country">中国</span>
+          </div>
+          <div class="dest-desc">
+            西藏江南的桃花源。雪山映衬下的野桃花绵延百里，雅鲁藏布江大峡谷春意盎然，摄影爱好者的天堂。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-mountain-sun"></i> 雪山桃花</span>
+            <span class="tag"><i class="fa-solid fa-person-hiking"></i> 徒步探险</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 夏季 -->
+    <div class="season-card summer">
+      <i class="fa-solid fa-sun season-bg-icon"></i>
+      <div class="season-header">
+        <div class="season-title"><i class="fa-solid fa-umbrella-beach"></i> 夏季 SUMMER</div>
+        <div style="font-size: 14px; font-weight: 500; opacity: 0.8;">6月 - 8月</div>
+      </div>
+      <div class="destinations">
+        <!-- 目的地 1 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">圣托里尼</div>
+            <span class="dest-country">希腊</span>
+          </div>
+          <div class="dest-desc">
+            爱琴海上的璀璨明珠。蓝顶白墙的建筑与蔚蓝大海交相辉映，享受绝美的日落与地中海美食。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-water"></i> 海岛风情</span>
+            <span class="tag"><i class="fa-solid fa-wine-glass"></i> 浪漫度假</span>
+          </div>
+        </div>
+        <!-- 目的地 2 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">雷克雅未克</div>
+            <span class="dest-country">冰岛</span>
+          </div>
+          <div class="dest-desc">
+            体验神奇的"午夜阳光"。探索火山、冰川与瀑布，在舒适的温度下进行环岛自驾，感受极致自然。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-road"></i> 环岛自驾</span>
+            <span class="tag"><i class="fa-solid fa-icicles"></i> 避暑胜地</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 秋季 -->
+    <div class="season-card autumn">
+      <i class="fa-brands fa-canadian-maple-leaf season-bg-icon"></i>
+      <div class="season-header">
+        <div class="season-title"><i class="fa-solid fa-wheat-awn"></i> 秋季 AUTUMN</div>
+        <div style="font-size: 14px; font-weight: 500; opacity: 0.8;">9月 - 11月</div>
+      </div>
+      <div class="destinations">
+        <!-- 目的地 1 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">班夫公园</div>
+            <span class="dest-country">加拿大</span>
+          </div>
+          <div class="dest-desc">
+            落基山脉的秋日童话。金色的落叶松与碧绿的湖水构成油画般的景色，邂逅野生动物的最佳时节。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-tree"></i> 森林湖泊</span>
+            <span class="tag"><i class="fa-solid fa-paw"></i> 自然生态</span>
+          </div>
+        </div>
+        <!-- 目的地 2 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">慕尼黑</div>
+            <span class="dest-country">德国</span>
+          </div>
+          <div class="dest-desc">
+            举世闻名的十月啤酒节。在巴伐利亚的秋风中畅饮啤酒，品尝烤猪肘，感受浓郁的欧洲人文庆典。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-beer-mug-empty"></i> 啤酒节</span>
+            <span class="tag"><i class="fa-solid fa-music"></i> 人文狂欢</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 冬季 -->
+    <div class="season-card winter">
+      <i class="fa-regular fa-snowflake season-bg-icon"></i>
+      <div class="season-header">
+        <div class="season-title"><i class="fa-solid fa-snowflake"></i> 冬季 WINTER</div>
+        <div style="font-size: 14px; font-weight: 500; opacity: 0.8;">12月 - 2月</div>
+      </div>
+      <div class="destinations">
+        <!-- 目的地 1 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">采尔马特</div>
+            <span class="dest-country">瑞士</span>
+          </div>
+          <div class="dest-desc">
+            马特洪峰脚下的冰雪天堂。世界顶级的滑雪胜地，无车小镇的宁静，享受最纯粹的阿尔卑斯雪景。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-person-skiing"></i> 顶级滑雪</span>
+            <span class="tag"><i class="fa-solid fa-mountain"></i> 雪山景观</span>
+          </div>
+        </div>
+        <!-- 目的地 2 -->
+        <div class="dest-item">
+          <div class="dest-top">
+            <div class="dest-name">哈尔滨</div>
+            <span class="dest-country">中国</span>
+          </div>
+          <div class="dest-desc">
+            东方的莫斯科，梦幻的冰雪大世界。漫步中央大街，体验零下三十度的极致严寒与热情的东北文化。
+          </div>
+          <div class="dest-features">
+            <span class="tag"><i class="fa-solid fa-igloo"></i> 冰雪艺术</span>
+            <span class="tag"><i class="fa-solid fa-building-columns"></i> 异域风情</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

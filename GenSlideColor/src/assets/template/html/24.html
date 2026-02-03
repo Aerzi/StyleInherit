@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2025年核心KPI目标设定</title>
+    <style>
+        :root {
+            --bg-dark: #1a1d21;
+            --card-bg: #2a2e35;
+            --primary-cyan: #40e0d0;
+            --text-white: #ffffff;
+            --text-gray: #a0a5ad;
+            --accent-cyan: rgba(64, 224, 208, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1280px;
+            height: 720px;
+            background-color: var(--bg-dark);
+            position: relative;
+            padding: 35px 60px; /* 减小内边距 */
+            display: flex;
+            flex-direction: column;
+            color: var(--text-white);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 25px; /* 减小间距 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-tag {
+            font-size: 13px;
+            color: var(--primary-cyan);
+            border-left: 3px solid var(--primary-cyan);
+            padding-left: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .main-title {
+            font-size: 38px; /* 缩小标题 */
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        /* Top Cards Grid */
+        .top-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px; /* 减小间距 */
+            margin-bottom: 20px; /* 减小间距 */
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px; /* 缩小内边距 */
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        .card.active {
+            border: 1px solid var(--primary-cyan);
+            box-shadow: 0 0 15px rgba(64, 224, 208, 0.2);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; /* 减小间距 */
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .icon {
+            font-size: 22px;
+            color: var(--primary-cyan);
+            opacity: 0.8;
+        }
+
+        .data-list {
+            list-style: none;
+            flex-grow: 1;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px; /* 减小行间距 */
+            font-size: 17px;
+        }
+
+        .data-label {
+            color: var(--text-gray);
+        }
+
+        .data-value {
+            font-weight: bold;
+            color: var(--primary-cyan);
+            font-size: 19px;
+        }
+
+        .card-footer-btn {
+            background-color: var(--accent-cyan);
+            color: var(--primary-cyan);
+            text-align: center;
+            padding: 8px; /* 减小内边距 */
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        /* Bottom Brand Card */
+        .bottom-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px 35px; /* 增加内边距 */
+            flex: 1; 
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start; /* 改为顶部对齐 */
+        }
+
+        .bottom-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 35px; /* 增大标题与内容的间距 */
+            font-size: 22px; /* 增大标题字号 */
+            font-weight: bold;
+            color: var(--text-white);
+        }
+
+        .bottom-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px; /* 增大项之间的间距 */
+            align-items: start;
+        }
+
+        .brand-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .brand-icon {
+            font-size: 32px; /* 还原较大的图标 */
+            color: var(--primary-cyan);
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .brand-name {
+            font-size: 19px; /* 还原较大的字号 */
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: var(--text-white);
+        }
+
+        .brand-desc {
+            font-size: 14.5px; /* 还原清晰的字号 */
+            color: var(--text-gray);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-tag">2025 KPI<br>TARGETS</div>
+            <h1 class="main-title">2025年核心KPI目标设定</h1>
+        </div>
+
+        <div class="top-cards">
+            <!-- 用户增长目标 -->
+            <div class="card active">
+                <div class="card-header">
+                    <span class="card-title">用户增长目标</span>
+                    <span class="icon">👥</span>
+                </div>
+                <div class="data-list">
+                    <div class="data-item">
+                        <span class="data-label">全球月活设备数</span>
+                        <span class="data-value">7亿</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">PC版月活</span>
+                        <span class="data-value">3.2亿</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">AI月活用户</span>
+                        <span class="data-value">3000万</span>
+                    </div>
+                </div>
+                <div class="card-footer-btn">同比增长 +10%</div>
+            </div>
+
+            <!-- 收入增长目标 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">收入增长目标</span>
+                    <span class="icon">＄</span>
+                </div>
+                <div class="data-list">
+                    <div class="data-item">
+                        <span class="data-label">总收入突破</span>
+                        <span class="data-value">60亿</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">WPS 365收入</span>
+                        <span class="data-value">10亿</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">个人业务收入</span>
+                        <span class="data-value">36亿</span>
+                    </div>
+                </div>
+                <div class="card-footer-btn">同比增长 +17%</div>
+            </div>
+
+            <!-- 市场目标 -->
+            <div class="card">
+                <div class="card-header">
+                    <span class="card-title">市场目标</span>
+                    <span class="icon">🎯</span>
+                </div>
+                <div class="data-list">
+                    <div class="data-item">
+                        <span class="data-label">新增标杆客户</span>
+                        <span class="data-value">50家</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">WPS 365收入占比</span>
+                        <span class="data-value">16%+</span>
+                    </div>
+                    <div class="data-item">
+                        <span class="data-label">B端客户覆盖</span>
+                        <span class="data-value">150万</span>
+                    </div>
+                </div>
+                <div class="card-footer-btn">覆盖金融、制造、互联网</div>
+            </div>
+        </div>
+
+        <div class="bottom-card">
+            <div class="bottom-header">
+                <span class="icon">📢</span> 品牌建设目标
+            </div>
+            <div class="bottom-grid">
+                <div class="brand-item">
+                    <div class="brand-icon">📺</div>
+                    <div class="brand-name">加大品牌投入</div>
+                    <div class="brand-desc">提升WPS 365品牌认知度，建立协同办公市场品牌影响力</div>
+                </div>
+                <div class="brand-item">
+                    <div class="brand-icon">🕸️</div>
+                    <div class="brand-name">完善渠道建设</div>
+                    <div class="brand-desc">建立分销网络，覆盖民营企业及地方国企</div>
+                </div>
+                <div class="brand-item">
+                    <div class="brand-icon">🏆</div>
+                    <div class="brand-name">标杆案例打造</div>
+                    <div class="brand-desc">持续打造行业标杆客户案例，形成示范效应</div>
+                </div>
+                <div class="brand-item">
+                    <div class="brand-icon">📈</div>
+                    <div class="brand-name">市场份额提升</div>
+                    <div class="brand-desc">从11.62%提升至16%以上，缩小与竞品差距</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

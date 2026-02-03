@@ -1,0 +1,396 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+      display: grid;
+      grid-template-rows: 80px 100px 1fr;
+      height: 100%;
+      padding: 30px 50px;
+      gap: 20px;
+    }
+
+    /* 头部样式 */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 15px;
+    }
+    .title-group h1 {
+      font-size: 32px;
+      color: #111827;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+    }
+    .title-group p {
+      font-size: 16px;
+      color: #6b7280;
+      margin-top: 5px;
+    }
+    .brand-tag {
+      background: #1f2937;
+      color: #fff;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-weight: 500;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* 关键指标卡片 (KPI Cards) */
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+    }
+    .kpi-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+      border-left: 4px solid transparent;
+    }
+    .kpi-card.blue { border-left-color: #3b82f6; }
+    .kpi-card.green { border-left-color: #10b981; }
+    .kpi-card.orange { border-left-color: #f59e0b; }
+    .kpi-card.purple { border-left-color: #8b5cf6; }
+
+    .kpi-label { font-size: 14px; color: #6b7280; margin-bottom: 5px; font-weight: 500; }
+    .kpi-value { font-size: 28px; font-weight: 700; color: #111827; }
+    .kpi-trend { font-size: 12px; margin-top: 4px; display: flex; align-items: center; gap: 4px; }
+    .trend-up { color: #10b981; }
+    .trend-down { color: #ef4444; }
+
+    /* 主内容区：左侧表格，右侧图表 */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1.4fr 1fr;
+      gap: 25px;
+      height: 100%;padding-top: 50px;
+    }
+
+    /* 表格样式 */
+    .table-container {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .section-title i { color: #4b5563; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th {
+      text-align: left;
+      padding: 12px 15px;
+      background-color: #f9fafb;
+      color: #4b5563;
+      font-size: 14px;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+    }
+    td {
+      padding: 14px 15px;
+      border-bottom: 1px solid #f3f4f6;
+      color: #1f2937;
+      font-size: 15px;
+      vertical-align: middle;
+    }
+    tr:last-child td { border-bottom: none; }
+    
+    .platform-cell { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+    .platform-icon { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; border-radius: 6px; }
+    .icon-google { color: #DB4437; background: rgba(219, 68, 55, 0.1); }
+    .icon-meta { color: #0668E1; background: rgba(6, 104, 225, 0.1); }
+    .icon-tiktok { color: #000000; background: rgba(0, 0, 0, 0.1); }
+    .icon-linkedin { color: #0077b5; background: rgba(0, 119, 181, 0.1); }
+    .icon-twitter { color: #1DA1F2; background: rgba(29, 161, 242, 0.1); }
+
+    .num-cell { font-family: 'Roboto', sans-serif; font-weight: 500; }
+    .roi-badge {
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 13px;
+      font-weight: 700;
+      display: inline-block;
+      width: 60px;
+      text-align: center;
+    }
+    .roi-high { background: #d1fae5; color: #065f46; }
+    .roi-med { background: #ffedd5; color: #9a3412; }
+    .roi-low { background: #fee2e2; color: #991b1b; }
+
+    /* 图表区域 */
+    .chart-container {
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+    }
+    #roiChart {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 辅助类 */
+    .text-right { text-align: right; }
+    .text-green { color: #10b981; }
+    .text-gray { color: #6b7280; font-size: 13px; }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- 头部 -->
+  
+
+  <!-- 关键指标 -->
+  <div class="kpi-row">
+    <div class="kpi-card blue">
+      <div class="kpi-label">总消耗金额 (Spend)</div>
+      <div class="kpi-value">¥ 128,000</div>
+      <div class="kpi-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 12.5% 环比增长</div>
+    </div>
+    <div class="kpi-card green">
+      <div class="kpi-label">总产出金额 (Revenue)</div>
+      <div class="kpi-value">¥ 342,400</div>
+      <div class="kpi-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 24.8% 环比增长</div>
+    </div>
+    <div class="kpi-card orange">
+      <div class="kpi-label">平均 ROI</div>
+      <div class="kpi-value">2.68</div>
+      <div class="kpi-trend trend-up"><i class="fa-solid fa-arrow-up"></i> 0.3 提升</div>
+    </div>
+    <div class="kpi-card purple">
+      <div class="kpi-label">转化率 (CVR)</div>
+      <div class="kpi-value">3.85%</div>
+      <div class="kpi-trend trend-down"><i class="fa-solid fa-arrow-down"></i> 0.2% 波动</div>
+    </div>
+  </div>
+
+  <!-- 主内容 -->
+  <div class="main-content">
+    <!-- 左侧：数据表格 -->
+    <div class="table-container">
+      <div class="section-title">
+        <i class="fa-solid fa-list-ul"></i> 分渠道投放详情
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th width="25%">投放平台</th>
+            <th width="20%" class="text-right">消耗金额 (¥)</th>
+            <th width="20%" class="text-right">产出金额 (¥)</th>
+            <th width="15%" class="text-center">ROI</th>
+            <th width="20%" class="text-right">占比</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>
+              <div class="platform-cell">
+                <div class="platform-icon icon-meta"><i class="fa-brands fa-meta"></i></div>
+                Meta Ads
+              </div>
+            </td>
+            <td class="text-right num-cell">45,000</td>
+            <td class="text-right num-cell">168,750</td>
+            <td class="text-center"><span class="roi-badge roi-high">3.75</span></td>
+            <td class="text-right text-gray">49.2%</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="platform-cell">
+                <div class="platform-icon icon-google"><i class="fa-brands fa-google"></i></div>
+                Google Ads
+              </div>
+            </td>
+            <td class="text-right num-cell">38,000</td>
+            <td class="text-right num-cell">98,800</td>
+            <td class="text-center"><span class="roi-badge roi-med">2.60</span></td>
+            <td class="text-right text-gray">28.8%</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="platform-cell">
+                <div class="platform-icon icon-tiktok"><i class="fa-brands fa-tiktok"></i></div>
+                TikTok
+              </div>
+            </td>
+            <td class="text-right num-cell">25,000</td>
+            <td class="text-right num-cell">37,500</td>
+            <td class="text-center"><span class="roi-badge roi-low">1.50</span></td>
+            <td class="text-right text-gray">10.9%</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="platform-cell">
+                <div class="platform-icon icon-linkedin"><i class="fa-brands fa-linkedin-in"></i></div>
+                LinkedIn
+              </div>
+            </td>
+            <td class="text-right num-cell">12,000</td>
+            <td class="text-right num-cell">31,200</td>
+            <td class="text-center"><span class="roi-badge roi-med">2.60</span></td>
+            <td class="text-right text-gray">9.1%</td>
+          </tr>
+          <tr>
+            <td>
+              <div class="platform-cell">
+                <div class="platform-icon icon-twitter"><i class="fa-brands fa-x-twitter"></i></div>
+                Twitter (X)
+              </div>
+            </td>
+            <td class="text-right num-cell">8,000</td>
+            <td class="text-right num-cell">6,150</td>
+            <td class="text-center"><span class="roi-badge roi-low">0.77</span></td>
+            <td class="text-right text-gray">1.8%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- 右侧：可视化图表 -->
+    <div class="chart-container">
+      <div class="section-title">
+        <i class="fa-solid fa-chart-simple"></i> 投入产出对比分析
+      </div>
+      <div id="roiChart" _echarts_instance_="ec_1766739066130" style="user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); position: relative;"><div style="position: relative; width: 441px; height: 359px; padding: 0px; margin: 0px; border-width: 0px; cursor: default;"><canvas data-zr-dom-id="zr_0" width="661" height="538" style="position: absolute; left: 0px; top: 0px; width: 441px; height: 359px; user-select: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); padding: 0px; margin: 0px; border-width: 0px;"></canvas></div><div class="" style="position: absolute; display: block; border-style: solid; white-space: nowrap; z-index: 9999999; box-shadow: rgba(0, 0, 0, 0.2) 1px 2px 10px; transition: opacity 0.2s cubic-bezier(0.23, 1, 0.32, 1), visibility 0.2s cubic-bezier(0.23, 1, 0.32, 1), transform 0.4s cubic-bezier(0.23, 1, 0.32, 1); background-color: rgb(255, 255, 255); border-width: 1px; border-radius: 4px; color: rgb(102, 102, 102); font: 14px / 21px &quot;Microsoft YaHei&quot;; padding: 10px; top: 0px; left: 0px; transform: translate3d(167px, 39px, 0px); border-color: rgb(255, 255, 255); pointer-events: none; visibility: hidden; opacity: 0;"><div style="margin: 0px 0 0;line-height:1;"><div style="margin: 0px 0 0;line-height:1;"><div style="font-size:14px;color:#666;font-weight:400;line-height:1;">Meta</div><div style="margin: 10px 0 0;line-height:1;"><div style="margin: 0px 0 0;line-height:1;"><div style="margin: 0px 0 0;line-height:1;"><span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#cbd5e1;"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">消耗金额</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">45,000</span><div style="clear:both"></div></div><div style="clear:both"></div></div><div style="margin: 10px 0 0;line-height:1;"><div style="margin: 0px 0 0;line-height:1;"><span style="display:inline-block;margin-right:4px;border-radius:10px;width:10px;height:10px;background-color:#34d399;"></span><span style="font-size:14px;color:#666;font-weight:400;margin-left:2px">产出金额</span><span style="float:right;margin-left:20px;font-size:14px;color:#666;font-weight:900">168,750</span><div style="clear:both"></div></div><div style="clear:both"></div></div><div style="clear:both"></div></div><div style="clear:both"></div></div><div style="clear:both"></div></div></div></div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // 初始化 ECharts 实例
+  var chartDom = document.getElementById('roiChart');
+  var myChart = echarts.init(chartDom);
+  var option;
+
+  option = {
+    animation: false, // 严格禁止动画
+    backgroundColor: 'transparent',
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: { type: 'shadow' }
+    },
+    legend: {
+      data: ['消耗金额', '产出金额'],
+      bottom: 0,
+      itemGap: 20,
+      textStyle: { color: '#6b7280' }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '10%',
+      top: '5%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'value',
+      axisLabel: {
+        formatter: function (value) {
+          return value / 1000 + 'k';
+        },
+        color: '#9ca3af'
+      },
+      splitLine: {
+        lineStyle: {
+          type: 'dashed',
+          color: '#e5e7eb'
+        }
+      }
+    },
+    yAxis: {
+      type: 'category',
+      data: ['Twitter', 'LinkedIn', 'TikTok', 'Google', 'Meta'],
+      axisLine: { show: false },
+      axisTick: { show: false },
+      axisLabel: {
+        color: '#374151',
+        fontWeight: 'bold',
+        fontSize: 12
+      }
+    },
+    series: [
+      {
+        name: '消耗金额',
+        type: 'bar',
+        data: [8000, 12000, 25000, 38000, 45000],
+        itemStyle: {
+          color: '#cbd5e1', // 灰色代表成本
+          borderRadius: [0, 4, 4, 0]
+        },
+        barGap: '20%',
+        label: {
+          show: true,
+          position: 'right',
+          formatter: '¥{c}',
+          fontSize: 10,
+          color: '#64748b'
+        }
+      },
+      {
+        name: '产出金额',
+        type: 'bar',
+        data: [6150, 31200, 37500, 98800, 168750],
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+            { offset: 0, color: '#34d399' }, // 绿色渐变代表收益
+            { offset: 1, color: '#059669' }
+          ]),
+          borderRadius: [0, 4, 4, 0]
+        },
+        label: {
+          show: true,
+          position: 'right',
+          formatter: '¥{c}',
+          fontWeight: 'bold',
+          color: '#059669'
+        }
+      }
+    ]
+  };
+
+  myChart.setOption(option);
+</script>
+
+
+</body></html>

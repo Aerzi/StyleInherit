@@ -1,0 +1,371 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    /* 背景装饰 */
+    .bg-shape {
+      position: absolute;
+      z-index: 0;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.4;
+    }
+    .shape-1 { top: -100px; left: -100px; width: 500px; height: 500px; background: #ffecd2; }
+    .shape-2 { bottom: -100px; right: -100px; width: 600px; height: 600px; background: #d4fc79; }
+
+    /* 主容器 */
+    .container {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 标题区域 */
+    header {
+      margin-bottom: 30px;
+      border-left: 8px solid #343a40;
+      padding-left: 24px;
+    }
+    h1 {
+      font-size: 42px;
+      font-weight: 900;
+      color: #212529;
+      letter-spacing: 1px;
+      margin-bottom: 8px;
+    }
+    p.subtitle {
+      font-size: 20px;
+      color: #6c757d;
+      font-weight: 500;
+    }
+
+    /* 内容区域布局 */
+    .content-wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      height: 540px;
+      gap: 30px;
+    }
+
+    /* 卡片通用样式 */
+    .strategy-card {
+      flex: 1;
+      background: white;
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #f1f3f5;
+    }
+    
+    .icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 16px;
+      color: white;
+    }
+
+    .card-title h2 {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    .card-title span {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.7;
+      text-transform: uppercase;
+    }
+
+    /* 激进型特定样式 */
+    .aggressive { border-top: 6px solid #e63946; }
+    .aggressive .icon-box { background: linear-gradient(135deg, #e63946, #ff6b6b); box-shadow: 0 4px 12px rgba(230, 57, 70, 0.3); }
+    .aggressive h2 { color: #e63946; }
+    
+    /* 保守型特定样式 */
+    .conservative { border-top: 6px solid #2a9d8f; }
+    .conservative .icon-box { background: linear-gradient(135deg, #2a9d8f, #48cae4); box-shadow: 0 4px 12px rgba(42, 157, 143, 0.3); }
+    .conservative h2 { color: #2a9d8f; }
+
+    /* 列表样式 */
+    ul { list-style: none; flex-grow: 1; }
+    li {
+      margin-bottom: 18px;
+      font-size: 16px;
+      line-height: 1.6;
+      color: #495057;
+      display: flex;
+      align-items: flex-start;
+    }
+    li i {
+      margin-top: 5px;
+      margin-right: 12px;
+      font-size: 14px;
+    }
+    .aggressive li i { color: #e63946; }
+    .conservative li i { color: #2a9d8f; }
+
+    .tag {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-top: 8px;
+    }
+    .tag-risk { background: #ffe3e3; color: #e03131; }
+    .tag-safe { background: #e6fcf5; color: #0ca678; }
+
+    /* 中间图表区域 */
+    .chart-section {
+      flex: 1.2;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #343a40;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    #radar-chart {
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 底部总结条 */
+    .summary-bar {
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #eee;
+      font-size: 14px;
+      color: #868e96;
+      text-align: center;
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- 背景装饰 -->
+  <div class="bg-shape shape-1"></div>
+  <div class="bg-shape shape-2"></div>
+
+  <div class="container">
+    <header style="border-bottom: none;">
+      <h1>危机应对策略分析</h1>
+      
+    </header>
+
+    <div class="content-wrapper">
+      
+      <!-- 左侧：激进型 -->
+      <div class="strategy-card aggressive">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-rocket"></i></div>
+          <div class="card-title">
+            <h2>激进型策略</h2>
+            <span>High Risk, High Return</span>
+          </div>
+        </div>
+        <ul>
+          <li>
+            <i class="fa-solid fa-bolt"></i>
+            <div>
+              <strong>快速响应与转型</strong><br>
+              利用危机作为洗牌机会，迅速抢占市场空白。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-money-bill-trend-up"></i>
+            <div>
+              <strong>逆势投资</strong><br>
+              在资产价格低点进行并购或扩大产能。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            <div>
+              <strong>主要风险</strong><br>
+              现金流断裂风险高，容错率极低。
+              <div class="tag tag-risk">高风险敞口</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+      <!-- 中间：图表 -->
+      <div class="chart-section">
+        <div class="chart-title">核心维度对比雷达图</div>
+        <div id="radar-chart"></div>
+      </div>
+
+      <!-- 右侧：保守型 -->
+      <div class="strategy-card conservative">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="card-title">
+            <h2>保守型策略</h2>
+            <span>Stability &amp; Survival</span>
+          </div>
+        </div>
+        <ul>
+          <li>
+            <i class="fa-solid fa-piggy-bank"></i>
+            <div>
+              <strong>现金流为王</strong><br>
+              削减非必要开支，储备现金，确保生存底线。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-user-shield"></i>
+            <div>
+              <strong>核心业务聚焦</strong><br>
+              收缩战线，剥离边缘业务，深耕存量客户。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            <div>
+              <strong>主要风险</strong><br>
+              可能错失反弹先机，市场份额被蚕食。
+              <div class="tag tag-safe">高稳定性</div>
+            </div>
+          </li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script>
+    // 初始化 ECharts
+    var chartDom = document.getElementById('radar-chart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // 严格禁止动画
+      color: ['#e63946', '#2a9d8f'],
+      tooltip: {
+        trigger: 'item'
+      },
+      legend: {
+        bottom: '0',
+        data: ['激进型策略', '保守型策略'],
+        textStyle: {
+          fontSize: 14,
+          color: '#555'
+        },
+        itemGap: 30
+      },
+      radar: {
+        indicator: [
+          { name: '市场响应速度', max: 100 },
+          { name: '风险敞口', max: 100 },
+          { name: '短期成本投入', max: 100 },
+          { name: '创新与变革', max: 100 },
+          { name: '现金流稳定性', max: 100 }
+        ],
+        radius: '65%',
+        center: ['50%', '45%'],
+        splitNumber: 4,
+        axisName: {
+          color: '#666',
+          fontSize: 12,
+          fontWeight: 'bold'
+        },
+        splitArea: {
+          areaStyle: {
+            color: ['#f8f9fa', '#fff', '#f8f9fa', '#fff'],
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        axisLine: {
+          lineStyle: {
+            color: 'rgba(0,0,0,0.1)'
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: 'rgba(0,0,0,0.1)'
+          }
+        }
+      },
+      series: [
+        {
+          name: '策略对比',
+          type: 'radar',
+          data: [
+            {
+              value: [95, 90, 85, 90, 30],
+              name: '激进型策略',
+              areaStyle: {
+                color: 'rgba(230, 57, 70, 0.2)'
+              },
+              lineStyle: {
+                width: 3
+              },
+              symbol: 'circle',
+              symbolSize: 6
+            },
+            {
+              value: [40, 20, 30, 30, 95],
+              name: '保守型策略',
+              areaStyle: {
+                color: 'rgba(42, 157, 143, 0.2)'
+              },
+              lineStyle: {
+                width: 3
+              },
+              symbol: 'circle',
+              symbolSize: 6
+            }
+          ]
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

@@ -1,0 +1,357 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f8f9fa;
+      color: #333;
+    }
+
+    /* 背景装饰 - 调整层级避免逻辑重叠 */
+    .bg-decoration {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 40%;
+      height: 100%;
+      background: linear-gradient(135deg, #e0f2f1 0%, #f8f9fa 100%);
+      z-index: 0; /* 设为0，作为底层 */
+      clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+    }
+
+    .container {
+      position: relative; /* 建立层叠上下文 */
+      z-index: 1; /* 确保内容在背景装饰之上 */
+      display: flex;
+      height: 100%;
+      padding: 35px 50px; /* 减小内边距以防止溢出 */
+    }
+
+    /* 左侧区域：标题 + 图表 */
+    .left-section {
+      width: 35%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding-right: 30px; /* 减小间距 */
+    }
+
+    .header {
+      margin-bottom: 15px;
+    }
+
+    .tag {
+      display: inline-block;
+      padding: 5px 10px;
+      background-color: #e0f2f1;
+      color: #00897b;
+      border-radius: 4px;
+      font-size: 13px; /* 稍微减小 */
+      font-weight: 700;
+      margin-bottom: 10px;
+      letter-spacing: 1px;
+    }
+
+    h1 {
+      font-size: 40px; /* 减小字体防止换行过多 */
+      font-weight: 900;
+      color: #1a1a1a;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    h1 span {
+      color: #00897b;
+    }
+
+    .subtitle {
+      font-size: 15px; /* 稍微减小 */
+      color: #666;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    #chart-container {
+      width: 100%;
+      height: 300px; /* 减小高度以适应布局 */
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+      padding: 15px;
+      position: relative;
+    }
+
+    .chart-label {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      font-size: 15px;
+      font-weight: 700;
+      color: #444;
+    }
+
+    /* 右侧区域：卡片网格 */
+    .right-section {
+      width: 65%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px; /* 减小网格间距 */
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 18px;
+      padding: 22px; /* 减小卡片内边距 */
+      box-shadow: 0 8px 24px rgba(0,0,0,0.04);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      border-top: 5px solid transparent;
+      z-index: 2; /* 确保卡片层级高于背景 */
+    }
+
+    /* 卡片颜色定义 */
+    .card.diet { border-color: #10b981; }
+    .card.exercise { border-color: #f59e0b; }
+    .card.sleep { border-color: #3b82f6; }
+    .card.mental { border-color: #ec4899; }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px; /* 减小间距 */
+    }
+
+    .icon-box {
+      width: 46px; /* 减小图标尺寸 */
+      height: 46px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      margin-right: 12px;
+    }
+
+    .diet .icon-box { background: #d1fae5; color: #059669; }
+    .exercise .icon-box { background: #fef3c7; color: #d97706; }
+    .sleep .icon-box { background: #dbeafe; color: #2563eb; }
+    .mental .icon-box { background: #fce7f3; color: #db2777; }
+
+    .card-title {
+      font-size: 19px; /* 稍微减小 */
+      font-weight: 700;
+      color: #2d3748;
+    }
+
+    .card-list {
+      list-style: none;
+      flex: 1;
+    }
+
+    .card-list li {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 8px; /* 减小列表间距 */
+      font-size: 13.5px; /* 调整字体大小以适应空间 */
+      color: #555;
+      line-height: 1.45;
+    }
+
+    .card-list li:last-child {
+      margin-bottom: 0;
+    }
+
+    .card-list li i {
+      margin-top: 4px;
+      margin-right: 8px;
+      font-size: 12px;
+      opacity: 0.7;
+      flex-shrink: 0; /* 防止图标被压缩 */
+    }
+
+    .diet li i { color: #10b981; }
+    .exercise li i { color: #f59e0b; }
+    .sleep li i { color: #3b82f6; }
+    .mental li i { color: #ec4899; }
+
+    /* 底部装饰条 */
+    .footer-bar {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 6px;
+      background: linear-gradient(90deg, #10b981 0%, #3b82f6 50%, #ec4899 100%);
+      z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-decoration"></div>
+
+  <div class="container">
+    <!-- 左侧 -->
+    <div class="left-section">
+      <div class="header" style="border-bottom: none;">
+        <span class="tag">HEALTH PLAN</span>
+        <h1>全面健康<br><span>管理计划</span></h1>
+        <p class="subtitle">
+          通过科学的规划，在饮食、运动、睡眠与心理四个维度建立良性循环，提升整体生命质量与工作效能。
+        </p>
+      </div>
+      
+      <div id="chart-container">
+        <div class="chart-label">健康维度平衡模型</div>
+        <div id="radarChart" style="width: 100%; height: 100%;"></div>
+      </div>
+    </div>
+
+    <!-- 右侧 -->
+    <div class="right-section">
+      
+      <!-- 饮食 -->
+      <div class="card diet">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-carrot"></i></div>
+          <div class="card-title">科学饮食</div>
+        </div>
+        <ul class="card-list">
+          <li><i class="fa-solid fa-check"></i><span><b>结构均衡：</b>采用"地中海饮食"模式，增加全谷物与蔬果摄入。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>控糖限油：</b>每日添加糖&lt;25g，优先选择不饱和脂肪酸。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>规律三餐：</b>定时定量，保持七分饱，睡前3小时不进食。</span></li>
+        </ul>
+      </div>
+
+      <!-- 运动 -->
+      <div class="card exercise">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-person-running"></i></div>
+          <div class="card-title">适量运动</div>
+        </div>
+        <ul class="card-list">
+          <li><i class="fa-solid fa-check"></i><span><b>有氧基础：</b>每周至少150分钟中等强度有氧运动（如快走）。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>力量强化：</b>每周2次抗阻训练，提升核心肌群与代谢率。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>碎片活动：</b>久坐1小时起身活动5分钟，保持身体活跃。</span></li>
+        </ul>
+      </div>
+
+      <!-- 睡眠 -->
+      <div class="card sleep">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-moon"></i></div>
+          <div class="card-title">优质睡眠</div>
+        </div>
+        <ul class="card-list">
+          <li><i class="fa-solid fa-check"></i><span><b>时长保证：</b>每晚保持7-8小时高质量睡眠，固定作息时间。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>环境优化：</b>保持卧室黑暗、安静、凉爽，使用遮光窗帘。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>睡前仪式：</b>睡前1小时远离电子屏幕，进行阅读或冥想。</span></li>
+        </ul>
+      </div>
+
+      <!-- 心理 -->
+      <div class="card mental">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-brain"></i></div>
+          <div class="card-title">心理调节</div>
+        </div>
+        <ul class="card-list">
+          <li><i class="fa-solid fa-check"></i><span><b>正念冥想：</b>每日10分钟正念练习，缓解焦虑，提升专注力。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>情绪疏导：</b>建立社交支持系统，定期与亲友沟通或记录日记。</span></li>
+          <li><i class="fa-solid fa-check"></i><span><b>压力管理：</b>学会任务分级，合理拒绝，保持工作生活边界。</span></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="footer-bar"></div>
+
+  <script>
+    // 初始化 ECharts 雷达图
+    var chartDom = document.getElementById('radarChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // 严格禁止动画
+      color: ['#00897b', '#f59e0b'],
+      radar: {
+        indicator: [
+          { name: '营养摄入', max: 100 },
+          { name: '有氧耐力', max: 100 },
+          { name: '肌肉力量', max: 100 },
+          { name: '睡眠质量', max: 100 },
+          { name: '情绪稳定', max: 100 },
+          { name: '压力管理', max: 100 }
+        ],
+        radius: '65%',
+        center: ['50%', '55%'],
+        splitNumber: 4,
+        axisName: {
+          color: '#666',
+          fontWeight: 'bold',
+          fontSize: 11 // 稍微减小字体
+        },
+        splitArea: {
+          areaStyle: {
+            color: ['#f1f8f6', '#fff', '#f1f8f6', '#fff'],
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        },
+        axisLine: {
+          lineStyle: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: 'rgba(0, 0, 0, 0.1)'
+          }
+        }
+      },
+      series: [
+        {
+          name: 'Health Status',
+          type: 'radar',
+          data: [
+            {
+              value: [85, 70, 60, 90, 80, 75],
+              name: '当前状态',
+              symbol: 'circle',
+              symbolSize: 6,
+              areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                  { offset: 0, color: 'rgba(0, 137, 123, 0.5)' },
+                  { offset: 1, color: 'rgba(0, 137, 123, 0.1)' }
+                ])
+              },
+              lineStyle: {
+                width: 2,
+                color: '#00897b'
+              },
+              itemStyle: {
+                color: '#00897b'
+              }
+            }
+          ]
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/html-slides/static/font-awesome/css/all.min.css">
+  <link href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/slide_res/20241121/css2/css2.css" rel="stylesheet">
+  <style>
+    /* === 基础约束（必须保留） === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden !important;
+      font-family: 'Noto Sans SC', sans-serif;
+    }
+
+    /* === 布局结构 === */
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 背景装饰层 */
+    .bg-decoration {
+      position: absolute;
+      z-index: 0;
+    }
+
+    /* 头部区域 */
+    header {
+      flex-shrink: 0;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      /* AI填充: 字号、颜色 */
+    }
+
+    .subtitle {
+      margin-top: 8px;
+      /* AI填充: 副标题样式 */
+    }
+
+    /* 时间轴主体 */
+    main {
+      flex: 1;
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    /* 时间轴容器 */
+    .timeline {
+      width: 100%;
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      padding: 0 20px;
+    }
+
+    /* 时间轴连接线 */
+    .timeline::before {
+      content: '';
+      position: absolute;
+      top: 40px;
+      left: 60px;
+      right: 60px;
+      height: 4px;
+      border-radius: 2px;
+      z-index: 1;
+      /* AI填充: 线条颜色 */
+    }
+
+    /* 时间节点 */
+    .milestone {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      position: relative;
+      z-index: 10;
+      max-width: 200px;
+    }
+
+    /* 时间标签 */
+    .time-label {
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding: 6px 16px;
+      border-radius: 20px;
+      /* AI填充: 时间标签样式 */
+    }
+
+    /* 节点圆点 */
+    .node-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 16px;
+      position: relative;
+      z-index: 2;
+      /* AI填充: 圆点样式 */
+    }
+
+    .node-dot i {
+      font-size: 12px;
+      /* AI填充: 图标颜色 */
+    }
+
+    /* 内容卡片 */
+    .milestone-card {
+      width: 100%;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      position: relative;
+      z-index: 10;
+      /* AI填充: 卡片样式 */
+    }
+
+    .milestone-title {
+      font-weight: 600;
+      margin-bottom: 8px;
+      /* AI填充: 标题样式 */
+    }
+
+    .milestone-desc {
+      line-height: 1.5;
+      /* AI填充: 描述样式 */
+    }
+
+    /* 底部区域 */
+    footer {
+      flex-shrink: 0;
+      margin-top: 30px;
+      text-align: center;
+      /* AI填充: 底部样式 */
+    }
+
+    .footer-stats {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-value {
+      font-weight: 700;
+      /* AI填充: 数值样式 */
+    }
+
+    .stat-label {
+      /* AI填充: 标签样式 */
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-decoration"></div>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header>
+      <h1><i class="fa-solid fa-timeline"></i> 发展历程</h1>
+      <p class="subtitle">从创立到未来的关键里程碑</p>
+    </header>
+
+    <!-- 时间轴主体 -->
+    <main>
+      <div class="timeline">
+        <!-- 节点1 -->
+        <div class="milestone">
+          <div class="time-label">2020</div>
+          <div class="node-dot">
+            <i class="fa-solid fa-seedling"></i>
+          </div>
+          <div class="milestone-card">
+            <div class="milestone-title">项目启动</div>
+            <div class="milestone-desc">初创团队组建<br>完成产品原型</div>
+          </div>
+        </div>
+
+        <!-- 节点2 -->
+        <div class="milestone">
+          <div class="time-label">2021</div>
+          <div class="node-dot">
+            <i class="fa-solid fa-rocket"></i>
+          </div>
+          <div class="milestone-card">
+            <div class="milestone-title">正式发布</div>
+            <div class="milestone-desc">产品1.0上线<br>获得首批用户</div>
+          </div>
+        </div>
+
+        <!-- 节点3 -->
+        <div class="milestone">
+          <div class="time-label">2022</div>
+          <div class="node-dot">
+            <i class="fa-solid fa-chart-line"></i>
+          </div>
+          <div class="milestone-card">
+            <div class="milestone-title">快速增长</div>
+            <div class="milestone-desc">用户突破10万<br>完成A轮融资</div>
+          </div>
+        </div>
+
+        <!-- 节点4 -->
+        <div class="milestone">
+          <div class="time-label">2023</div>
+          <div class="node-dot">
+            <i class="fa-solid fa-globe"></i>
+          </div>
+          <div class="milestone-card">
+            <div class="milestone-title">全面扩展</div>
+            <div class="milestone-desc">业务覆盖全国<br>团队规模翻倍</div>
+          </div>
+        </div>
+
+        <!-- 节点5 -->
+        <div class="milestone">
+          <div class="time-label">2024</div>
+          <div class="node-dot">
+            <i class="fa-solid fa-star"></i>
+          </div>
+          <div class="milestone-card">
+            <div class="milestone-title">行业领先</div>
+            <div class="milestone-desc">市场份额第一<br>开启国际化</div>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部统计 -->
+    <footer>
+      <div class="footer-stats">
+        <div class="stat-item">
+          <span class="stat-value">5年</span>
+          <span class="stat-label">发展历程</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">100万+</span>
+          <span class="stat-label">累计用户</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-value">500+</span>
+          <span class="stat-label">团队成员</span>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>
+

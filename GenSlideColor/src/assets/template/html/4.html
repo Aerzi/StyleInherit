@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-color: #f0f2f5;
+      --std-color: #2c7a7b; /* Teal for Standardized */
+      --std-bg: #e6fffa;
+      --cust-color: #c05621; /* Burnt Orange for Customized */
+      --cust-bg: #fffaf0;
+      --text-main: #2d3748;
+      --text-light: #718096;
+      --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+
+    /* Layout Structure */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 30px 40px;
+    }
+
+    /* Header - Strict Requirement: Only main-title */
+    header {
+      height: 70px;
+      display: flex;
+      align-items: center;
+      margin-bottom: 25px;
+      border-bottom: 3px solid #cbd5e0;
+      padding-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 900;
+      color: #1a202c;
+      letter-spacing: 1px;
+    }
+    
+    h1 i {
+      color: #4a5568;
+      margin-right: 15px;
+      font-size: 32px;
+    }
+
+    /* Main Content Area */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      flex: 1;
+      height: calc(100% - 95px); /* Remaining height */
+    }
+
+    /* Card Styling */
+    .card {
+      background: white;
+      border-radius: 16px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.05);
+    }
+
+    .card-header {
+      padding: 20px 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid rgba(0,0,0,0.05);
+    }
+
+    .card-header.std { background-color: var(--std-bg); color: var(--std-color); }
+    .card-header.cust { background-color: var(--cust-bg); color: var(--cust-color); }
+
+    .card-title {
+      font-size: 24px;
+      font-weight: 700;
+    }
+    
+    .card-subtitle {
+      font-size: 14px;
+      font-weight: 500;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .card-body {
+      flex: 1;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    /* Process Flow Visualization */
+    .flow-container {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      position: relative;
+    }
+
+    /* Connecting Line */
+    .flow-line {
+      position: absolute;
+      left: 24px;
+      top: 20px;
+      bottom: 20px;
+      width: 4px;
+      background: #e2e8f0;
+      z-index: 0;
+    }
+
+    .step {
+      display: flex;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .step-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      background: white;
+      border: 3px solid #cbd5e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      color: #718096;
+      margin-right: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .std .step-icon { border-color: var(--std-color); color: var(--std-color); }
+    .cust .step-icon { border-color: var(--cust-color); color: var(--cust-color); }
+
+    .step-content {
+      flex: 1;
+      background: #f7fafc;
+      padding: 12px 15px;
+      border-radius: 8px;
+      border-left: 4px solid #cbd5e0;
+    }
+
+    .std .step-content { border-left-color: var(--std-color); background: #f0fdfa; }
+    .cust .step-content { border-left-color: var(--cust-color); background: #fffaf0; }
+
+    .step-title {
+      font-weight: 700;
+      font-size: 16px;
+      margin-bottom: 2px;
+    }
+
+    .step-desc {
+      font-size: 13px;
+      color: var(--text-light);
+    }
+
+    /* Feature Grid (Bottom of Card) */
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 2px dashed #e2e8f0;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      font-size: 14px;
+      color: #4a5568;
+    }
+
+    .feature-item i {
+      margin-right: 10px;
+      width: 24px;
+      text-align: center;
+    }
+    
+    .std .feature-item i { color: var(--std-color); }
+    .cust .feature-item i { color: var(--cust-color); }
+
+    .label {
+      font-weight: 700;
+      margin-right: 5px;
+    }
+
+    /* Comparison Summary Footer */
+    .comparison-summary {
+      background: #2d3748;
+      color: white;
+      border-radius: 12px;
+      padding: 15px 25px;
+      margin-top: 15px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      align-items: center;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      border-right: 1px solid rgba(255,255,255,0.2);
+    }
+    .summary-item:last-child { border-right: none; }
+
+    .s-title { font-size: 12px; opacity: 0.7; margin-bottom: 5px; text-transform: uppercase; }
+    .s-val { font-size: 16px; font-weight: 600; }
+    .s-val span { font-weight: 400; font-size: 14px; margin: 0 5px; opacity: 0.5; }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Header: Strict requirement compliance -->
+  <header>
+    <h1><i class="fa-solid fa-sliders"></i> 标准化 vs 定制化产品生产流程对比</h1>
+  </header>
+
+  <div class="content-grid">
+    
+    <!-- Left Card: Standardized -->
+    <div class="card std">
+      <div class="card-header std">
+        <div>
+          <div class="card-title">标准化产品</div>
+          <div class="card-subtitle">Make to Stock (MTS)</div>
+        </div>
+        <i class="fa-solid fa-cubes fa-2x"></i>
+      </div>
+      <div class="card-body">
+        <div class="flow-container">
+          <div class="flow-line"></div>
+          
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-chart-line"></i></div>
+            <div class="step-content">
+              <div class="step-title">1. 市场预测</div>
+              <div class="step-desc">基于历史数据预测需求</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-flask"></i></div>
+            <div class="step-content">
+              <div class="step-title">2. 研发与定型</div>
+              <div class="step-desc">一次性设计，锁定规格</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-industry"></i></div>
+            <div class="step-content">
+              <div class="step-title">3. 批量生产</div>
+              <div class="step-desc">规模化连续制造，降低成本</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-boxes-stacked"></i></div>
+            <div class="step-content">
+              <div class="step-title">4. 库存与销售</div>
+              <div class="step-desc">产品入库，等待客户下单</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="features">
+          <div class="feature-item"><i class="fa-solid fa-dollar-sign"></i> <div><span class="label">成本:</span> 低 (规模经济)</div></div>
+          <div class="feature-item"><i class="fa-solid fa-clock"></i> <div><span class="label">交付:</span> 即时/极快</div></div>
+          <div class="feature-item"><i class="fa-solid fa-layer-group"></i> <div><span class="label">批量:</span> 大批量</div></div>
+          <div class="feature-item"><i class="fa-solid fa-rotate"></i> <div><span class="label">灵活:</span> 低</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right Card: Customized -->
+    <div class="card cust">
+      <div class="card-header cust">
+        <div>
+          <div class="card-title">定制化产品</div>
+          <div class="card-subtitle">Make to Order (MTO)</div>
+        </div>
+        <i class="fa-solid fa-pen-ruler fa-2x"></i>
+      </div>
+      <div class="card-body">
+        <div class="flow-container">
+          <div class="flow-line"></div>
+          
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-hand-holding-dollar"></i></div>
+            <div class="step-content">
+              <div class="step-title">1. 客户需求</div>
+              <div class="step-desc">接收具体规格与个性化要求</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-compass-drafting"></i></div>
+            <div class="step-content">
+              <div class="step-title">2. 方案设计</div>
+              <div class="step-desc">针对性设计，客户确认方案</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-file-signature"></i></div>
+            <div class="step-content">
+              <div class="step-title">3. 采购与生产</div>
+              <div class="step-desc">按单采购，柔性化制造</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-icon"><i class="fa-solid fa-truck-fast"></i></div>
+            <div class="step-content">
+              <div class="step-title">4. 交付与服务</div>
+              <div class="step-desc">发货并提供安装/调试</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="features">
+          <div class="feature-item"><i class="fa-solid fa-coins"></i> <div><span class="label">成本:</span> 高 (包含设计费)</div></div>
+          <div class="feature-item"><i class="fa-solid fa-hourglass-half"></i> <div><span class="label">交付:</span> 较长周期</div></div>
+          <div class="feature-item"><i class="fa-solid fa-box-open"></i> <div><span class="label">批量:</span> 单件或小批</div></div>
+          <div class="feature-item"><i class="fa-solid fa-up-right-and-down-left-from-center"></i> <div><span class="label">灵活:</span> 极高</div></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Bottom Summary Strip to minimize whitespace -->
+  <div class="comparison-summary">
+    <div class="summary-item">
+      <div class="s-title">生产驱动力</div>
+      <div class="s-val">库存 <span>vs</span> 订单</div>
+    </div>
+    <div class="summary-item">
+      <div class="s-title">客户参与度</div>
+      <div class="s-val">低 (购买成品) <span>vs</span> 高 (参与设计)</div>
+    </div>
+    <div class="summary-item">
+      <div class="s-title">设备要求</div>
+      <div class="s-val">专用流水线 <span>vs</span> 通用柔性设备</div>
+    </div>
+    <div class="summary-item">
+      <div class="s-title">核心竞争力</div>
+      <div class="s-val">价格与效率 <span>vs</span> 差异化与服务</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
+<!-- 
+符合要求：无动画，无滚动，尺寸1280x720，配色和谐，布局饱满，header仅含title。
+-->

@@ -1,0 +1,323 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Noto Sans SC', sans-serif; background-color: #F0F2F5; color: #333; }
+    
+    /* 布局容器 */
+    .slide-container {
+      width: 100%;
+      height: 100%;
+      padding: 40px 60px;
+      display: flex;
+      flex-direction: column;
+      background: linear-gradient(135deg, #F0F2F5 0%, #E6E9EF 100%);
+      position: relative;
+    }
+
+    /* 装饰背景元素 */
+    .bg-shape {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 300px;
+      background: #00695C;
+      opacity: 0.05;
+      border-bottom-left-radius: 100%;
+      z-index: 0;
+    }
+
+    /* 头部区域 */
+    header {
+      margin-bottom: 40px;
+      position: relative;
+      z-index: 1;
+      border-left: 8px solid #00695C;
+      padding-left: 24px;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 700;
+      color: #263238;
+      margin-bottom: 8px;
+      letter-spacing: 1px;
+    }
+
+    p.subtitle {
+      font-size: 20px;
+      color: #546E7A;
+      font-weight: 500;
+    }
+
+    /* 主内容网格 */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 450px 1fr;
+      gap: 40px;
+      flex: 1;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 左侧图表卡片 */
+    .chart-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #37474F;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .chart-container {
+      flex: 1;
+      width: 100%;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    /* 右侧分析列表 */
+    .analysis-list {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+
+    .analysis-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.04);
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+      position: relative;
+      overflow: hidden;
+      height: 31%; /* 均匀分布 */
+    }
+
+    /* 卡片左侧颜色条 */
+    .analysis-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+    }
+
+    .card-value::before { background-color: #00897B; } /* Teal */
+    .card-competitor::before { background-color: #D84315; } /* Burnt Orange */
+    .card-service::before { background-color: #F9A825; } /* Mustard */
+
+    .icon-box {
+      width: 64px;
+      height: 64px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 28px;
+    }
+
+    .card-value .icon-box { background-color: #E0F2F1; color: #00695C; }
+    .card-competitor .icon-box { background-color: #FBE9E7; color: #D84315; }
+    .card-service .icon-box { background-color: #FFFDE7; color: #F9A825; }
+
+    .text-content {
+      flex: 1;
+    }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #263238;
+      margin-bottom: 8px;
+    }
+
+    .card-desc {
+      font-size: 16px;
+      color: #546E7A;
+      line-height: 1.5;
+    }
+
+    /* 底部数据摘要 */
+    .data-highlight {
+      margin-top: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 4px;
+      display: inline-block;
+    }
+    
+    .card-value .data-highlight { background: #E0F2F1; color: #00695C; }
+    .card-competitor .data-highlight { background: #FBE9E7; color: #D84315; }
+    .card-service .data-highlight { background: #FFFDE7; color: #F57F17; }
+
+  </style>
+</head>
+<body>
+
+<div class="slide-container">
+  <div class="bg-shape"></div>
+
+  <header style="border-bottom: none;">
+    <h1>用户留存率下降深度归因分析</h1>
+    
+  </header>
+
+  <div class="content-grid">
+    <!-- 左侧：数据图表 -->
+    <div class="chart-card">
+      <div class="chart-title">
+        <i class="fa-solid fa-chart-area" style="color: #00695C;"></i>
+        近6个月留存率走势 (MoM)
+      </div>
+      <div id="retentionChart" class="chart-container"></div>
+      <div style="margin-top: 15px; font-size: 14px; color: #78909C; text-align: center;">
+        <i class="fa-solid fa-triangle-exclamation"></i> 
+        Q3季度末出现明显拐点，累计下降 <strong>12.5%</strong>
+      </div>
+    </div>
+
+    <!-- 右侧：原因分析 -->
+    <div class="analysis-list">
+      
+      <!-- 原因 1 -->
+      <div class="analysis-card card-value">
+        <div class="icon-box">
+          <i class="fa-solid fa-gem"></i>
+        </div>
+        <div class="text-content">
+          <div class="card-title">产品价值感知薄弱</div>
+          <div class="card-desc">
+            核心功能同质化严重，高频用户反馈“新功能缺乏吸引力”。用户难以感知付费版与免费版的差异化价值。
+          </div>
+          <div class="data-highlight">功能使用率环比 -8%</div>
+        </div>
+      </div>
+
+      <!-- 原因 2 -->
+      <div class="analysis-card card-competitor">
+        <div class="icon-box">
+          <i class="fa-solid fa-bolt"></i>
+        </div>
+        <div class="text-content">
+          <div class="card-title">竞品低价策略冲击</div>
+          <div class="card-desc">
+            主要竞品 "X-Pro" 推出季度半价补贴，导致价格敏感型用户（占比40%）大量迁移，市场份额受到挤压。
+          </div>
+          <div class="data-highlight">流失用户中 65% 转投竞品</div>
+        </div>
+      </div>
+
+      <!-- 原因 3 -->
+      <div class="analysis-card card-service">
+        <div class="icon-box">
+          <i class="fa-solid fa-headset"></i>
+        </div>
+        <div class="text-content">
+          <div class="card-title">服务体验响应滞后</div>
+          <div class="card-desc">
+            随着用户量增长，客服团队扩容不足。平均工单响应时间从 2小时延长至 8小时，导致售后满意度评分下滑。
+          </div>
+          <div class="data-highlight">NPS (净推荐值) 下降 15 分</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  // 初始化 ECharts 图表
+  var chartDom = document.getElementById('retentionChart');
+  var myChart = echarts.init(chartDom);
+  var option;
+
+  option = {
+    animation: false, // 严格禁止动画
+    grid: {
+      top: '15%',
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      boundaryGap: false,
+      data: ['5月', '6月', '7月', '8月', '9月', '10月'],
+      axisLine: { lineStyle: { color: '#CFD8DC' } },
+      axisLabel: { color: '#546E7A', fontSize: 12 }
+    },
+    yAxis: {
+      type: 'value',
+      min: 40,
+      max: 80,
+      axisLine: { show: false },
+      axisTick: { show: false },
+      splitLine: { lineStyle: { type: 'dashed', color: '#ECEFF1' } },
+      axisLabel: { formatter: '{value}%', color: '#90A4AE' }
+    },
+    series: [
+      {
+        name: '留存率',
+        type: 'line',
+        smooth: true,
+        symbol: 'circle',
+        symbolSize: 8,
+        itemStyle: {
+          color: '#00897B',
+          borderColor: '#fff',
+          borderWidth: 2
+        },
+        lineStyle: {
+          width: 3,
+          color: '#00897B'
+        },
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: 'rgba(0, 137, 123, 0.2)' },
+            { offset: 1, color: 'rgba(0, 137, 123, 0.02)' }
+          ])
+        },
+        data: [72, 71, 68, 62, 58, 55],
+        markPoint: {
+          symbol: 'pin',
+          symbolSize: 40,
+          label: { show: true, color: '#fff', fontSize: 10, formatter: 'Low' },
+          itemStyle: { color: '#D84315' },
+          data: [
+            { type: 'min', name: '最低点' }
+          ],
+          animation: false
+        }
+      }
+    ]
+  };
+
+  myChart.setOption(option);
+</script>
+
+
+</body></html>

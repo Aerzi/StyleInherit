@@ -1,0 +1,400 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f4f6f8;
+      color: #333;
+    }
+
+    /* 背景装饰 */
+    .bg-decoration {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 300px;
+      background: linear-gradient(180deg, #eef2f5 0%, #f4f6f8 100%);
+      z-index: -1;
+    }
+
+    /* 顶部标题栏 */
+    header {
+      padding: 40px 60px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    h1 {
+      font-size: 42px;
+      font-weight: 900;
+      color: #2c3e50;
+      letter-spacing: 1px;
+    }
+
+    h1 span {
+      color: #009688; /* Teal accent */
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #7f8c8d;
+      font-weight: 500;
+    }
+
+    /* 主内容区域 */
+    .main-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: stretch;
+      padding: 20px 60px 60px;
+      height: 600px;
+      position: relative;
+    }
+
+    /* 流程箭头背景 */
+    .flow-arrow-bg {
+      position: absolute;
+      top: 50%;
+      left: 60px;
+      right: 60px;
+      height: 4px;
+      background: #e0e0e0;
+      z-index: 0;
+      transform: translateY(-50%);
+    }
+
+    /* 卡片通用样式 */
+    .layer-card {
+      width: 270px;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+      z-index: 1;
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .card-header {
+      height: 100px;
+      border-radius: 16px 16px 0 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header h2 {
+      color: #fff;
+      font-size: 36px;
+      font-weight: 900;
+      z-index: 2;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .card-header .sub-label {
+      position: absolute;
+      bottom: 10px;
+      color: rgba(255,255,255,0.9);
+      font-size: 14px;
+      font-weight: 500;
+      z-index: 2;
+    }
+
+    .card-header i {
+      position: absolute;
+      font-size: 80px;
+      right: -10px;
+      bottom: -15px;
+      opacity: 0.15;
+      color: #fff;
+      transform: rotate(-15deg);
+    }
+
+    .card-body {
+      padding: 25px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .feature-list {
+      list-style: none;
+    }
+
+    .feature-list li {
+      margin-bottom: 16px;
+      display: flex;
+      align-items: flex-start;
+      font-size: 15px;
+      color: #546e7a;
+      line-height: 1.5;
+    }
+
+    .feature-list li i {
+      margin-right: 12px;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    /* 各层特定样式 */
+    
+    /* ODS - 贴源层 */
+    .ods .card-header {
+      background: linear-gradient(135deg, #607d8b 0%, #455a64 100%);
+    }
+    .ods .feature-list li i { color: #607d8b; }
+    .ods { border-bottom: 4px solid #607d8b; }
+
+    /* DWD - 明细层 */
+    .dwd .card-header {
+      background: linear-gradient(135deg, #009688 0%, #00796b 100%);
+    }
+    .dwd .feature-list li i { color: #009688; }
+    .dwd { border-bottom: 4px solid #009688; }
+
+    /* DWS - 服务层 */
+    .dws .card-header {
+      background: linear-gradient(135deg, #1976d2 0%, #1565c0 100%);
+    }
+    .dws .feature-list li i { color: #1976d2; }
+    .dws { border-bottom: 4px solid #1976d2; }
+
+    /* ADS - 应用层 */
+    .ads .card-header {
+      background: linear-gradient(135deg, #e64a19 0%, #d84315 100%);
+    }
+    .ads .feature-list li i { color: #e64a19; }
+    .ads { border-bottom: 4px solid #e64a19; }
+
+    /* 连接箭头 */
+    .connector {
+      position: absolute;
+      top: 50%;
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      color: #90a4ae;
+      font-size: 18px;
+      z-index: 2;
+      transform: translateY(-50%);
+    }
+
+    .c1 { left: 25%; }
+    .c2 { left: 48%; }
+    .c3 { left: 72%; }
+
+    /* 底部标签 */
+    .footer-tag {
+      margin-top: auto;
+      padding-top: 15px;
+      border-top: 1px dashed #eee;
+      font-size: 13px;
+      color: #90a4ae;
+      text-align: center;
+    }
+
+    /* 数据流向指示 */
+    .data-flow-label {
+      position: absolute;
+      bottom: 20px;
+      left: 60px;
+      right: 60px;
+      display: flex;
+      justify-content: space-between;
+      color: #b0bec5;
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="bg-decoration"></div>
+
+  <header style="border-bottom: none;">
+    <div>
+      <h1>数据仓库</h1>
+      
+    </div>
+    
+  </header>
+
+  <div class="main-container">
+    <!-- 背景连线 -->
+    <div class="flow-arrow-bg"></div>
+
+    <!-- 连接图标 -->
+    <div class="connector c1"><i class="fa-solid fa-chevron-right"></i></div>
+    <div class="connector c2"><i class="fa-solid fa-chevron-right"></i></div>
+    <div class="connector c3"><i class="fa-solid fa-chevron-right"></i></div>
+
+    <!-- ODS 层 -->
+    <div class="layer-card ods">
+      <div class="card-header">
+        <h2>ODS</h2>
+        <span class="sub-label">Operational Data Store</span>
+        <i class="fa-solid fa-database"></i>
+      </div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>贴源层 / 原始数据</strong><br>
+              保持与业务系统数据结构一致，不做修改。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>数据备份</strong><br>
+              起到数据缓冲区和隔离区的作用。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>全量/增量</strong><br>
+              存储历史数据，支持数据追溯。
+            </div>
+          </li>
+        </ul>
+        <div class="footer-tag">Input: 业务DB / 日志</div>
+      </div>
+    </div>
+
+    <!-- DWD 层 -->
+    <div class="layer-card dwd">
+      <div class="card-header">
+        <h2>DWD</h2>
+        <span class="sub-label">Data Warehouse Detail</span>
+        <i class="fa-solid fa-filter"></i>
+      </div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>明细数据层</strong><br>
+              进行数据清洗、脱敏、规范化处理。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>维度建模</strong><br>
+              采用星型模型，构建事实表与维度表。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>统一标准</strong><br>
+              统一字段命名、字典定义和编码格式。
+            </div>
+          </li>
+        </ul>
+        <div class="footer-tag">Process: 清洗 / 建模</div>
+      </div>
+    </div>
+
+    <!-- DWS 层 -->
+    <div class="layer-card dws">
+      <div class="card-header">
+        <h2>DWS</h2>
+        <span class="sub-label">Data Warehouse Service</span>
+        <i class="fa-solid fa-cubes"></i>
+      </div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>服务数据层</strong><br>
+              基于业务主题进行轻度汇总和聚合。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>宽表构建</strong><br>
+              将多张关联表合并为主题宽表，减少Join。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>公共指标</strong><br>
+              沉淀通用的业务指标，避免重复计算。
+            </div>
+          </li>
+        </ul>
+        <div class="footer-tag">Process: 聚合 / 汇总</div>
+      </div>
+    </div>
+
+    <!-- ADS 层 -->
+    <div class="layer-card ads">
+      <div class="card-header">
+        <h2>ADS</h2>
+        <span class="sub-label">Application Data Store</span>
+        <i class="fa-solid fa-chart-pie"></i>
+      </div>
+      <div class="card-body">
+        <ul class="feature-list">
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>应用数据层</strong><br>
+              面向具体业务应用的最终结果数据。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>高度聚合</strong><br>
+              数据量小，查询响应速度极快。
+            </div>
+          </li>
+          <li>
+            <i class="fa-solid fa-circle"></i>
+            <div>
+              <strong>多场景支持</strong><br>
+              支持报表、仪表盘、用户画像等应用。
+            </div>
+          </li>
+        </ul>
+        <div class="footer-tag">Output: BI / 报表</div>
+      </div>
+    </div>
+
+    <!-- 底部流向文字 -->
+    <div class="data-flow-label">
+      <span><i class="fa-solid fa-arrow-right-long"></i> Data Ingestion</span>
+      <span>Data Value <i class="fa-solid fa-arrow-trend-up"></i></span>
+    </div>
+
+  </div>
+
+
+</body></html>

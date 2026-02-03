@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>策略二：B端市场突破路径</title>
+    <style>
+        :root {
+            --bg-dark: #1a1d21;
+            --card-bg: #2a2e35;
+            --primary-cyan: #40e0d0;
+            --text-white: #ffffff;
+            --text-gray: #a0a5ad;
+            --accent-cyan: rgba(64, 224, 208, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "PingFang SC", "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background-color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 1280px;
+            height: 720px;
+            background-color: var(--bg-dark);
+            position: relative;
+            padding: 25px 60px; /* 进一步减小上下内边距 */
+            display: flex;
+            flex-direction: column;
+            color: var(--text-white);
+            overflow: hidden;
+        }
+
+        /* Header */
+        .header {
+            margin-bottom: 20px; /* 减小间距 */
+        }
+
+        .header-tag {
+            font-size: 13px;
+            color: var(--primary-cyan);
+            border-left: 3px solid var(--primary-cyan);
+            padding-left: 10px;
+            letter-spacing: 1px;
+            margin-bottom: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .main-title {
+            font-size: 38px; /* 适度缩小标题 */
+            font-weight: 800;
+            letter-spacing: 2px;
+        }
+
+        /* Top Grid - 3 Cards */
+        .top-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px; /* 减小间距 */
+            margin-bottom: 20px; /* 减小间距 */
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 25px; /* 减小内边距 */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .card.active {
+            border: 1px solid rgba(64, 224, 208, 0.4);
+            box-shadow: 0 0 20px rgba(64, 224, 208, 0.05);
+        }
+
+        .icon-box {
+            font-size: 28px; /* 缩小图标 */
+            color: var(--primary-cyan);
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 22px; /* 缩小标题字号 */
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .bullet-list {
+            list-style: none;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* 减小项间距 */
+            text-align: left;
+        }
+
+        .bullet-item {
+            display: flex;
+            gap: 10px;
+            font-size: 14.5px; /* 缩小字号 */
+            line-height: 1.4;
+        }
+
+        .dot {
+            color: var(--primary-cyan);
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        .item-text b { color: var(--text-white); }
+        .item-text span { color: var(--text-gray); }
+
+        /* Bottom Grid - 2 Wide Cards */
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .sub-card {
+            padding: 20px 35px; /* 减小内边距 */
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+
+        .sub-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            font-size: 20px; /* 缩小字号 */
+            font-weight: bold;
+        }
+
+        .sub-icon { color: var(--primary-cyan); font-size: 22px; }
+
+        /* Competition Strategy Items */
+        .strat-item {
+            background-color: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 15px 20px; /* 减小内边距 */
+            margin-bottom: 15px; /* 减小项间距 */
+        }
+
+        .strat-name {
+            font-size: 17px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: var(--text-white);
+        }
+
+        .strat-desc {
+            font-size: 14px;
+            color: var(--text-gray);
+            line-height: 1.5;
+        }
+
+        .strat-desc b { color: var(--text-white); font-weight: bold; }
+
+        /* Advantages List */
+        .adv-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px; /* 减小项间距 */
+        }
+
+        .adv-item {
+            display: flex;
+            gap: 15px;
+            font-size: 15px;
+            align-items: flex-start;
+        }
+
+        .adv-dot {
+            width: 10px;
+            height: 10px;
+            background-color: var(--primary-cyan);
+            border-radius: 50%;
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        .adv-info {
+            line-height: 1.4;
+        }
+
+        .adv-info b { color: var(--text-white); margin-right: 8px; }
+        .adv-info span { color: var(--text-gray); }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="header-tag">STRATEGY 02 · B-SIDE EXPANSION</div>
+            <h1 class="main-title">策略二：B端市场突破路径</h1>
+        </div>
+
+        <div class="top-row">
+            <!-- 客户分层运营 -->
+            <div class="card active">
+                <div class="icon-box">👥</div>
+                <div class="card-title">客户分层运营</div>
+                <ul class="bullet-list">
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>巩固央国企:</b> <span>政务大模型、安全合规</span></div>
+                    </li>
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>加速民企:</b> <span>灵活定价、行业方案</span></div>
+                    </li>
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>完善渠道:</b> <span>建设分销网络</span></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 行业纵深布局 -->
+            <div class="card">
+                <div class="icon-box">🏭</div>
+                <div class="card-title">行业纵深布局</div>
+                <ul class="bullet-list">
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>金融行业:</b> <span>资产管理、合规风控</span></div>
+                    </li>
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>制造行业:</b> <span>订单管理、供应链协同</span></div>
+                    </li>
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>互联网行业:</b> <span>敏捷开发、知识管理</span></div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- 生态合作拓展 -->
+            <div class="card">
+                <div class="icon-box">🤝</div>
+                <div class="card-title">生态合作拓展</div>
+                <ul class="bullet-list">
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>大模型合作:</b> <span>通义千问、智谱AI等</span></div>
+                    </li>
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>行业大模型:</b> <span>建立垂直大模型生态</span></div>
+                    </li>
+                    <li class="bullet-item">
+                        <span class="dot">•</span>
+                        <div class="item-text"><b>开放生态:</b> <span>API开放，伙伴共建</span></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="bottom-row">
+            <!-- 竞争策略 -->
+            <div class="card sub-card">
+                <div class="sub-header">
+                    <span class="sub-icon">♟️</span> 竞争策略
+                </div>
+                <div class="strat-item">
+                    <div class="strat-name">避开正面战场</div>
+                    <div class="strat-desc">不直接与钉钉、飞书在协同功能上硬碰硬，<b>以文档处理为核心差异化优势</b></div>
+                </div>
+                <div class="strat-item">
+                    <div class="strat-name">找到蓝海机会</div>
+                    <div class="strat-desc">从协同办公红海中找到蓝海机会，<b>发挥办公软件基因优势</b></div>
+                </div>
+            </div>
+
+            <!-- 核心优势 -->
+            <div class="card sub-card">
+                <div class="sub-header">
+                    <span class="sub-icon">🏆</span> 核心优势
+                </div>
+                <div class="adv-list">
+                    <div class="adv-item">
+                        <div class="adv-dot"></div>
+                        <div class="adv-info"><b>文档优势：</b><span>36年办公软件基因，文档处理能力行业领先</span></div>
+                    </div>
+                    <div class="adv-item">
+                        <div class="adv-dot"></div>
+                        <div class="adv-info"><b>AI优势：</b><span>WPS AI深度融合，智能化水平领先竞品</span></div>
+                    </div>
+                    <div class="adv-item">
+                        <div class="adv-dot"></div>
+                        <div class="adv-info"><b>政企优势：</b><span>央国企客户资源丰富，政务大模型独特</span></div>
+                    </div>
+                    <div class="adv-item">
+                        <div class="adv-dot"></div>
+                        <div class="adv-info"><b>安全优势：</b><span>自主可控，满足政企客户安全合规需求</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,365 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #F3F4F6;
+      color: #1F2937;
+    }
+
+    /* 布局容器 */
+    .container {
+      display: grid;
+      grid-template-rows: 80px 1fr;
+      grid-template-columns: 1fr 380px;
+      gap: 24px;
+      padding: 40px;
+      height: 100%;
+    }
+
+    /* 标题区域 */
+    .header {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #E5E7EB;
+      padding-bottom: 20px;
+    }
+
+    .title-group h1 {
+      font-size: 32px;
+      font-weight: 900;
+      color: #111827;
+      letter-spacing: -0.5px;
+    }
+
+    .title-group p {
+      font-size: 16px;
+      color: #6B7280;
+      margin-top: 4px;
+    }
+
+    .header-stat {
+      display: flex;
+      gap: 30px;
+    }
+
+    .stat-item {
+      text-align: right;
+    }
+    .stat-item .label {
+      font-size: 12px;
+      color: #6B7280;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    .stat-item .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0F766E; /* Teal */
+    }
+
+    /* 图表区域 */
+    .chart-section {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #374151;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .section-title i {
+      color: #0F766E;
+    }
+
+    #mainChart {
+      flex: 1;
+      width: 100%;
+    }
+
+    /* 重点关注区域 (右侧) */
+    .highlight-section {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .alert-card {
+      background: #FFFFFF;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+      border-left: 6px solid #EF4444; /* Red for alert */
+      position: relative;
+      overflow: hidden;
+    }
+
+    .alert-card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100px;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(239, 68, 68, 0.03));
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+
+    .category-name {
+      font-size: 20px;
+      font-weight: 700;
+      color: #1F2937;
+    }
+
+    .icon-box {
+      width: 40px;
+      height: 40px;
+      background-color: #FEF2F2;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #EF4444;
+    }
+
+    .metric-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+    }
+
+    .increase-rate {
+      font-size: 36px;
+      font-weight: 900;
+      color: #EF4444;
+      line-height: 1;
+    }
+
+    .increase-rate span {
+      font-size: 16px;
+      font-weight: 500;
+      margin-left: 2px;
+    }
+
+    .absolute-diff {
+      font-size: 14px;
+      color: #6B7280;
+      font-weight: 500;
+    }
+
+    .analysis-text {
+      margin-top: 12px;
+      font-size: 13px;
+      color: #4B5563;
+      line-height: 1.5;
+      background: #F9FAFB;
+      padding: 8px 12px;
+      border-radius: 6px;
+    }
+
+    /* 图例说明 */
+    .legend-custom {
+      display: flex;
+      gap: 16px;
+      margin-top: auto;
+      padding-top: 20px;
+      border-top: 1px solid #E5E7EB;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #4B5563;
+    }
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+    }
+    .dot.last-year { background-color: #CBD5E1; }
+    .dot.this-year { background-color: #0F766E; }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header class="header" style="border-bottom: none;">
+      <div class="title-group">
+        <h1>年度运营支出对比分析</h1>
+        
+      </div>
+      
+    </header>
+
+    <!-- 左侧图表 -->
+    <section class="chart-section">
+      <div class="section-title">
+        <i class="fa-solid fa-chart-column"></i>
+        各科目支出明细对比
+      </div>
+      <div id="mainChart"></div>
+      <div class="legend-custom">
+        <div class="legend-item"><div class="dot last-year"></div>2023年 (去年)</div>
+        <div class="legend-item"><div class="dot this-year"></div>2024年 (今年)</div>
+      </div>
+    </section>
+
+    <!-- 右侧重点关注 -->
+    <aside class="highlight-section">
+      <div class="section-title" style="margin-bottom: 0;">
+        <i class="fa-solid fa-triangle-exclamation" style="color: #EF4444;"></i>
+        涨幅预警 (&gt;20%)
+      </div>
+
+      <!-- 卡片 1 -->
+      <div class="alert-card">
+        <div class="card-header">
+          <div class="category-name">市场推广费</div>
+          <div class="icon-box">
+            <i class="fa-solid fa-bullhorn"></i>
+          </div>
+        </div>
+        <div class="metric-row">
+          <div class="increase-rate">+45.8%<span>同比</span></div>
+          <div class="absolute-diff">+ ¥550万</div>
+        </div>
+        <div class="analysis-text">
+          Q2 新品发布会及全渠道广告投放增加，导致营销成本显著上升。
+        </div>
+      </div>
+
+      <!-- 卡片 2 -->
+      <div class="alert-card">
+        <div class="card-header">
+          <div class="category-name">云服务成本</div>
+          <div class="icon-box">
+            <i class="fa-solid fa-server"></i>
+          </div>
+        </div>
+        <div class="metric-row">
+          <div class="increase-rate">+28.5%<span>同比</span></div>
+          <div class="absolute-diff">+ ¥180万</div>
+        </div>
+        <div class="analysis-text">
+          用户量激增导致服务器扩容，以及引入新的 AI 算力集群。
+        </div>
+      </div>
+
+    </aside>
+  </div>
+
+  <script>
+    // 初始化 ECharts
+    var chartDom = document.getElementById('mainChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // 严格禁止动画
+      grid: {
+        top: '15%',
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: ['研发投入', '市场推广', '人力行政', '云服务', '差旅费', '其他'],
+        axisLine: { lineStyle: { color: '#E5E7EB' } },
+        axisLabel: { 
+          color: '#4B5563',
+          fontSize: 14,
+          fontWeight: 500,
+          margin: 15
+        },
+        axisTick: { show: false }
+      },
+      yAxis: {
+        type: 'value',
+        splitLine: { 
+          lineStyle: { 
+            type: 'dashed',
+            color: '#E5E7EB' 
+          } 
+        },
+        axisLabel: { color: '#9CA3AF' }
+      },
+      series: [
+        {
+          name: '2023年',
+          type: 'bar',
+          data: [1200, 1200, 800, 630, 300, 150],
+          itemStyle: {
+            color: '#CBD5E1', // 灰色
+            borderRadius: [4, 4, 0, 0]
+          },
+          barGap: '20%',
+          label: {
+            show: true,
+            position: 'top',
+            color: '#9CA3AF',
+            fontSize: 12,
+            formatter: '{c}'
+          }
+        },
+        {
+          name: '2024年',
+          type: 'bar',
+          data: [1350, 1750, 820, 810, 310, 160],
+          itemStyle: {
+            color: function(params) {
+              // 重点标红涨幅大的科目
+              if (params.dataIndex === 1 || params.dataIndex === 3) {
+                return '#EF4444'; // 红色
+              }
+              return '#0F766E'; // 深青色
+            },
+            borderRadius: [4, 4, 0, 0]
+          },
+          label: {
+            show: true,
+            position: 'top',
+            color: '#374151',
+            fontWeight: 'bold',
+            fontSize: 14,
+            formatter: '{c}'
+          }
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

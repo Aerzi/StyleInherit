@@ -1,0 +1,317 @@
+<!-- 符合要求，无动画，布局饱满，配色专业 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { width: 1280px; height: 720px; overflow: hidden; font-family: 'Noto Sans SC', sans-serif; background-color: #f0f2f5; color: #333; }
+    
+    /* 布局容器 */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+
+    /* Header strictly contains main-title only */
+    header {
+      height: 80px;
+      background: linear-gradient(135deg, #2c3e50 0%, #000000 100%);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      flex-shrink: 0;
+      border-bottom: 4px solid #e67e22;
+    }
+
+    h1.main-title {
+      font-size: 32px;
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    /* 主体内容区 */
+    .main-content {
+      flex: 1;
+      display: flex;
+      padding: 30px 40px;
+      gap: 30px;
+      height: calc(720px - 80px); /* 确保填满剩余空间 */
+    }
+
+    /* 左侧：黑天鹅定义 (35% 宽度) */
+    .left-panel {
+      flex: 0 0 35%;
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .swan-header {
+      background-color: #2c3e50;
+      color: #fff;
+      padding: 25px;
+      text-align: center;
+      position: relative;
+    }
+    
+    .swan-icon-large {
+      font-size: 60px;
+      color: #e67e22;
+      margin-bottom: 10px;
+    }
+
+    .section-title {
+      font-size: 24px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .swan-body {
+      padding: 30px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .definition-box {
+      font-size: 18px;
+      line-height: 1.6;
+      color: #444;
+      background: #f8f9fa;
+      padding: 20px;
+      border-left: 5px solid #e67e22;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+    }
+
+    .feature-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      background: #fff;
+      border: 1px solid #eee;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.02);
+    }
+
+    .feature-icon {
+      width: 40px;
+      height: 40px;
+      background: #fdf0e4;
+      color: #d35400;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-right: 15px;
+      font-size: 18px;
+    }
+
+    .feature-text h4 {
+      font-size: 18px;
+      color: #2c3e50;
+      margin-bottom: 2px;
+    }
+    
+    .feature-text p {
+      font-size: 14px;
+      color: #7f8c8d;
+    }
+
+    /* 右侧：反脆弱能力 (65% 宽度) */
+    .right-panel {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .panel-header {
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .panel-header h2 {
+      font-size: 26px;
+      color: #2c3e50;
+      font-weight: 700;
+    }
+
+    .panel-header i {
+      color: #27ae60;
+      font-size: 24px;
+    }
+
+    /* 卡片网格 */
+    .strategies-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .strategy-card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border-top: 4px solid transparent;
+      position: relative;
+    }
+
+    /* 不同的顶部颜色 */
+    .card-1 { border-top-color: #27ae60; } /* Green */
+    .card-2 { border-top-color: #2980b9; } /* Blue */
+    .card-3 { border-top-color: #f39c12; } /* Orange */
+    .card-4 { border-top-color: #8e44ad; } /* Purple */
+
+    .card-icon {
+      font-size: 32px;
+      margin-bottom: 15px;
+    }
+    .card-1 .card-icon { color: #27ae60; }
+    .card-2 .card-icon { color: #2980b9; }
+    .card-3 .card-icon { color: #f39c12; }
+    .card-4 .card-icon { color: #8e44ad; }
+
+    .card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .card-desc {
+      font-size: 15px;
+      color: #555;
+      line-height: 1.5;
+      flex: 1; /* 填满空间 */
+    }
+
+    .card-tag {
+      align-self: flex-start;
+      padding: 4px 10px;
+      background: #f0f2f5;
+      border-radius: 4px;
+      font-size: 12px;
+      color: #666;
+      font-weight: 500;
+      margin-top: 10px;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 class="main-title">黑天鹅事件与企业反脆弱能力构建</h1>
+    </header>
+
+    <div class="main-content">
+      
+      <!-- 左侧：定义 -->
+      <div class="left-panel">
+        <div class="swan-header">
+          <i class="fa-solid fa-crow swan-icon-large"></i>
+          <div class="section-title">定义：黑天鹅</div>
+          <div style="font-size: 14px; opacity: 0.8; margin-top:5px;">Black Swan Events</div>
+        </div>
+        <div class="swan-body">
+          <div class="definition-box">
+            指那些<strong>无法预测</strong>、<strong>极其罕见</strong>，但一旦发生就会造成<strong>极端影响</strong>的重大事件。
+          </div>
+          
+          <ul class="feature-list">
+            <li class="feature-item">
+              <div class="feature-icon"><i class="fa-solid fa-eye-slash"></i></div>
+              <div class="feature-text">
+                <h4>不可预测性</h4>
+                <p>超出常规预期，缺乏历史参照</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-icon"><i class="fa-solid fa-burst"></i></div>
+              <div class="feature-text">
+                <h4>极端冲击力</h4>
+                <p>对现状产生颠覆性的巨大影响</p>
+              </div>
+            </li>
+            <li class="feature-item">
+              <div class="feature-icon"><i class="fa-solid fa-brain"></i></div>
+              <div class="feature-text">
+                <h4>事后合理化</h4>
+                <p>发生后才被人类编造理由解释</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- 右侧：应对策略 -->
+      <div class="right-panel">
+        <div class="panel-header">
+          <i class="fa-solid fa-shield-halved"></i>
+          <h2>应对之道：建立反脆弱 (Antifragile)</h2>
+        </div>
+
+        <div class="strategies-grid">
+          <!-- 策略 1 -->
+          <div class="strategy-card card-1">
+            <i class="fa-solid fa-layer-group card-icon"></i>
+            <h3 class="card-title">建立冗余机制</h3>
+            <p class="card-desc">放弃对“过度效率”的追求，在核心业务、供应链和资金链中保持安全边际和备份，以应对突发中断。</p>
+            <span class="card-tag">ACTION: 储备现金流 / 多供应商</span>
+          </div>
+
+          <!-- 策略 2 -->
+          <div class="strategy-card card-2">
+            <i class="fa-solid fa-network-wired card-icon"></i>
+            <h3 class="card-title">去中心化架构</h3>
+            <p class="card-desc">避免单一故障点，构建分布式组织结构和决策机制。确保局部受损时，整体系统依然能够正常运转。</p>
+            <span class="card-tag">ACTION: 扁平化管理 / 分布式系统</span>
+          </div>
+
+          <!-- 策略 3 -->
+          <div class="strategy-card card-3">
+            <i class="fa-solid fa-flask card-icon"></i>
+            <h3 class="card-title">低成本试错</h3>
+            <p class="card-desc">通过频繁的小规模实验，主动暴露问题。利用“小失败”获取信息，从而避免“大崩溃”。</p>
+            <span class="card-tag">ACTION: 敏捷开发 / 内部创业</span>
+          </div>
+
+          <!-- 策略 4 -->
+          <div class="strategy-card card-4">
+            <i class="fa-solid fa-bolt card-icon"></i>
+            <h3 class="card-title">动态适应与进化</h3>
+            <p class="card-desc">不只是抵御冲击，而是从冲击中获益。建立快速反馈回路，根据环境变化实时调整战略方向。</p>
+            <span class="card-tag">ACTION: 持续复盘 / 灵活转型</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

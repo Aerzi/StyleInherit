@@ -1,0 +1,395 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    :root {
+      --bg-color: #f0f2f5;
+      --text-main: #1f2937;
+      --text-sub: #4b5563;
+      
+      /* Color Palette - Avoiding Blue/Purple gradients */
+      --public-color: #059669; /* Emerald Green */
+      --public-bg: #ecfdf5;
+      
+      --private-color: #334155; /* Slate Dark */
+      --private-bg: #e2e8f0;
+      
+      --hybrid-color: #d97706; /* Amber/Orange */
+      --hybrid-bg: #fffbeb;
+      
+      --card-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: var(--bg-color);
+      color: var(--text-main);
+    }
+
+    .container {
+      display: grid;
+      grid-template-rows: 80px 1fr;
+      height: 100%;
+      padding: 40px 60px;
+      gap: 30px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      font-weight: 900;
+      color: #111827;
+      letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: var(--text-sub);
+      font-weight: 500;
+      background: #e5e7eb;
+      padding: 6px 16px;
+      border-radius: 20px;
+    }
+
+    /* Main Content Grid */
+    .content-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 320px; /* 3 Cards + 1 Chart Column */
+      gap: 24px;
+      height: 100%;
+    }
+
+    /* Cards */
+    .card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--card-shadow);
+      position: relative;
+      overflow: hidden;
+      border-top: 6px solid transparent;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; right: 0;
+      width: 100px;
+      height: 100px;
+      background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.03) 50%);
+      pointer-events: none;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      gap: 12px;
+    }
+
+    .icon-box {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .feature-list {
+      list-style: none;
+      margin-bottom: 20px;
+      flex-grow: 1;
+    }
+
+    .feature-list li {
+      margin-bottom: 12px;
+      font-size: 15px;
+      color: var(--text-sub);
+      display: flex;
+      align-items: flex-start;
+      line-height: 1.5;
+    }
+
+    .feature-list li i {
+      margin-right: 10px;
+      margin-top: 4px;
+      font-size: 12px;
+    }
+
+    .scenario-box {
+      background: #f9fafb;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .scenario-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #6b7280;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .tag {
+      font-size: 13px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    /* Specific Card Styles */
+    .card.public { border-color: var(--public-color); }
+    .card.public .icon-box { background: var(--public-bg); color: var(--public-color); }
+    .card.public .card-title { color: var(--public-color); }
+    .card.public .feature-list li i { color: var(--public-color); }
+    .card.public .tag { background: var(--public-bg); color: var(--public-color); }
+
+    .card.private { border-color: var(--private-color); }
+    .card.private .icon-box { background: var(--private-bg); color: var(--private-color); }
+    .card.private .card-title { color: var(--private-color); }
+    .card.private .feature-list li i { color: var(--private-color); }
+    .card.private .tag { background: var(--private-bg); color: var(--private-color); }
+
+    .card.hybrid { border-color: var(--hybrid-color); }
+    .card.hybrid .icon-box { background: var(--hybrid-bg); color: var(--hybrid-color); }
+    .card.hybrid .card-title { color: var(--hybrid-color); }
+    .card.hybrid .feature-list li i { color: var(--hybrid-color); }
+    .card.hybrid .tag { background: var(--hybrid-bg); color: var(--hybrid-color); }
+
+    /* Chart Section */
+    .chart-section {
+      background: white;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: var(--card-shadow);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .chart-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 10px;
+      width: 100%;
+      text-align: center;
+      border-bottom: 1px solid #f3f4f6;
+      padding-bottom: 10px;
+    }
+
+    #radarChart {
+      width: 280px;
+      height: 320px;
+    }
+    
+    .legend-box {
+      width: 100%;
+      margin-top: 10px;
+    }
+    
+    .legend-item {
+      display: flex;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 6px;
+      color: var(--text-sub);
+    }
+    
+    .dot { width: 10px; height: 10px; border-radius: 50%; margin-right: 8px; }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header style="border-bottom: none;">
+      <h1>云部署模式对比分析</h1>
+      
+    </header>
+
+    <div class="content-grid">
+      
+      <!-- Public Cloud -->
+      <div class="card public">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-cloud"></i></div>
+          <div class="card-title">公有云</div>
+        </div>
+        <ul class="feature-list">
+          <li><i class="fa-solid fa-check"></i> <strong>资源共享：</strong> 多租户架构，资源池化</li>
+          <li><i class="fa-solid fa-check"></i> <strong>成本模式：</strong> OPEX（运营支出），按需付费</li>
+          <li><i class="fa-solid fa-check"></i> <strong>维护：</strong> 云服务商全权负责运维</li>
+          <li><i class="fa-solid fa-check"></i> <strong>扩展性：</strong> 近乎无限的弹性伸缩</li>
+        </ul>
+        <div class="scenario-box">
+          <div class="scenario-title">适用场景</div>
+          <div class="tags">
+            <span class="tag">初创企业</span>
+            <span class="tag">SaaS 应用</span>
+            <span class="tag">开发测试</span>
+            <span class="tag">Web 托管</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Private Cloud -->
+      <div class="card private">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-server"></i></div>
+          <div class="card-title">私有云</div>
+        </div>
+        <ul class="feature-list">
+          <li><i class="fa-solid fa-check"></i> <strong>资源独享：</strong> 单一租户，物理隔离</li>
+          <li><i class="fa-solid fa-check"></i> <strong>成本模式：</strong> CAPEX（资本支出），前期投入大</li>
+          <li><i class="fa-solid fa-check"></i> <strong>控制力：</strong> 完全自主的控制权与定制化</li>
+          <li><i class="fa-solid fa-check"></i> <strong>安全性：</strong> 极高的数据隐私与合规性</li>
+        </ul>
+        <div class="scenario-box">
+          <div class="scenario-title">适用场景</div>
+          <div class="tags">
+            <span class="tag">政府机构</span>
+            <span class="tag">金融银行</span>
+            <span class="tag">核心数据</span>
+            <span class="tag">合规要求高</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Hybrid Cloud -->
+      <div class="card hybrid">
+        <div class="card-header">
+          <div class="icon-box"><i class="fa-solid fa-network-wired"></i></div>
+          <div class="card-title">混合云</div>
+        </div>
+        <ul class="feature-list">
+          <li><i class="fa-solid fa-check"></i> <strong>架构融合：</strong> 结合公有云与私有云优势</li>
+          <li><i class="fa-solid fa-check"></i> <strong>灵活性：</strong> 负载在不同环境间迁移</li>
+          <li><i class="fa-solid fa-check"></i> <strong>复杂性：</strong> 架构与管理难度较高</li>
+          <li><i class="fa-solid fa-check"></i> <strong>策略：</strong> 敏感数据本地化，算力云端化</li>
+        </ul>
+        <div class="scenario-box">
+          <div class="scenario-title">适用场景</div>
+          <div class="tags">
+            <span class="tag">业务爆发</span>
+            <span class="tag">灾备容灾</span>
+            <span class="tag">逐步上云</span>
+            <span class="tag">法律合规</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Analysis Chart -->
+      <div class="chart-section">
+        <div class="chart-title">多维能力评估</div>
+        <div id="radarChart"></div>
+        <div class="legend-box">
+          <div class="legend-item"><div class="dot" style="background: #059669;"></div> 公有云：高扩展，低成本</div>
+          <div class="legend-item"><div class="dot" style="background: #334155;"></div> 私有云：高安全，强控制</div>
+          <div class="legend-item"><div class="dot" style="background: #d97706;"></div> 混合云：均衡，高灵活</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // Initialize ECharts
+    var chartDom = document.getElementById('radarChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // STRICTLY DISABLED
+      radar: {
+        indicator: [
+          { name: '成本效益', max: 100 },
+          { name: '扩展能力', max: 100 },
+          { name: '数据安全', max: 100 },
+          { name: '定制控制', max: 100 },
+          { name: '部署速度', max: 100 }
+        ],
+        radius: '65%',
+        center: ['50%', '50%'],
+        splitNumber: 4,
+        axisName: {
+          color: '#6b7280',
+          fontSize: 12,
+          fontWeight: 'bold'
+        },
+        splitArea: {
+          areaStyle: {
+            color: ['#f8fafc', '#f1f5f9', '#e2e8f0', '#cbd5e1'],
+            shadowColor: 'rgba(0, 0, 0, 0.1)',
+            shadowBlur: 10
+          }
+        }
+      },
+      series: [
+        {
+          name: 'Cloud Comparison',
+          type: 'radar',
+          data: [
+            {
+              value: [95, 100, 60, 40, 95],
+              name: '公有云',
+              itemStyle: { color: '#059669' },
+              areaStyle: { color: 'rgba(5, 150, 105, 0.2)' },
+              symbol: 'none'
+            },
+            {
+              value: [40, 50, 95, 100, 40],
+              name: '私有云',
+              itemStyle: { color: '#334155' },
+              areaStyle: { color: 'rgba(51, 65, 85, 0.2)' },
+              symbol: 'none'
+            },
+            {
+              value: [70, 80, 85, 75, 60],
+              name: '混合云',
+              itemStyle: { color: '#d97706' },
+              areaStyle: { color: 'rgba(217, 119, 6, 0.2)' },
+              symbol: 'none'
+            }
+          ]
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

@@ -1,0 +1,341 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f4f8;
+        color: #334155;
+    }
+
+    /* 布局容器 - 调整内边距以适应720px高度 */
+    .container {
+        display: grid;
+        grid-template-columns: 1fr 400px;
+        grid-template-rows: auto 1fr;
+        gap: 20px; /* 减小间距 */
+        padding: 30px 50px; /* 减小内边距 */
+        height: 100%;
+        position: relative;
+        z-index: 1;
+    }
+
+    /* 背景装饰 */
+    .bg-shape {
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 500px;
+        height: 100%;
+        background: linear-gradient(135deg, #e2e8f0 0%, #f0f4f8 100%);
+        z-index: 0;
+        clip-path: polygon(20% 0, 100% 0, 100% 100%, 0% 100%);
+    }
+    
+    .accent-bar {
+        position: absolute;
+        top: 30px; /* 跟随容器padding调整 */
+        left: 0;
+        width: 8px;
+        height: 60px;
+        background-color: #0f766e; /* Teal */
+        border-top-right-radius: 4px;
+        border-bottom-right-radius: 4px;
+    }
+
+    /* 标题区域 */
+    .header {
+        grid-column: 1 / -1;
+        margin-bottom: 5px;
+    }
+
+    .header h1 {
+        font-size: 36px; /* 减小字体 */
+        font-weight: 900;
+        color: #0f172a;
+        line-height: 1.2;
+        letter-spacing: -1px;
+    }
+
+    .header p {
+        font-size: 16px; /* 减小字体 */
+        color: #64748b;
+        margin-top: 5px;
+        font-weight: 500;
+    }
+
+    /* 左侧内容网格 */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 16px; /* 减小间距 */
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px; /* 减小内边距 */
+        box-shadow: 0 4px 15px rgba(148, 163, 184, 0.1);
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-start;
+        border-left: 4px solid transparent;
+    }
+
+    .card.primary { border-left-color: #0f766e; }
+    .card.secondary { border-left-color: #0d9488; }
+    .card.tertiary { border-left-color: #14b8a6; }
+    .card.quaternary { border-left-color: #2dd4bf; }
+
+    .card-icon {
+        width: 40px; /* 减小图标尺寸 */
+        height: 40px;
+        background-color: #f0fdfa;
+        color: #0f766e;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        margin-bottom: 10px;
+    }
+
+    .card h3 {
+        font-size: 18px; /* 减小字体 */
+        font-weight: 700;
+        margin-bottom: 8px;
+        color: #1e293b;
+    }
+
+    .card p {
+        font-size: 14px; /* 减小字体 */
+        line-height: 1.5;
+        color: #475569;
+        text-align: justify;
+    }
+
+    /* 右侧图表区域 */
+    .chart-panel {
+        background: white;
+        border-radius: 12px;
+        padding: 20px; /* 减小内边距 */
+        box-shadow: 0 4px 15px rgba(148, 163, 184, 0.1);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .chart-title {
+        font-size: 16px; /* 减小字体 */
+        font-weight: 700;
+        color: #334155;
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: left;
+        border-bottom: 1px solid #e2e8f0;
+        padding-bottom: 8px;
+    }
+
+    #radar-chart {
+        width: 100%;
+        height: 250px; /* 减小高度以适应页面 */
+    }
+
+    .chart-legend {
+        display: flex;
+        gap: 15px;
+        margin-top: 5px;
+        font-size: 12px;
+        color: #64748b;
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    
+    .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+    }
+
+    .highlight-box {
+        margin-top: 15px;
+        background-color: #fff7ed; /* Orange tint */
+        border: 1px solid #ffedd5;
+        padding: 12px; /* 减小内边距 */
+        border-radius: 8px;
+        width: 100%;
+    }
+
+    .highlight-box p {
+        font-size: 13px; /* 减小字体 */
+        color: #9a3412;
+        line-height: 1.4;
+    }
+    
+    .highlight-box i {
+        margin-right: 6px;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="bg-shape"></div>
+  <div class="accent-bar"></div>
+
+  <div class="container">
+    <!-- 头部 -->
+    <div class="header" style="border-bottom: none;">
+        <h1>数字化转型的核心思考</h1>
+        
+    </div>
+
+    <!-- 左侧：核心观点卡片 -->
+    <div class="content-grid">
+        <!-- 卡片 1 -->
+        <div class="card primary">
+            <div class="card-icon"><i class="fa-solid fa-brain"></i></div>
+            <h3>思维转变 &gt; 软件购买</h3>
+            <p>数字化不仅仅是引入几套IT系统，更是一场深刻的认知革命。从“流程驱动”转向“数据驱动”的思维模式。</p>
+        </div>
+
+        <!-- 卡片 2 -->
+        <div class="card secondary">
+            <div class="card-icon"><i class="fa-solid fa-network-wired"></i></div>
+            <h3>打破孤岛，互联互通</h3>
+            <p>消除部门间的数据壁垒，实现业务流与数据流的实时贯通，让数据成为企业流动的血液。</p>
+        </div>
+
+        <!-- 卡片 3 -->
+        <div class="card tertiary">
+            <div class="card-icon"><i class="fa-solid fa-users-gear"></i></div>
+            <h3>全员参与，组织升级</h3>
+            <p>一把手工程：领导层高度重视。同时加强员工数字化技能培训，构建适应数字时代的组织能力。</p>
+        </div>
+
+        <!-- 卡片 4 -->
+        <div class="card quaternary">
+            <div class="card-icon"><i class="fa-solid fa-road"></i></div>
+            <h3>长期主义，持续迭代</h3>
+            <p>这是一个漫长的过程，不能急于求成。需要保持战略定力，在实践中不断优化和迭代。</p>
+        </div>
+    </div>
+
+    <!-- 右侧：对标分析图表 -->
+    <div class="chart-panel">
+        <div class="chart-title">
+            <i class="fa-solid fa-chart-simple" style="margin-right: 8px; color: #0f766e;"></i>
+            行业对标与差距分析
+        </div>
+        
+        <div id="radar-chart"></div>
+        
+        <div class="chart-legend">
+            <div class="legend-item">
+                <div class="dot" style="background: #d97706;"></div>
+                <span>行业标杆</span>
+            </div>
+            <div class="legend-item">
+                <div class="dot" style="background: #0f766e;"></div>
+                <span>当前现状</span>
+            </div>
+        </div>
+
+        <div class="highlight-box">
+            <p><i class="fa-solid fa-lightbulb"></i> <strong>关键洞察：</strong> 通过对标发现，我们在“数据互联”与“组织能力”方面与行业标杆存在显著差距，需作为下一阶段重点突破口。</p>
+        </div>
+    </div>
+  </div>
+
+  <script>
+    // 初始化 ECharts 图表
+    var chartDom = document.getElementById('radar-chart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+        animation: false, // 严格禁止动画
+        color: ['#d97706', '#0f766e'], // 橙色(标杆), 青色(现状)
+        radar: {
+            indicator: [
+                { name: '战略思维', max: 100 },
+                { name: '数据互联', max: 100 },
+                { name: '组织能力', max: 100 },
+                { name: '技术应用', max: 100 },
+                { name: '业务流程', max: 100 }
+            ],
+            radius: '60%', // 稍微减小半径以适应高度
+            center: ['50%', '50%'],
+            splitNumber: 4,
+            axisName: {
+                color: '#64748b',
+                fontSize: 12,
+                fontWeight: 'bold'
+            },
+            splitArea: {
+                areaStyle: {
+                    color: ['#f8fafc', '#f1f5f9', '#e2e8f0', '#cbd5e1'],
+                    shadowColor: 'rgba(0, 0, 0, 0.1)',
+                    shadowBlur: 10
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: 'rgba(255, 255, 255, 0.5)'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(255, 255, 255, 0.5)'
+                }
+            }
+        },
+        series: [
+            {
+                name: '对标分析',
+                type: 'radar',
+                data: [
+                    {
+                        value: [90, 95, 85, 90, 88],
+                        name: '行业标杆',
+                        areaStyle: {
+                            color: 'rgba(217, 119, 6, 0.2)'
+                        },
+                        lineStyle: {
+                            width: 2
+                        },
+                        symbol: 'none'
+                    },
+                    {
+                        value: [75, 40, 50, 70, 65],
+                        name: '当前现状',
+                        areaStyle: {
+                            color: 'rgba(15, 118, 110, 0.3)'
+                        },
+                        lineStyle: {
+                            width: 3
+                        },
+                        symbol: 'circle',
+                        symbolSize: 6
+                    }
+                ]
+            }
+        ]
+    };
+
+    option && myChart.setOption(option);
+  </script>
+
+</body></html>

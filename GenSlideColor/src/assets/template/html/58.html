@@ -1,0 +1,338 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    /* 布局容器 - 减少 Padding 和 Gap 以适应 720px 高度 */
+    .container {
+        display: grid;
+        grid-template-columns: 300px 1fr; /* 左侧稍微收窄 */
+        grid-template-rows: 60px 1fr; /* 头部高度减小 */
+        gap: 16px; /* 间距减小 */
+        padding: 20px 30px; /* Padding 减小 */
+        height: 100%;
+        width: 100%;
+    }
+
+    /* 头部区域 */
+    .header {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 8px;
+        border-bottom: 2px solid #e1e4e8;
+    }
+
+    .title-group h1 {
+        font-size: 24px; /* 字体减小 */
+        font-weight: 700;
+        color: #1f2937;
+        margin-bottom: 2px;
+    }
+
+    .title-group p {
+        font-size: 13px; /* 字体减小 */
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .header-meta {
+        display: flex;
+        gap: 12px; /* 间距减小 */
+    }
+
+    .meta-tag {
+        background: #ffffff;
+        padding: 6px 12px; /* Padding 减小 */
+        border-radius: 6px;
+        font-size: 12px; /* 字体减小 */
+        color: #4b5563;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .meta-tag i { color: #10b981; }
+
+    /* 左侧数据概览 */
+    .sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 12px; /* 间距减小 */
+        height: 100%;
+        overflow: hidden; /* 防止溢出 */
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 16px 20px; /* Padding 减小 */
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+        flex-shrink: 0; /* 防止被压缩 */
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 5px;
+        height: 100%;
+        background: #10b981;
+    }
+
+    .metric-icon {
+        font-size: 18px; /* 图标减小 */
+        color: #10b981;
+        margin-bottom: 8px;
+        background: #ecfdf5;
+        width: 36px; /* 尺寸减小 */
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+    }
+
+    .metric-label {
+        font-size: 13px;
+        color: #6b7280;
+        margin-bottom: 2px;
+    }
+
+    .metric-value {
+        font-size: 24px; /* 字体减小 */
+        font-weight: 700;
+        color: #111827;
+        line-height: 1.2;
+    }
+
+    .metric-sub {
+        font-size: 12px;
+        color: #10b981;
+        margin-top: 2px;
+        font-weight: 500;
+    }
+
+    .insight-box {
+        background: #1f2937;
+        color: white;
+        border-radius: 12px;
+        padding: 16px 20px; /* Padding 减小 */
+        flex-grow: 1;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+        overflow: hidden;
+    }
+
+    .insight-title {
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 8px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .insight-text {
+        font-size: 12px; /* 字体减小 */
+        line-height: 1.5;
+        color: #d1d5db;
+        overflow: hidden;
+    }
+    
+    .insight-text p {
+        margin-bottom: 8px;
+    }
+    .insight-text p:last-child {
+        margin-bottom: 0;
+    }
+
+    /* 右侧图表区域 */
+    .chart-container {
+        background: white;
+        border-radius: 16px;
+        padding: 16px; /* Padding 减小 */
+        box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
+        position: relative;
+        height: 100%;
+        overflow: hidden;
+    }
+
+    #mainChart {
+        width: 100%;
+        height: 100%;
+    }
+
+    /* 装饰元素 */
+    .chart-header {
+        position: absolute;
+        top: 16px;
+        left: 20px;
+        font-size: 16px; /* 字体减小 */
+        font-weight: 700;
+        color: #374151;
+        z-index: 10;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header class="header" style="border-bottom: none;">
+        <div class="title-group">
+            <h1>APP 功能模块点击分析</h1>
+            
+        </div>
+        
+    </header>
+
+    <!-- 左侧边栏 -->
+    <aside class="sidebar">
+        <div class="metric-card">
+            <div class="metric-icon"><i class="fa-solid fa-computer-mouse"></i></div>
+            <div class="metric-label">总点击量 (Total Clicks)</div>
+            <div class="metric-value">8,420,500</div>
+            <div class="metric-sub"><i class="fa-solid fa-arrow-trend-up"></i> 环比增长 12.5%</div>
+        </div>
+
+        <div class="metric-card" style="border-left-color: #3b82f6;">
+            <style>.metric-card:nth-child(2)::before { background: #3b82f6; } .metric-card:nth-child(2) .metric-icon { color: #3b82f6; background: #eff6ff; }</style>
+            <div class="metric-icon"><i class="fa-solid fa-users-viewfinder"></i></div>
+            <div class="metric-label">人均操作频次</div>
+            <div class="metric-value">42.8 次/日</div>
+            <div class="metric-sub" style="color: #3b82f6;"><i class="fa-solid fa-minus"></i> 保持平稳</div>
+        </div>
+
+        <div class="insight-box">
+            <div class="insight-title"><i class="fa-solid fa-lightbulb"></i> 核心洞察</div>
+            <div class="insight-text">
+                <p>"首页推荐"与"搜索功能"占据了超过 45% 的流量入口，表明用户目的性较强。</p>
+                <p>"购物车"点击率较上月提升 8%，促销活动效果显著。</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- 右侧图表 -->
+    <main class="chart-container">
+        <div class="chart-header">Top 10 高频功能模块 (点击次数)</div>
+        <div id="mainChart"></div>
+    </main>
+  </div>
+
+  <script>
+    // 初始化 ECharts
+    var chartDom = document.getElementById('mainChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    // 数据
+    var data = [
+        {name: '帮助中心', value: 120340},
+        {name: '我的订单', value: 210500},
+        {name: '系统设置', value: 254000},
+        {name: '每日签到', value: 310000},
+        {name: '消息通知', value: 450200},
+        {name: '个人主页', value: 580000},
+        {name: '购物车', value: 720000},
+        {name: '短视频流', value: 890000},
+        {name: '全站搜索', value: 1100000},
+        {name: '首页推荐', value: 1450000}
+    ];
+
+    option = {
+        animation: false, // 严格禁止动画
+        grid: {
+            top: '45px', // 增加顶部空间给标题
+            left: '2%',
+            right: '6%',
+            bottom: '2%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value',
+            boundaryGap: [0, 0.01],
+            splitLine: {
+                show: true,
+                lineStyle: {
+                    color: '#f3f4f6',
+                    type: 'dashed'
+                }
+            },
+            axisLabel: {
+                color: '#9ca3af',
+                fontFamily: 'Noto Sans SC',
+                fontSize: 11 // 减小字体
+            }
+        },
+        yAxis: {
+            type: 'category',
+            data: data.map(item => item.name),
+            axisLine: { show: false },
+            axisTick: { show: false },
+            axisLabel: {
+                fontSize: 13, // 减小字体
+                fontWeight: 500,
+                color: '#4b5563',
+                fontFamily: 'Noto Sans SC',
+                margin: 12
+            }
+        },
+        series: [
+            {
+                name: '点击量',
+                type: 'bar',
+                barWidth: '60%', // 稍微加宽
+                data: data.map(item => item.value),
+                itemStyle: {
+                    borderRadius: [0, 4, 4, 0],
+                    color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                        { offset: 0, color: '#10b981' }, 
+                        { offset: 1, color: '#059669' }  
+                    ]),
+                    shadowColor: 'rgba(16, 185, 129, 0.2)',
+                    shadowBlur: 10,
+                    shadowOffsetY: 4
+                },
+                label: {
+                    show: true,
+                    position: 'right',
+                    formatter: function(params) {
+                        return (params.value / 10000).toFixed(1) + 'w';
+                    },
+                    color: '#10b981',
+                    fontWeight: 'bold',
+                    fontFamily: 'Noto Sans SC',
+                    fontSize: 12, // 减小字体
+                    offset: [5, 0]
+                }
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

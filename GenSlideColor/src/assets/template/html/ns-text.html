@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/html-slides/static/font-awesome/css/all.min.css">
+  <link href="https://wpp-figma-slide.ks3-cn-beijing.ksyuncs.com/slide_res/20241121/css2/css2.css" rel="stylesheet">
+  <style>
+    /* === 基础约束（必须保留） === */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden !important;
+      font-family: 'Noto Sans SC', sans-serif;
+    }
+
+    /* === 布局结构（保留结构，样式由AI填充） === */
+    .container {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      padding: 40px 60px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 背景装饰层（z-index最低） */
+    .bg-decoration {
+      position: absolute;
+      z-index: 0;
+      /* AI填充: 背景装饰样式 */
+    }
+
+    /* 头部区域 */
+    header {
+      flex-shrink: 0;
+      margin-bottom: 30px;
+    }
+
+    h1 {
+      /* AI填充: 字号、颜色、字重 */
+    }
+
+    .subtitle {
+      /* AI填充: 副标题样式 */
+    }
+
+    /* 主体内容区 */
+    main {
+      flex: 1;
+      display: flex;
+      gap: 30px;
+    }
+
+    /* 左侧主要内容 */
+    .content-primary {
+      flex: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 右侧辅助内容 */
+    .content-secondary {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 内容卡片 */
+    .card {
+      padding: 24px;
+      border-radius: 12px;
+      position: relative;
+      z-index: 10;
+      /* AI填充: 背景色、阴影、边框 */
+    }
+
+    .card-title {
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      /* AI填充: 字号、颜色 */
+    }
+
+    .card-content {
+      /* AI填充: 正文样式 */
+    }
+
+    /* 列表样式 */
+    .list-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .list-item i {
+      flex-shrink: 0;
+      /* AI填充: 图标样式 */
+    }
+
+    /* 底部区域 */
+    footer {
+      flex-shrink: 0;
+      margin-top: 20px;
+      padding-top: 20px;
+      /* AI填充: 边框、背景 */
+    }
+  </style>
+</head>
+<body>
+  <!-- 背景装饰（AI可添加渐变、图形等，z-index必须最低） -->
+  <div class="bg-decoration"></div>
+
+  <div class="container">
+    <!-- 头部：仅主标题 -->
+    <header>
+      <h1><i class="fa-solid fa-file-lines"></i> 主标题文本</h1>
+      <p class="subtitle">副标题说明文字</p>
+    </header>
+
+    <!-- 主体内容 -->
+    <main>
+      <!-- 左侧主要内容区 -->
+      <div class="content-primary">
+        <div class="card">
+          <div class="card-title">
+            <i class="fa-solid fa-lightbulb"></i>
+            <span>核心要点一</span>
+          </div>
+          <div class="card-content">
+            <div class="list-item">
+              <i class="fa-solid fa-check"></i>
+              <span>要点内容描述文字，简洁明了</span>
+            </div>
+            <div class="list-item">
+              <i class="fa-solid fa-check"></i>
+              <span>要点内容描述文字，简洁明了</span>
+            </div>
+            <div class="list-item">
+              <i class="fa-solid fa-check"></i>
+              <span>要点内容描述文字，简洁明了</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <i class="fa-solid fa-chart-pie"></i>
+            <span>核心要点二</span>
+          </div>
+          <div class="card-content">
+            <p>详细说明段落文字，可以包含更多的描述内容。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧辅助内容区 -->
+      <div class="content-secondary">
+        <div class="card">
+          <div class="card-title">
+            <i class="fa-solid fa-star"></i>
+            <span>重点提示</span>
+          </div>
+          <div class="card-content">
+            <p>辅助说明内容</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">
+            <i class="fa-solid fa-bookmark"></i>
+            <span>补充信息</span>
+          </div>
+          <div class="card-content">
+            <p>额外的补充说明</p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 底部总结 -->
+    <footer>
+      <p><i class="fa-solid fa-circle-info"></i> 底部总结或备注信息</p>
+    </footer>
+  </div>
+</body>
+</html>
+

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 基础重置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    /* 页面容器 - 严格尺寸与无滚动条 */
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f4f7f6;
+        color: #333;
+    }
+
+    /* 布局结构 */
+    body {
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* 头部设计 - 仅包含 main-title */
+    header {
+        height: 100px;
+        background: linear-gradient(135deg, #264653 0%, #2a9d8f 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 40px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        z-index: 10;
+        flex-shrink: 0;
+    }
+
+    header h1 {
+        font-size: 38px;
+        color: #fff;
+        font-weight: 700;
+        letter-spacing: 2px;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* 主体内容区 */
+    .content-wrapper {
+        flex: 1;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        padding: 30px 40px;
+        height: calc(720px - 100px); /* 确保填满剩余高度 */
+    }
+
+    /* 左右板块通用样式 */
+    .panel {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+    }
+
+    .panel-header {
+        font-size: 24px;
+        font-weight: 700;
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 3px solid #ddd;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+
+    .left-panel .panel-header { color: #e76f51; border-color: #e76f51; }
+    .right-panel .panel-header { color: #2a9d8f; border-color: #2a9d8f; }
+
+    /* 卡片容器 */
+    .cards-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        flex: 1; /* 填充剩余垂直空间 */
+        justify-content: space-between; /* 均匀分布 */
+    }
+
+    /* 单个信息卡片 */
+    .card {
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px 25px;
+        display: flex;
+        align-items: flex-start;
+        gap: 20px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        flex: 1; /* 每个卡片平分高度 */
+        position: relative;
+        overflow: hidden;
+    }
+
+    /* 左侧误区卡片样式 */
+    .left-panel .card {
+        border-left: 6px solid #e76f51;
+        background: linear-gradient(to right, #fff 90%, #fff5f2 100%);
+    }
+
+    /* 右侧技巧卡片样式 */
+    .right-panel .card {
+        border-left: 6px solid #2a9d8f;
+        background: linear-gradient(to right, #fff 90%, #f0fdfa 100%);
+    }
+
+    /* 图标样式 */
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        background: #f0f2f5;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 20px;
+        flex-shrink: 0;
+    }
+
+    .left-panel .card-icon { color: #e76f51; background: rgba(231, 111, 81, 0.1); }
+    .right-panel .card-icon { color: #2a9d8f; background: rgba(42, 157, 143, 0.1); }
+
+    /* 文本内容 */
+    .card-content {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        height: 100%;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        margin-bottom: 6px;
+        color: #264653;
+    }
+
+    .card-desc {
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+        text-align: justify;
+    }
+
+    /* 装饰元素 */
+    .bg-decoration {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-size: 80px;
+        opacity: 0.05;
+        z-index: 0;
+        pointer-events: none;
+    }
+
+    /* 中间分割线 */
+    .divider {
+        position: absolute;
+        left: 50%;
+        top: 130px;
+        bottom: 30px;
+        width: 1px;
+        background: rgba(0,0,0,0.1);
+        transform: translateX(-50%);
+    }
+
+  </style>
+</head>
+<body>
+    <!-- 严格符合要求的 header -->
+    <header>
+        <h1 id="main-title">跨文化沟通：误区破解与全球视野构建</h1>
+    </header>
+
+    <!-- 视觉分割线 -->
+    <div class="divider"></div>
+
+    <main class="content-wrapper">
+        <!-- 左侧：常见误区 -->
+        <section class="panel left-panel">
+            <div class="panel-header">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                常见沟通误区 (Pitfalls)
+            </div>
+            <div class="cards-container">
+                <!-- 误区 1 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-user-tag"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">刻板印象 (Stereotyping)</div>
+                        <div class="card-desc">过度概括特定文化群体的特征，忽视个体差异，导致预设偏见和无效沟通。</div>
+                    </div>
+                    <i class="fa-solid fa-ban bg-decoration"></i>
+                </div>
+                <!-- 误区 2 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-globe"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">文化中心主义 (Ethnocentrism)</div>
+                        <div class="card-desc">仅以自身文化标准去评判他人行为，认为本国文化优于其他文化，造成心理隔阂。</div>
+                    </div>
+                </div>
+                <!-- 误区 3 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-comment-slash"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">忽视高低语境 (Context Blindness)</div>
+                        <div class="card-desc">未能识别高语境（含蓄、言外之意）与低语境（直接、明确）文化的表达差异。</div>
+                    </div>
+                </div>
+                <!-- 误区 4 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-face-flushed"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">非语言信号误读 (Non-verbal Errors)</div>
+                        <div class="card-desc">错误解读眼神交流、肢体距离或手势含义，不同文化中同一动作可能截然相反。</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧：培养技巧 -->
+        <section class="panel right-panel">
+            <div class="panel-header">
+                <i class="fa-solid fa-bridge-water"></i>
+                全球化沟通技巧 (Global Skills)
+            </div>
+            <div class="cards-container">
+                <!-- 技巧 1 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-heart-circle-check"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">文化共情力 (Cultural Empathy)</div>
+                        <div class="card-desc">尝试站在对方的文化背景中思考，理解其价值观和情感逻辑，而非单纯的语言翻译。</div>
+                    </div>
+                    <i class="fa-solid fa-handshake bg-decoration"></i>
+                </div>
+                <!-- 技巧 2 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-ear-listen"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">积极倾听 (Active Listening)</div>
+                        <div class="card-desc">专注于对方的表达内容与情绪，通过复述确认理解，不急于下结论或打断。</div>
+                    </div>
+                </div>
+                <!-- 技巧 3 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-shuffle"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">认知适应性 (Cognitive Flexibility)</div>
+                        <div class="card-desc">保持开放心态，面对文化冲突时能灵活调整沟通策略，容忍模糊性和不确定性。</div>
+                    </div>
+                </div>
+                <!-- 技巧 4 -->
+                <div class="card">
+                    <div class="card-icon"><i class="fa-solid fa-magnifying-glass-location"></i></div>
+                    <div class="card-content">
+                        <div class="card-title">持续学习 (Continuous Learning)</div>
+                        <div class="card-desc">主动了解目标文化的历史、习俗与禁忌，将每一次互动视为提升文化智商（CQ）的机会。</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 这是一个静态页面，无ECharts，无动画，严格遵守尺寸限制。-->
+    <!-- 修复思路：使用 Flexbox 和 Grid 确保内容在 720px 高度内垂直分布，消除不必要的留白。 -->
+</body>
+</html>

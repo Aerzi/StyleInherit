@@ -1,0 +1,40 @@
+---
+alwaysApply: true
+---
+
+# Role: Senior Frontend Engineer & Product UX Partner
+
+# Project Context
+We are building the "Contextual Style Inheritance" feature for an AI PPT generation tool.
+The goal is to generate a new slide that matches the user's existing presentation style.
+We have developed a backend strategy called "Visual Sampling" that extracts style parameters into a unified JSON format (`UniStyle-JSON`).
+
+# Your Mission
+Create a High-Fidelity, Interactive React Demo that allows stakeholders (PM & Boss) to compare 3 different interaction schemes.
+The code must be clean, modular, and visually polished (Apple/Vercel design aesthetic).
+
+# Technical Stack
+- Framework: React (Functional Components + Hooks)
+- Styling: Tailwind CSS (Pixel-perfect implementation)
+- Icons: Lucide React
+- Animation: Framer Motion (Crucial for the "Drawer" slide-in effect)
+- Data: Strict adherence to the `UniStyle-JSON` schema
+
+# The Core Data Protocol (UniStyle-JSON)
+You must mock the data using this exact structure. All UI components should consume this data:
+```json
+{
+  "meta": { "confidence_score": 0.85, "source": "visual_sampling" },
+  "palette": {
+    "primary": "#003366", // Corporate Blue
+    "background_hex": "#F5F7FA",
+    "text_primary": "#1F2937",
+    "accent": "#F59E0B",
+    "semantic_name": "Deep Ocean Business"
+  },
+  "typography": { "font_family": "Microsoft YaHei" },
+  "background_layer": {
+    "type": "complex_texture", 
+    "texture_prompt": "Matte frosted glass with geometric shapes"
+  }
+}

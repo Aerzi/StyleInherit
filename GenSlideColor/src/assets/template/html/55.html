@@ -1,0 +1,433 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+        display: grid;
+        grid-template-rows: 80px 1fr;
+        height: 100%;
+        padding: 0;
+    }
+
+    /* 头部样式 */
+    header {
+        background: linear-gradient(135deg, #0f766e 0%, #115e59 100%); /* 深青色渐变，避免蓝紫 */
+        color: white;
+        padding: 0 40px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        z-index: 10;
+    }
+
+    .header-title {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .header-title h1 {
+        font-size: 28px;
+        font-weight: 700;
+        letter-spacing: 1px;
+    }
+
+    .header-info {
+        font-size: 16px;
+        opacity: 0.9;
+        font-weight: 500;
+    }
+
+    /* 主内容区域 */
+    .main-content {
+        padding: 30px 40px;
+        display: grid;
+        grid-template-columns: 2fr 1fr; /* 左侧图表宽，右侧表格窄 */
+        gap: 25px;
+    }
+
+    /* 卡片通用样式 */
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+        display: flex;
+        flex-direction: column;
+    }
+
+    .card-title {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-left: 4px solid #0d9488;
+        padding-left: 10px;
+    }
+
+    /* 左侧布局：KPI + 趋势图 */
+    .left-column {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .kpi-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 20px;
+    }
+
+    .kpi-card {
+        background: white;
+        border-radius: 10px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        border-top: 4px solid #e2e8f0;
+    }
+    
+    .kpi-card.primary { border-color: #0f766e; }
+    .kpi-card.secondary { border-color: #d97706; }
+    .kpi-card.accent { border-color: #0ea5e9; }
+
+    .kpi-label {
+        font-size: 14px;
+        color: #64748b;
+        margin-bottom: 8px;
+    }
+
+    .kpi-value {
+        font-size: 28px;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .kpi-trend {
+        font-size: 14px;
+        margin-top: 5px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .trend-up { color: #16a34a; }
+
+    .chart-container {
+        flex: 1;
+        position: relative;
+        min-height: 300px;
+    }
+
+    /* 右侧布局：地区分布 + 表格 */
+    .right-column {
+        display: flex;
+        flex-direction: column;
+        gap: 25px;
+    }
+
+    .region-chart-box {
+        height: 220px;
+    }
+
+    /* 表格样式 */
+    .table-container {
+        flex: 1;
+        overflow: hidden;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+    }
+
+    th {
+        background-color: #f8fafc;
+        color: #475569;
+        font-weight: 600;
+        text-align: left;
+        padding: 10px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+
+    td {
+        padding: 10px;
+        border-bottom: 1px solid #f1f5f9;
+        color: #334155;
+    }
+
+    tr:last-child td {
+        border-bottom: none;
+    }
+
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+    
+    /* 强调色 */
+    .highlight-text { color: #0d9488; font-weight: 600; }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+    <header style="border-bottom: none;">
+        <div class="header-title">
+            
+            <h1>2024年Q4 财务报表分析</h1>
+        </div>
+        
+    </header>
+
+    <div class="main-content">
+        <!-- 左侧区域 -->
+        <div class="left-column">
+            <!-- 核心指标卡片 -->
+            <div class="kpi-row">
+                <div class="kpi-card primary">
+                    <div class="kpi-label">Q4 总营收 (亿元)</div>
+                    <div class="kpi-value">125.8</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fa-solid fa-arrow-trend-up"></i> 同比 +15.2%
+                    </div>
+                </div>
+                <div class="kpi-card secondary">
+                    <div class="kpi-label">Q4 净利润 (亿元)</div>
+                    <div class="kpi-value">32.4</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fa-solid fa-arrow-trend-up"></i> 同比 +8.5%
+                    </div>
+                </div>
+                <div class="kpi-card accent">
+                    <div class="kpi-label">Q4 毛利率</div>
+                    <div class="kpi-value">34.5%</div>
+                    <div class="kpi-trend trend-up">
+                        <i class="fa-solid fa-arrow-trend-up"></i> 环比 +1.2pp
+                    </div>
+                </div>
+            </div>
+
+            <!-- 趋势图表 -->
+            <div class="card chart-container">
+                <div class="card-title">
+                    <i class="fa-solid fa-chart-column"></i>
+                    近5个季度核心财务指标趋势
+                </div>
+                <div id="trendChart" style="width: 100%; height: 100%;"></div>
+            </div>
+        </div>
+
+        <!-- 右侧区域 -->
+        <div class="right-column">
+            <!-- 地区分布图 -->
+            <div class="card region-chart-box">
+                <div class="card-title">
+                    <i class="fa-solid fa-map-location-dot"></i>
+                    分地区销售占比 (Q4)
+                </div>
+                <div id="regionChart" style="width: 100%; height: 100%;"></div>
+            </div>
+
+            <!-- 详细数据表格 -->
+            <div class="card table-container">
+                <div class="card-title">
+                    <i class="fa-solid fa-table-list"></i>
+                    季度财务数据明细
+                </div>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>季度</th>
+                            <th class="text-right">营收(亿)</th>
+                            <th class="text-right">净利(亿)</th>
+                            <th class="text-right">毛利率</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>2023 Q4</td>
+                            <td class="text-right">109.2</td>
+                            <td class="text-right">29.8</td>
+                            <td class="text-right">31.5%</td>
+                        </tr>
+                        <tr>
+                            <td>2024 Q1</td>
+                            <td class="text-right">112.5</td>
+                            <td class="text-right">30.1</td>
+                            <td class="text-right">32.0%</td>
+                        </tr>
+                        <tr>
+                            <td>2024 Q2</td>
+                            <td class="text-right">118.4</td>
+                            <td class="text-right">31.2</td>
+                            <td class="text-right">32.8%</td>
+                        </tr>
+                        <tr>
+                            <td>2024 Q3</td>
+                            <td class="text-right">121.6</td>
+                            <td class="text-right">31.8</td>
+                            <td class="text-right">33.3%</td>
+                        </tr>
+                        <tr style="background-color: #f0fdfa;">
+                            <td class="highlight-text">2024 Q4</td>
+                            <td class="text-right highlight-text">125.8</td>
+                            <td class="text-right highlight-text">32.4</td>
+                            <td class="text-right highlight-text">34.5%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // 初始化趋势图 (柱状图 + 折线图)
+    var trendChart = echarts.init(document.getElementById('trendChart'));
+    var trendOption = {
+        animation: false, // 禁止动画
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' }
+        },
+        legend: {
+            data: ['营收', '净利润', '毛利率'],
+            bottom: 0
+        },
+        grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '10%',
+            top: '15%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'category',
+            data: ['23 Q4', '24 Q1', '24 Q2', '24 Q3', '24 Q4'],
+            axisLine: { lineStyle: { color: '#94a3b8' } },
+            axisLabel: { color: '#64748b' }
+        },
+        yAxis: [
+            {
+                type: 'value',
+                name: '金额 (亿元)',
+                min: 0,
+                max: 150,
+                interval: 30,
+                axisLabel: { color: '#64748b' },
+                splitLine: { lineStyle: { type: 'dashed', color: '#e2e8f0' } }
+            },
+            {
+                type: 'value',
+                name: '毛利率',
+                min: 20,
+                max: 40,
+                interval: 5,
+                axisLabel: { formatter: '{value} %', color: '#64748b' },
+                splitLine: { show: false }
+            }
+        ],
+        series: [
+            {
+                name: '营收',
+                type: 'bar',
+                barWidth: 20,
+                itemStyle: { color: '#0f766e' }, // 深青色
+                data: [109.2, 112.5, 118.4, 121.6, 125.8]
+            },
+            {
+                name: '净利润',
+                type: 'bar',
+                barWidth: 20,
+                itemStyle: { color: '#2dd4bf' }, // 浅青色
+                data: [29.8, 30.1, 31.2, 31.8, 32.4]
+            },
+            {
+                name: '毛利率',
+                type: 'line',
+                yAxisIndex: 1,
+                symbol: 'circle',
+                symbolSize: 8,
+                itemStyle: { color: '#d97706', borderWidth: 2, borderColor: '#fff' }, // 琥珀色
+                lineStyle: { width: 3 },
+                data: [31.5, 32.0, 32.8, 33.3, 34.5]
+            }
+        ]
+    };
+    trendChart.setOption(trendOption);
+
+    // 初始化地区分布图 (环形图)
+    var regionChart = echarts.init(document.getElementById('regionChart'));
+    var regionOption = {
+        animation: false, // 禁止动画
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}: {c}亿 ({d}%)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            top: 'middle',
+            itemWidth: 10,
+            itemHeight: 10,
+            textStyle: { fontSize: 12 }
+        },
+        series: [
+            {
+                name: '地区销售',
+                type: 'pie',
+                radius: ['45%', '70%'],
+                center: ['65%', '50%'],
+                avoidLabelOverlap: false,
+                label: {
+                    show: false,
+                    position: 'center'
+                },
+                emphasis: {
+                    label: {
+                        show: true,
+                        fontSize: 14,
+                        fontWeight: 'bold'
+                    }
+                },
+                labelLine: {
+                    show: false
+                },
+                data: [
+                    { value: 45.2, name: '华东', itemStyle: { color: '#0f766e' } },
+                    { value: 32.5, name: '华南', itemStyle: { color: '#14b8a6' } },
+                    { value: 22.1, name: '华北', itemStyle: { color: '#5eead4' } },
+                    { value: 15.4, name: '西南', itemStyle: { color: '#fbbf24' } },
+                    { value: 10.6, name: '西北', itemStyle: { color: '#d97706' } }
+                ]
+            }
+        ]
+    };
+    regionChart.setOption(regionOption);
+
+    // 窗口大小改变时重绘图表（虽然PPT尺寸固定，但保持代码健壮性）
+    window.addEventListener('resize', function() {
+        trendChart.resize();
+        regionChart.resize();
+    });
+</script>
+
+
+</body></html>

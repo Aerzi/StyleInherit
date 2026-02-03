@@ -1,0 +1,317 @@
+<!-- 符合要求，严格控制尺寸，无滚动条，无动画 -->
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #00695C; /* Teal 800 */
+      --secondary-color: #004D40; /* Teal 900 */
+      --accent-color: #F9A825; /* Yellow 800 */
+      --bg-color: #F0F4F4;
+      --card-bg: #FFFFFF;
+      --text-main: #263238;
+      --text-sub: #546E7A;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* 头部设计 - 仅包含 Main Title */
+    header {
+      height: 90px;
+      background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 40px;
+      flex-shrink: 0;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      position: relative;
+      z-index: 10;
+    }
+
+    header h1 {
+      font-size: 38px;
+      color: white;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    /* 主体布局 */
+    .main-container {
+      flex: 1;
+      padding: 25px 30px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 25px;
+      height: calc(720px - 90px); /* 剩余高度 */
+    }
+
+    /* 卡片通用样式 */
+    .card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      border-top: 6px solid var(--primary-color);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #ECEFF1;
+    }
+
+    .icon-box {
+      width: 50px;
+      height: 50px;
+      background: #E0F2F1;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-right: 15px;
+      color: var(--primary-color);
+      font-size: 24px;
+    }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--secondary-color);
+      line-height: 1.2;
+    }
+
+    .card-subtitle {
+      font-size: 14px;
+      color: var(--text-sub);
+      margin-top: 4px;
+      font-weight: 500;
+    }
+
+    .card-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .list-group {
+      list-style: none;
+    }
+
+    .list-item {
+      display: flex;
+      align-items: flex-start;
+      margin-bottom: 16px;
+      font-size: 16px;
+      line-height: 1.5;
+      color: #37474F;
+    }
+
+    .list-item i {
+      color: var(--accent-color);
+      margin-right: 12px;
+      margin-top: 5px;
+      font-size: 14px;
+    }
+
+    /* 底部高亮块 */
+    .highlight-footer {
+      background: linear-gradient(to right, #E0F2F1, #FFFFFF);
+      padding: 15px;
+      border-radius: 8px;
+      margin-top: auto;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .highlight-footer p {
+      color: var(--secondary-color);
+      font-weight: 700;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+    }
+    
+    .highlight-footer i {
+      margin-right: 10px;
+      color: var(--accent-color);
+    }
+
+    /* 装饰性背景图标 */
+    .bg-icon {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      font-size: 180px;
+      opacity: 0.03;
+      color: var(--primary-color);
+      pointer-events: none;
+    }
+
+    /* 强调文字 */
+    strong {
+      color: var(--primary-color);
+    }
+
+    /* 底部通栏标语 */
+    .bottom-bar {
+      grid-column: 1 / -1;
+      background: var(--secondary-color);
+      color: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 15px;
+      margin-top: 5px;
+      height: 70px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .bottom-bar-text {
+      font-size: 20px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    
+    .bottom-bar-icon {
+      margin-right: 15px;
+      font-size: 24px;
+      color: var(--accent-color);
+    }
+
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>做好主动运维，提高服务质量</h1>
+  </header>
+
+  <div class="main-container">
+    
+    <!-- 第一列：落地策略 -->
+    <div class="card">
+      <i class="fa-solid fa-location-dot bg-icon"></i>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-map-location-dot"></i></div>
+        <div>
+          <div class="card-title">主动运维落地</div>
+          <div class="card-subtitle">策略：“一周一站一村”</div>
+        </div>
+      </div>
+      <div class="card-content">
+        <ul class="list-group">
+          <li class="list-item">
+            <i class="fa-solid fa-check"></i>
+            <span><strong>入户安维：</strong>深入用户现场，解决实际问题</span>
+          </li>
+          <li class="list-item">
+            <i class="fa-solid fa-check"></i>
+            <span><strong>拉网覆盖：</strong>全面排查网络隐患，无死角覆盖</span>
+          </li>
+          <li class="list-item">
+            <i class="fa-solid fa-check"></i>
+            <span><strong>客情维系：</strong>建立良好互动，进行续约提醒</span>
+          </li>
+        </ul>
+        <div class="highlight-footer">
+          <p><i class="fa-solid fa-chart-line"></i> 目标：显著提高客户保有率</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第二列：五位一体 -->
+    <div class="card">
+      <i class="fa-solid fa-hand-holding-heart bg-icon"></i>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-users-gear"></i></div>
+        <div>
+          <div class="card-title">五位一体服务</div>
+          <div class="card-subtitle">模式：“装维销服查”</div>
+        </div>
+      </div>
+      <div class="card-content">
+        <ul class="list-group">
+          <li class="list-item">
+            <i class="fa-solid fa-circle-check"></i>
+            <span><strong>摸清需求：</strong>精准识别用户痛点与潜在需求</span>
+          </li>
+          <li class="list-item">
+            <i class="fa-solid fa-circle-check"></i>
+            <span><strong>营销挖掘：</strong>寻找增值业务机会，提升单客价值</span>
+          </li>
+          <li class="list-item">
+            <i class="fa-solid fa-circle-check"></i>
+            <span><strong>灵活策略：</strong>综合运用市场政策与差异化服务</span>
+          </li>
+        </ul>
+        <div class="highlight-footer">
+          <p><i class="fa-solid fa-magnifying-glass-dollar"></i> 核心：服务与营销深度融合</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 第三列：理念与目标 -->
+    <div class="card">
+      <i class="fa-solid fa-rocket bg-icon"></i>
+      <div class="card-header">
+        <div class="icon-box"><i class="fa-solid fa-network-wired"></i></div>
+        <div>
+          <div class="card-title">理念与提升</div>
+          <div class="card-subtitle">理念：网络优化、服务优先</div>
+        </div>
+      </div>
+      <div class="card-content">
+        <ul class="list-group">
+          <li class="list-item">
+            <i class="fa-solid fa-wrench"></i>
+            <span><strong>弱光整治：</strong>结合专项行动，提升网络硬实力</span>
+          </li>
+          <li class="list-item">
+            <i class="fa-solid fa-user-clock"></i>
+            <span><strong>主动意识：</strong>培养员工主动检修，变被动为主动</span>
+          </li>
+          <li class="list-item">
+            <i class="fa-solid fa-heart"></i>
+            <span><strong>全生命周期：</strong>打造以客户为中心的维护闭环</span>
+          </li>
+        </ul>
+        <div class="highlight-footer">
+          <p><i class="fa-solid fa-thumbs-up"></i> 结果：全面提升客户体验</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- 底部通栏 -->
+    <div class="bottom-bar">
+      <i class="fa-solid fa-gauge-high bottom-bar-icon"></i>
+      <div class="bottom-bar-text">使客服工作成为公司提质增效的“助推器”</div>
+    </div>
+
+  </div>
+
+</body>
+</html>

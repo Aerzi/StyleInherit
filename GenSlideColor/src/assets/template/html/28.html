@@ -1,0 +1,385 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+        width: 1280px; 
+        height: 720px; 
+        overflow: hidden; 
+        font-family: 'Noto Sans SC', sans-serif; 
+        background-color: #f0f2f5;
+        color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+        display: grid;
+        grid-template-rows: 100px 1fr;
+        grid-template-columns: 1fr 400px;
+        gap: 30px;
+        padding: 50px 60px;
+        height: 100%;
+        background: linear-gradient(135deg, #ffffff 0%, #f0f2f5 100%);
+    }
+
+    /* 标题区域 */
+    .header {
+        grid-column: 1 / -1;
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-end;
+        border-bottom: 2px solid #e5e7eb;
+        padding-bottom: 20px;
+    }
+
+    .title-group h1 {
+        font-size: 42px;
+        font-weight: 900;
+        color: #111827;
+        letter-spacing: -1px;
+        margin-bottom: 8px;
+    }
+
+    .title-group h1 span {
+        color: #0d9488; /* Teal color */
+    }
+
+    .title-group p {
+        font-size: 18px;
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .year-badge {
+        background: #0f766e;
+        color: white;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-weight: 700;
+        font-size: 16px;
+        box-shadow: 0 4px 6px -1px rgba(15, 118, 110, 0.2);
+    }
+
+    /* 左侧内容区：三个变化点 */
+    .content-area {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding-right: 20px;
+    }
+
+    .strategy-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px 30px;
+        display: flex;
+        align-items: center;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05), 0 4px 6px -2px rgba(0, 0, 0, 0.025);
+        border-left: 6px solid #cbd5e1; /* Default grey border */
+        height: 140px;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .strategy-card.highlight {
+        border-left-color: #0d9488;
+    }
+
+    /* 卡片内部布局 */
+    .card-icon {
+        width: 60px;
+        height: 60px;
+        background: #f3f4f6;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: #4b5563;
+        margin-right: 30px;
+        flex-shrink: 0;
+    }
+
+    .card-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .year-block {
+        width: 35%;
+    }
+
+    .year-label {
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 4px;
+        display: block;
+    }
+
+    .year-2023 .year-label { color: #9ca3af; }
+    .year-2023 h3 { color: #6b7280; font-size: 20px; font-weight: 500; }
+    
+    .year-2024 .year-label { color: #0d9488; }
+    .year-2024 h3 { color: #111827; font-size: 22px; font-weight: 700; }
+    .year-2024 p { font-size: 14px; color: #4b5563; margin-top: 4px; line-height: 1.4; }
+
+    .arrow-divider {
+        color: #d1d5db;
+        font-size: 20px;
+        margin: 0 20px;
+    }
+
+    /* 右侧图表区 */
+    .chart-area {
+        background: white;
+        border-radius: 20px;
+        padding: 20px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden; /* 防止背景图形溢出 */
+    }
+
+    .chart-title {
+        position: absolute;
+        top: 25px;
+        left: 25px;
+        font-size: 18px;
+        font-weight: 700;
+        color: #374151;
+        z-index: 10; /* 确保文字在背景之上 */
+    }
+
+    #radarChart {
+        width: 100%;
+        height: 340px; /* 稍微减小高度以避免拥挤 */
+        margin-top: 20px; /* 增加顶部间距，避免与标题重叠 */
+        position: relative;
+        z-index: 10; /* 确保图表在背景之上 */
+    }
+
+    .legend-custom {
+        display: flex;
+        gap: 20px;
+        margin-top: 10px;
+        position: relative;
+        z-index: 10; /* 修复：确保图例文字在背景图形之上 */
+    }
+    
+    .legend-item {
+        display: flex;
+        align-items: center;
+        font-size: 14px;
+        color: #4b5563;
+        font-weight: 500;
+    }
+    
+    .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        margin-right: 8px;
+    }
+
+    /* 装饰元素 */
+    .bg-shape {
+        position: absolute;
+        bottom: -50px;
+        right: -50px;
+        width: 300px;
+        height: 300px;
+        background: radial-gradient(circle, rgba(13, 148, 136, 0.05) 0%, rgba(255,255,255,0) 70%);
+        z-index: 1; /* 修复：置于底层 */
+        pointer-events: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+    <!-- 头部 -->
+    <div class="header" style="border-bottom: none;">
+        <div class="title-group">
+            <h1>2023 vs  营销策略演进</h1>
+            
+        </div>
+        
+    </div>
+
+    <!-- 左侧：三个主要变化 -->
+    <div class="content-area">
+        
+        <!-- 变化点 1 -->
+        <div class="strategy-card highlight">
+            <div class="card-icon" style="color: #0d9488; background: #ccfbf1;">
+                <i class="fa-solid fa-bullseye"></i>
+            </div>
+            <div class="card-content">
+                <div class="year-block year-2023">
+                    <span class="year-label">2023 策略</span>
+                    <h3>广撒网式投放</h3>
+                </div>
+                <div class="arrow-divider">
+                    <i class="fa-solid fa-arrow-right-long"></i>
+                </div>
+                <div class="year-block year-2024" style="width: 45%;">
+                    <span class="year-label">2024 策略</span>
+                    <h3>精细化人群运营</h3>
+                    <p>基于数据的用户分层与私域深耕</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 变化点 2 -->
+        <div class="strategy-card highlight">
+            <div class="card-icon" style="color: #0d9488; background: #ccfbf1;">
+                <i class="fa-solid fa-pen-nib"></i>
+            </div>
+            <div class="card-content">
+                <div class="year-block year-2023">
+                    <span class="year-label">2023 内容</span>
+                    <h3>短平快流量导向</h3>
+                </div>
+                <div class="arrow-divider">
+                    <i class="fa-solid fa-arrow-right-long"></i>
+                </div>
+                <div class="year-block year-2024" style="width: 45%;">
+                    <span class="year-label">2024 内容</span>
+                    <h3>高价值深度内容</h3>
+                    <p>注重品牌叙事与情绪价值共鸣</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 变化点 3 -->
+        <div class="strategy-card highlight">
+            <div class="card-icon" style="color: #0d9488; background: #ccfbf1;">
+                <i class="fa-solid fa-robot"></i>
+            </div>
+            <div class="card-content">
+                <div class="year-block year-2023">
+                    <span class="year-label">2023 技术</span>
+                    <h3>基础自动化辅助</h3>
+                </div>
+                <div class="arrow-divider">
+                    <i class="fa-solid fa-arrow-right-long"></i>
+                </div>
+                <div class="year-block year-2024" style="width: 45%;">
+                    <span class="year-label">2024 技术</span>
+                    <h3>AIGC 全面赋能</h3>
+                    <p>AI 生成素材与千人千面个性化推荐</p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- 右侧：图表可视化 -->
+    <div class="chart-area">
+        <div class="chart-title">资源投入维度偏移</div>
+        <div id="radarChart"></div>
+        <div class="legend-custom">
+            <div class="legend-item">
+                <div class="dot" style="background: #94a3b8;"></div> 2023
+            </div>
+            <div class="legend-item">
+                <div class="dot" style="background: #0d9488;"></div> 2024
+            </div>
+        </div>
+        <div class="bg-shape"></div>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+<script>
+    var chartDom = document.getElementById('radarChart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+        animation: false, // 禁止动画
+        color: ['#94a3b8', '#0d9488'],
+        radar: {
+            indicator: [
+                { name: 'AI 技术应用', max: 100 },
+                { name: '内容深度', max: 100 },
+                { name: '用户留存率', max: 100 },
+                { name: '私域运营', max: 100 },
+                { name: '广告投放量', max: 100 }
+            ],
+            radius: '65%',
+            center: ['50%', '50%'],
+            splitNumber: 4,
+            axisName: {
+                color: '#6b7280',
+                fontWeight: 'bold',
+                fontSize: 12
+            },
+            splitArea: {
+                areaStyle: {
+                    color: ['#f8fafc', '#f1f5f9', '#e2e8f0', '#cbd5e1'],
+                    shadowColor: 'rgba(0, 0, 0, 0.1)',
+                    shadowBlur: 10
+                }
+            },
+            axisLine: {
+                lineStyle: {
+                    color: 'rgba(211, 211, 211, 0.5)'
+                }
+            },
+            splitLine: {
+                lineStyle: {
+                    color: 'rgba(211, 211, 211, 0.5)'
+                }
+            }
+        },
+        series: [
+            {
+                name: '2023 vs 2024',
+                type: 'radar',
+                data: [
+                    {
+                        value: [30, 40, 50, 40, 90],
+                        name: '2023',
+                        symbol: 'none',
+                        lineStyle: {
+                            width: 2,
+                            type: 'dashed'
+                        },
+                        areaStyle: {
+                            color: 'rgba(148, 163, 184, 0.2)'
+                        }
+                    },
+                    {
+                        value: [90, 85, 80, 85, 50],
+                        name: '2024',
+                        symbol: 'circle',
+                        symbolSize: 6,
+                        lineStyle: {
+                            width: 3
+                        },
+                        areaStyle: {
+                            color: 'rgba(13, 148, 136, 0.3)'
+                        }
+                    }
+                ]
+            }
+        ]
+    };
+
+    myChart.setOption(option);
+</script>
+
+
+</body></html>

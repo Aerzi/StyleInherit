@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* 严格禁止部分与基础设置 */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f4f5;
+      color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      padding: 40px 60px;
+      background: linear-gradient(135deg, #f0f4f5 0%, #e6eef0 100%);
+      position: relative;
+    }
+
+    /* 装饰背景图形 */
+    .bg-shape {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 400px;
+      height: 300px;
+      background: linear-gradient(225deg, #d3e4e6 0%, transparent 70%);
+      border-bottom-left-radius: 100%;
+      z-index: 0;
+    }
+
+    /* 头部区域 - 仅包含主标题 */
+    header {
+      flex: 0 0 auto;
+      margin-bottom: 30px;
+      z-index: 1;
+      border-left: 12px solid #005f73;
+      padding-left: 25px;
+    }
+
+    h1 {
+      font-size: 52px;
+      font-weight: 900;
+      color: #0a2e36;
+      line-height: 1.1;
+      letter-spacing: 2px;
+    }
+
+    /* 主体内容区 */
+    .content-wrapper {
+      display: flex;
+      flex: 1;
+      gap: 40px;
+      z-index: 1;
+      height: calc(100% - 100px); /* 减去头部高度 */
+    }
+
+    /* 左侧：重要性 (35%) */
+    .left-section {
+      flex: 0 0 35%;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .section-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #005f73;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .section-title i {
+      color: #ee9b00;
+    }
+
+    .importance-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      flex: 1;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .importance-card::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: #ee9b00;
+    }
+
+    .icon-box {
+      width: 60px;
+      height: 60px;
+      background: #e0f2f1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .icon-box i {
+      font-size: 28px;
+      color: #005f73;
+    }
+
+    .importance-text h3 {
+      font-size: 22px;
+      margin-bottom: 6px;
+      color: #2b2d42;
+    }
+
+    .importance-text p {
+      font-size: 16px;
+      color: #666;
+      line-height: 1.4;
+    }
+
+    /* 右侧：落地路径 (65%) */
+    .right-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: 1fr 1fr;
+      gap: 20px;
+      flex: 1;
+    }
+
+    .method-card {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      position: relative;
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    /* 不同卡片的顶部装饰条 */
+    .method-card:nth-child(1) { border-top: 6px solid #0a9396; }
+    .method-card:nth-child(2) { border-top: 6px solid #94d2bd; }
+    .method-card:nth-child(3) { border-top: 6px solid #e9d8a6; }
+    .method-card:nth-child(4) { border-top: 6px solid #ee9b00; }
+
+    .method-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 15px;
+      gap: 15px;
+    }
+
+    .method-header i {
+      font-size: 32px;
+      color: #0a9396;
+    }
+    
+    .method-card:nth-child(2) .method-header i { color: #5cb9a0; }
+    .method-card:nth-child(3) .method-header i { color: #dcb858; }
+    .method-card:nth-child(4) .method-header i { color: #d68c00; }
+
+    .method-header h3 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1d3557;
+    }
+
+    .method-card p {
+      font-size: 18px;
+      color: #555;
+      line-height: 1.5;
+      text-align: justify;
+    }
+
+    /* 视觉填充 */
+    .number-bg {
+      position: absolute;
+      right: 15px;
+      bottom: 5px;
+      font-size: 80px;
+      font-weight: 900;
+      color: rgba(0,0,0,0.03);
+      line-height: 1;
+      user-select: none;
+    }
+
+  </style>
+</head>
+<body>
+  <!-- 修复想法：使用严格的Grid和Flex布局填充空间，字体大小调大适配1280px，无滚动条。 -->
+  
+  <div class="container">
+    <div class="bg-shape"></div>
+    
+    <!-- 头部区域 -->
+    <header>
+      <h1>企业文化建设与价值观落地</h1>
+    </header>
+
+    <!-- 主体内容 -->
+    <div class="content-wrapper">
+      
+      <!-- 左侧：文化建设重要性 -->
+      <div class="left-section">
+        <div class="section-title">
+          <i class="fa-solid fa-star"></i> 文化建设的重要性
+        </div>
+        
+        <div class="importance-card">
+          <div class="icon-box"><i class="fa-solid fa-users-viewfinder"></i></div>
+          <div class="importance-text">
+            <h3>凝聚核心力量</h3>
+            <p>统一全员思想认知，增强员工归属感与忠诚度。</p>
+          </div>
+        </div>
+
+        <div class="importance-card">
+          <div class="icon-box"><i class="fa-solid fa-compass"></i></div>
+          <div class="importance-text">
+            <h3>明确战略导向</h3>
+            <p>为日常决策提供依据，确保企业发展不偏离航道。</p>
+          </div>
+        </div>
+
+        <div class="importance-card">
+          <div class="icon-box"><i class="fa-solid fa-shield-halved"></i></div>
+          <div class="importance-text">
+            <h3>构建竞争壁垒</h3>
+            <p>形成不可复制的软实力，驱动企业长效持续增长。</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 右侧：价值观落地路径 -->
+      <div class="right-section">
+        <div class="section-title">
+          <i class="fa-solid fa-road"></i> 日常管理落地路径
+        </div>
+        
+        <div class="grid-container">
+          <!-- 卡片 1 -->
+          <div class="method-card">
+            <div class="number-bg">01</div>
+            <div class="method-header">
+              <i class="fa-solid fa-scale-balanced"></i>
+              <h3>制度融合</h3>
+            </div>
+            <p>将价值观考核纳入KPI与晋升标准，使文化要求从"软约束"转化为"硬指标"，实现利益强关联。</p>
+          </div>
+
+          <!-- 卡片 2 -->
+          <div class="method-card">
+            <div class="number-bg">02</div>
+            <div class="method-header">
+              <i class="fa-solid fa-user-tie"></i>
+              <h3>行为示范</h3>
+            </div>
+            <p>管理者以身作则，成为价值观的践行者与捍卫者。通过"关键事件"树立标杆，发挥榜样力量。</p>
+          </div>
+
+          <!-- 卡片 3 -->
+          <div class="method-card">
+            <div class="number-bg">03</div>
+            <div class="method-header">
+              <i class="fa-solid fa-award"></i>
+              <h3>仪式强化</h3>
+            </div>
+            <p>利用晨会、颁奖典礼、团建等仪式感活动，反复确认和奖励符合价值观的行为，固化情感认同。</p>
+          </div>
+
+          <!-- 卡片 4 -->
+          <div class="method-card">
+            <div class="number-bg">04</div>
+            <div class="method-header">
+              <i class="fa-solid fa-bullhorn"></i>
+              <h3>持续宣导</h3>
+            </div>
+            <p>通过多渠道、高频次的内部沟通与故事传播，将抽象的理念具体化，确保价值观深入人心。</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</body>
+</html>

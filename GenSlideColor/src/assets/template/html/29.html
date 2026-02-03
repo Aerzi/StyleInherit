@@ -1,0 +1,468 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* 布局容器 */
+    .container {
+      display: grid;
+      grid-template-rows: 80px 1fr;
+      height: 100%;
+      padding: 30px 40px;
+      gap: 20px;
+    }
+
+    /* 头部样式 */
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: white;
+      padding: 0 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      border-left: 6px solid #00897b; /* Teal accent */
+    }
+
+    .title-group h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #263238;
+      letter-spacing: 1px;
+    }
+
+    .title-group p {
+      font-size: 14px;
+      color: #78909c;
+      margin-top: 4px;
+    }
+
+    .header-meta {
+      display: flex;
+      gap: 20px;
+    }
+
+    .meta-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      color: #546e7a;
+      background: #eceff1;
+      padding: 8px 16px;
+      border-radius: 20px;
+    }
+
+    /* 主内容区 */
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 24px;
+    }
+
+    /* 左侧：总漏斗图表 */
+    .chart-card {
+      background: white;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #37474f;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .card-title i {
+      color: #00897b;
+    }
+
+    #funnel-chart {
+      flex: 1;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* 右侧：渠道详情列表 */
+    .channels-container {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .channel-card {
+      background: white;
+      border-radius: 16px;
+      padding: 20px 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      height: 32%; /* Distribute height */
+      position: relative;
+      overflow: hidden;
+    }
+
+    .channel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eceff1;
+    }
+
+    .channel-name {
+      font-size: 18px;
+      font-weight: 700;
+      color: #263238;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .channel-badge {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-weight: 500;
+    }
+
+    .badge-social { background: #e3f2fd; color: #1565c0; }
+    .badge-search { background: #e0f2f1; color: #00695c; }
+    .badge-ads { background: #fff3e0; color: #ef6c00; }
+
+    .roi-tag {
+      font-size: 14px;
+      font-weight: 700;
+      color: #455a64;
+    }
+
+    .data-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+      text-align: center;
+    }
+
+    .data-item {
+      position: relative;
+    }
+
+    .data-item:not(:last-child)::after {
+      content: '\f054';
+      font-family: "Font Awesome 6 Free";
+      font-weight: 900;
+      position: absolute;
+      right: -10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #cfd8dc;
+      font-size: 12px;
+    }
+
+    .data-label {
+      font-size: 12px;
+      color: #90a4ae;
+      margin-bottom: 4px;
+    }
+
+    .data-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #37474f;
+    }
+
+    .conversion-rate {
+      font-size: 11px;
+      color: #00897b;
+      background: #e0f2f1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-top: 4px;
+    }
+
+    /* 装饰性背景条 */
+    .deco-bar {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 4px;
+    }
+    .bar-social { background: #1e88e5; }
+    .bar-search { background: #00897b; }
+    .bar-ads { background: #fb8c00; }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- 头部 -->
+    <header style="border-bottom: none;">
+      <div class="title-group">
+        <h1>全渠道转化漏斗分析</h1>
+        
+      </div>
+      
+    </header>
+
+    <!-- 内容区 -->
+    <div class="main-content">
+      
+      <!-- 左侧：ECharts 漏斗图 -->
+      <div class="chart-card">
+        <div class="card-title">
+          <i class="fa-solid fa-chart-pie"></i>
+          整体转化漏斗 (Aggregate Funnel)
+        </div>
+        <div id="funnel-chart"></div>
+      </div>
+
+      <!-- 右侧：渠道细分 -->
+      <div class="channels-container">
+        
+        <!-- 渠道 1 -->
+        <div class="channel-card">
+          <div class="deco-bar bar-social"></div>
+          <div class="channel-header">
+            <div class="channel-name">
+              <i class="fa-brands fa-weixin" style="color: #1e88e5;"></i>
+              社交媒体推广
+              <span class="channel-badge badge-social">Social</span>
+            </div>
+            <div class="roi-tag">ROI: 1:4.5</div>
+          </div>
+          <div class="data-grid">
+            <div class="data-item">
+              <div class="data-label">曝光量</div>
+              <div class="data-value">500,000</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">点击量</div>
+              <div class="data-value">45,000</div>
+              <div class="conversion-rate">9.0%</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">注册量</div>
+              <div class="data-value">12,000</div>
+              <div class="conversion-rate">26.6%</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">购买量</div>
+              <div class="data-value">3,800</div>
+              <div class="conversion-rate">31.6%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 渠道 2 -->
+        <div class="channel-card">
+          <div class="deco-bar bar-search"></div>
+          <div class="channel-header">
+            <div class="channel-name">
+              <i class="fa-brands fa-google" style="color: #00897b;"></i>
+              搜索引擎优化
+              <span class="channel-badge badge-search">SEO/SEM</span>
+            </div>
+            <div class="roi-tag">ROI: 1:6.2</div>
+          </div>
+          <div class="data-grid">
+            <div class="data-item">
+              <div class="data-label">曝光量</div>
+              <div class="data-value">450,000</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">点击量</div>
+              <div class="data-value">68,000</div>
+              <div class="conversion-rate">15.1%</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">注册量</div>
+              <div class="data-value">24,000</div>
+              <div class="conversion-rate">35.2%</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">购买量</div>
+              <div class="data-value">8,500</div>
+              <div class="conversion-rate">35.4%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 渠道 3 -->
+        <div class="channel-card">
+          <div class="deco-bar bar-ads"></div>
+          <div class="channel-header">
+            <div class="channel-name">
+              <i class="fa-solid fa-bullhorn" style="color: #fb8c00;"></i>
+              信息流广告
+              <span class="channel-badge badge-ads">Paid Ads</span>
+            </div>
+            <div class="roi-tag">ROI: 1:3.1</div>
+          </div>
+          <div class="data-grid">
+            <div class="data-item">
+              <div class="data-label">曝光量</div>
+              <div class="data-value">300,000</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">点击量</div>
+              <div class="data-value">15,000</div>
+              <div class="conversion-rate">5.0%</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">注册量</div>
+              <div class="data-value">4,500</div>
+              <div class="conversion-rate">30.0%</div>
+            </div>
+            <div class="data-item">
+              <div class="data-label">购买量</div>
+              <div class="data-value">3,120</div>
+              <div class="conversion-rate">69.3%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.4.3/echarts.min.js"></script>
+  <script>
+    // 初始化 ECharts
+    var chartDom = document.getElementById('funnel-chart');
+    var myChart = echarts.init(chartDom);
+    var option;
+
+    option = {
+      animation: false, // 严格禁止动画
+      color: ['#00897b', '#26a69a', '#80cbc4', '#b2dfdb'], // 现代蓝绿色系，避免蓝紫
+      tooltip: {
+        trigger: 'item',
+        formatter: "{b} : {c}"
+      },
+      legend: {
+        data: ['曝光量', '点击量', '注册量', '购买量'],
+        bottom: 0,
+        itemWidth: 12,
+        itemHeight: 12,
+        textStyle: {
+          color: '#546e7a'
+        }
+      },
+      series: [
+        {
+          name: 'Funnel',
+          type: 'funnel',
+          left: '10%',
+          top: 20,
+          bottom: 40,
+          width: '80%',
+          min: 0,
+          max: 100,
+          minSize: '0%',
+          maxSize: '100%',
+          sort: 'descending',
+          gap: 2,
+          label: {
+            show: true,
+            position: 'inside',
+            formatter: '{c}%', // 显示百分比或数值
+            color: '#fff',
+            fontSize: 14,
+            fontWeight: 'bold'
+          },
+          labelLine: {
+            length: 10,
+            lineStyle: {
+              width: 1,
+              type: 'solid'
+            }
+          },
+          itemStyle: {
+            borderColor: '#fff',
+            borderWidth: 1,
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowOffsetY: 5,
+            shadowColor: 'rgba(0, 0, 0, 0.1)'
+          },
+          emphasis: {
+            label: {
+              fontSize: 16
+            }
+          },
+          data: [
+            { value: 100, name: '曝光量', itemStyle: { color: '#546e7a' } }, // 灰蓝
+            { value: 60, name: '点击量', itemStyle: { color: '#26a69a' } },  // 蓝绿
+            { value: 30, name: '注册量', itemStyle: { color: '#fb8c00' } },  // 橙色
+            { value: 12, name: '购买量', itemStyle: { color: '#e53935' } }   // 红色
+          ]
+        },
+        // 外部标签层
+        {
+          name: 'FunnelLabels',
+          type: 'funnel',
+          left: '10%',
+          top: 20,
+          bottom: 40,
+          width: '80%',
+          min: 0,
+          max: 100,
+          sort: 'descending',
+          label: {
+            show: true,
+            position: 'right',
+            formatter: '{b}',
+            color: '#37474f',
+            fontSize: 14,
+            fontWeight: 500
+          },
+          labelLine: {
+            show: true,
+            length: 30,
+            lineStyle: {
+              width: 1,
+              type: 'solid',
+              color: '#cfd8dc'
+            }
+          },
+          itemStyle: {
+            opacity: 0, // 隐藏实际图形，只显示标签
+            borderWidth: 0
+          },
+          data: [
+            { value: 100, name: '曝光量' },
+            { value: 60, name: '点击量' },
+            { value: 30, name: '注册量' },
+            { value: 12, name: '购买量' }
+          ]
+        }
+      ]
+    };
+
+    myChart.setOption(option);
+  </script>
+
+</body></html>

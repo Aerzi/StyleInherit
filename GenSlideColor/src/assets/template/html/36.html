@@ -1,0 +1,328 @@
+<html lang="zh-CN"><head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=1280, height=720">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700;900&amp;display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html, body { 
+      width: 1280px; 
+      height: 720px; 
+      overflow: hidden; 
+      font-family: 'Noto Sans SC', sans-serif; 
+      background-color: #f0f2f5;
+      color: #333;
+    }
+
+    /* Layout */
+    .container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+    }
+
+    /* Left Sidebar - Context */
+    .sidebar {
+      width: 420px;
+      background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+      color: white;
+      padding: 60px 50px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      box-shadow: 10px 0 30px rgba(0,0,0,0.1);
+      z-index: 2;
+    }
+
+    .sidebar::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-image: radial-gradient(circle at 10% 10%, rgba(255,255,255,0.05) 0%, transparent 20%);
+      pointer-events: none;
+    }
+
+    .brand {
+      font-size: 24px;
+      font-weight: 700;
+      opacity: 0.8;
+      letter-spacing: 1px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .main-title {
+      font-size: 56px;
+      font-weight: 900;
+      line-height: 1.1;
+      margin-top: 40px;
+      margin-bottom: 20px;
+      background: linear-gradient(to right, #fff, #bdc3c7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .subtitle {
+      font-size: 20px;
+      font-weight: 400;
+      opacity: 0.7;
+      margin-bottom: 60px;
+      border-left: 4px solid #e74c3c;
+      padding-left: 15px;
+    }
+
+    .raw-input-box {
+      background: rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 25px;
+      font-size: 14px;
+      line-height: 1.6;
+      color: rgba(255,255,255,0.8);
+      position: relative;
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .raw-input-box i {
+      position: absolute;
+      top: -12px;
+      left: 20px;
+      background: #e74c3c;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      color: white;
+    }
+
+    /* Right Content - Cards */
+    .content {
+      flex: 1;
+      padding: 60px;
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      grid-template-rows: repeat(2, 1fr);
+      gap: 30px;
+      background-color: #ecf0f1;
+      background-image: 
+        radial-gradient(#bdc3c7 1px, transparent 1px),
+        radial-gradient(#bdc3c7 1px, transparent 1px);
+      background-size: 20px 20px;
+      background-position: 0 0, 10px 10px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 20px;
+      padding: 35px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(0,0,0,0.02);
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 6px;
+      height: 100%;
+    }
+
+    /* Card Variants */
+    .card.urgent::after { background-color: #e74c3c; } /* Red */
+    .card.project::after { background-color: #3498db; } /* Blue */
+    .card.health::after { background-color: #27ae60; } /* Green */
+    .card.life::after { background-color: #f39c12; } /* Orange */
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .urgent .card-icon { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+    .project .card-icon { background: rgba(52, 152, 219, 0.1); color: #3498db; }
+    .health .card-icon { background: rgba(39, 174, 96, 0.1); color: #27ae60; }
+    .life .card-icon { background: rgba(243, 156, 18, 0.1); color: #f39c12; }
+
+    .tag {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 6px 12px;
+      border-radius: 20px;
+      letter-spacing: 0.5px;
+    }
+
+    .urgent .tag { background: #fcebea; color: #c0392b; }
+    .project .tag { background: #ebf5fb; color: #2980b9; }
+    .health .tag { background: #eafaf1; color: #219150; }
+    .life .tag { background: #fef5e7; color: #d35400; }
+
+    .card-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #2c3e50;
+      margin-bottom: 10px;
+    }
+
+    .card-desc {
+      font-size: 16px;
+      color: #7f8c8d;
+      line-height: 1.5;
+      flex-grow: 1;
+    }
+
+    .card-footer {
+      margin-top: 20px;
+      padding-top: 20px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: #95a5a6;
+      font-weight: 500;
+    }
+
+    .card-footer i {
+      font-size: 14px;
+    }
+
+    /* Decorative background icon */
+    .bg-icon {
+      position: absolute;
+      bottom: -20px;
+      right: -20px;
+      font-size: 140px;
+      opacity: 0.03;
+      transform: rotate(-15deg);
+      pointer-events: none;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <!-- Left Sidebar -->
+  <div class="sidebar">
+    <div>
+      <div class="brand">
+        <i class="fa-solid fa-layer-group"></i>
+        <span>TASK.FLOW</span>
+      </div>
+      <h1 class="main-title">今日<br>事项概览</h1>
+      <div class="subtitle">Daily Task Breakdown</div>
+    </div>
+
+    <div class="raw-input-box">
+      <i class="fa-solid fa-quote-left"></i>
+      “今天天气不错，适合出去跑步。顺便说一下，昨天的报表有个数据错了，请修正。还有，下个月的展会物料准备好了吗？记得把新的Logo放上去。中午吃什么呢？”
+    </div>
+  </div>
+
+  <!-- Right Content Grid -->
+  <div class="content">
+    
+    <!-- Card 1: Urgent Work -->
+    <div class="card urgent">
+      <i class="fa-solid fa-file-circle-exclamation bg-icon"></i>
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="fa-solid fa-bug"></i>
+        </div>
+        <span class="tag">High Priority</span>
+      </div>
+      <div class="card-title">数据修正</div>
+      <div class="card-desc">
+        昨天的报表存在数据错误，需要立即核查并进行修正，确保数据准确性。
+      </div>
+      <div class="card-footer">
+        <i class="fa-regular fa-clock"></i> 立即处理
+      </div>
+    </div>
+
+    <!-- Card 2: Project Planning -->
+    <div class="card project">
+      <i class="fa-solid fa-briefcase bg-icon"></i>
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="fa-solid fa-palette"></i>
+        </div>
+        <span class="tag">Project</span>
+      </div>
+      <div class="card-title">展会物料筹备</div>
+      <div class="card-desc">
+        检查下个月展会物料准备进度，务必确认已更新并替换为<strong>最新的 Logo</strong>。
+      </div>
+      <div class="card-footer">
+        <i class="fa-solid fa-list-check"></i> 跟进中
+      </div>
+    </div>
+
+    <!-- Card 3: Health/Personal -->
+    <div class="card health">
+      <i class="fa-solid fa-person-running bg-icon"></i>
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="fa-solid fa-heart-pulse"></i>
+        </div>
+        <span class="tag">Wellness</span>
+      </div>
+      <div class="card-title">户外运动</div>
+      <div class="card-desc">
+        今天天气晴朗，空气质量优良，安排时间进行户外跑步锻炼。
+      </div>
+      <div class="card-footer">
+        <i class="fa-solid fa-cloud-sun"></i> 适宜出行
+      </div>
+    </div>
+
+    <!-- Card 4: Life/Misc -->
+    <div class="card life">
+      <i class="fa-solid fa-utensils bg-icon"></i>
+      <div class="card-header">
+        <div class="card-icon">
+          <i class="fa-solid fa-bowl-food"></i>
+        </div>
+        <span class="tag">Life</span>
+      </div>
+      <div class="card-title">午餐安排</div>
+      <div class="card-desc">
+        思考并决定今日午餐计划。
+      </div>
+      <div class="card-footer">
+        <i class="fa-regular fa-lightbulb"></i> 待定
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+</body></html>
