@@ -21,7 +21,7 @@ interface HistoryRecord {
   outputType: 'html' | 'image' | 'both';
   html?: string;
   imageUrl?: string;
-  templateId?: number | '';
+  templateId?: number | string;  // 支持数字ID和字符串ID（如 ns-text）
 }
 
 // localStorage key
@@ -37,7 +37,7 @@ const StyleInheritance: React.FC = () => {
   // Configuration State
   const [generateUserPrompt, setGenerateUserPrompt] = useState('');
   const [outputType, setOutputType] = useState<'html' | 'image' | 'both'>('html');
-  const [selectedHtmlTemplateId, setSelectedHtmlTemplateId] = useState<number | ''>('');
+  const [selectedHtmlTemplateId, setSelectedHtmlTemplateId] = useState<number | string>('');
   const [selectedHtmlTemplateContent, setSelectedHtmlTemplateContent] = useState<string>('');
   const [isTemplateLoading, setIsTemplateLoading] = useState(false);
   const [showTemplatePreview, setShowTemplatePreview] = useState(false);
@@ -70,8 +70,14 @@ const StyleInheritance: React.FC = () => {
   // Models State
   const [selectedModel, setSelectedModel] = useState('doubao-seed-1.8');
   const [selectedHtmlModel] = useState('doubao-seed-1.8');
-  const [selectedImageModel] = useState('Doubao-image-seedream-v4.5');
+  const [selectedImageModel, setSelectedImageModel] = useState('Doubao-image-seedream-v4.5');
   const [modelList, setModelList] = useState<ModelInfo[]>([]);
+  
+  // 图片生成模型列表
+  const imageModelList = [
+    { id: 'Doubao-image-seedream-v4.5', name: 'Doubao (16:9 高清)', provider: 'doubao' },
+    { id: 'gemini-3-pro-image-preview', name: 'Gemini (1:1 方形)', provider: 'google' },
+  ];
 
   // Template List State
   const [templateList, setTemplateList] = useState<HtmlTemplateInfo[]>([]);
@@ -393,8 +399,19 @@ const StyleInheritance: React.FC = () => {
   };
 
   const handleTemplateSelect = async (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const id = Number(e.target.value);
-    setSelectedHtmlTemplateId(id || '');
+    const rawValue = e.target.value;
+    
+    // 处理数字ID和字符串ID两种情况
+    // 数字ID: "1", "2", "3" 等
+    // 字符串ID: "ns-text", "ns-table", "ns-timeline" 等
+    let id: number | string = '';
+    if (rawValue) {
+      const numValue = Number(rawValue);
+      // 如果能转成有效数字则用数字，否则用原始字符串
+      id = !isNaN(numValue) && rawValue.match(/^\d+$/) ? numValue : rawValue;
+    }
+    
+    setSelectedHtmlTemplateId(id);
     if (!id) {
       setSelectedHtmlTemplateContent('');
       return;
@@ -708,6 +725,30 @@ const StyleInheritance: React.FC = () => {
                         </button>
                       </div>
                     )}
+                  </div>
+                )}
+
+                {/* 图片模型选择器 - 当选择图片或HTML+图片模式时显示 */}
+                {(outputType === 'image' || outputType === 'both') && (
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-slate-600">🖼️ 图片生成模型</label>
+                    <select
+                      value={selectedImageModel}
+                      onChange={(e) => setSelectedImageModel(e.target.value)}
+                      disabled={isProcessing}
+                      className="w-full p-2 rounded-md border border-slate-300 text-sm bg-white focus:outline-none focus:border-indigo-500"
+                    >
+                      {imageModelList.map(m => (
+                        <option key={m.id} value={m.id}>
+                          {m.name}
+                        </option>
+                      ))}
+                    </select>
+                    <p className="text-xs text-slate-500">
+                      {selectedImageModel === 'Doubao-image-seedream-v4.5' 
+                        ? '豆包模型：3600×2025 高清画质，16:9 比例' 
+                        : 'Gemini模型：1024×1024 方形，支持参考图片'}
+                    </p>
                   </div>
                 )}
               </div>

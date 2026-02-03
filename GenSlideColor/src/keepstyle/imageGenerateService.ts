@@ -151,7 +151,9 @@ ${request.userPrompt || '根据设计风格生成一张专业的幻灯片图片'
 
 /**
  * 提交图片生成任务
- * 参考 submitImageTask 函数
+ * 严格按照以下 curl 格式：
+ * - Doubao: model=Doubao-image-seedream-v4.5, provider=doubao, width=3600, height=2025
+ * - Gemini: model=gemini-3-pro-image-preview, provider=google, width=1024, height=1024
  */
 async function submitImageTask(
   promptText: string,
@@ -163,37 +165,44 @@ async function submitImageTask(
 ): Promise<string> {
   const config = getImageApiConfig();
   
+  // 判断模型类型
+  const isGemini = modelId === 'gemini-3-pro-image-preview';
+  
+  // 根据模型类型设置默认参数
+  // Doubao: 3600x2025 (16:9)
+  // Gemini: 1024x1024 (1:1 正方形)
+  const defaultWidth = isGemini ? 1024 : 3600;
+  const defaultHeight = isGemini ? 1024 : 2025;
+  const provider = isGemini ? 'google' : 'doubao';
+  const model = modelId || 'Doubao-image-seedream-v4.5';
+  
   // 构建请求体，严格按照 curl 格式
+  // Doubao: {"prompt", "image_size", "model", "provider", "width", "height"} - 不含 input_images
+  // Gemini: {"prompt", "image_size", "model", "provider", "width", "height", "input_images"?}
   const body: Record<string, unknown> = {
     prompt: promptText,
     image_size: imageSize,
-    model: modelId || 'Doubao-image-seedream-v4.5',
-    provider: 'doubao',
-    width: width || 3600,
-    height: height || 2025
+    model: model,
+    provider: provider,
+    width: width || defaultWidth,
+    height: height || defaultHeight
   };
   
-  // 根据模型ID确定provider
-  if (modelId === 'gemini-3-pro-image-preview') {
-    body.provider = 'google';
-    
-    // Gemini 模型可能支持参考图片，添加 input_images
-    if (referenceImages && referenceImages.length > 0) {
-      body.input_images = referenceImages.map((img) => {
-        // 去掉 data:image/...;base64, 前缀
-        let base64Data = img;
-        if (img.includes('base64,')) {
-          base64Data = img.split('base64,')[1];
-        }
-        return {
-          image_data: base64Data
-        };
-      });
-    }
+  // 如果有参考图片，添加 input_images（Doubao 和 Gemini 都支持）
+  if (referenceImages && referenceImages.length > 0) {
+    body.input_images = referenceImages.map((img) => {
+      // 保留完整的 data:image/xxx;base64,... 格式
+      // 如果没有前缀，则添加默认的 png 前缀
+      let imageData = img;
+      if (!img.startsWith('data:image/')) {
+        imageData = `data:image/png;base64,${img}`;
+      }
+      return {
+        image_data: imageData
+      };
+    });
+    console.log('[ImageAPI] 添加参考图片数量:', (body.input_images as Array<unknown>).length);
   }
-  
-  // 注意：Doubao-image-seedream-v4.5 是纯文生图模型，不支持 input_images 参数
-  // 如果需要参考图片的风格，应该通过样式提取后在 prompt 中描述
 
   // 打印请求参数用于调试
   const inputImagesArray = body.input_images as Array<unknown> | undefined;
