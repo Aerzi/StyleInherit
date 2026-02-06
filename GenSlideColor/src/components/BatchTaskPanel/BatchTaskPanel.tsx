@@ -31,7 +31,8 @@ import {
   getStorageUsage 
 } from '../../keepstyle/batchStorageService';
 import { batchExecutor } from '../../keepstyle/batchExecutorService';
-import { getTemplateList, HtmlTemplateInfo } from '../../assets/template/templateLoader';
+import { getTemplateList } from '../../assets/template/templateLoader';
+import type { HtmlTemplateInfo } from '../../assets/template/templateLoader';
 
 interface BatchTaskPanelProps {
   onClose?: () => void;

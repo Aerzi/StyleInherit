@@ -1,11 +1,29 @@
-import { useState } from 'react';
+import { useState, Component, type ReactNode } from 'react';
 import StyleInheritance from './components/StyleInheritance/StyleInheritance';
 import './App.css';
+
+class AppErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
+  state = { hasError: false, error: null as Error | null };
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+  render() {
+    if (this.state.hasError && this.state.error) {
+      return (
+        <div style={{ padding: 24, color: '#b91c1c', background: '#fef2f2', minHeight: '100vh', fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+          <strong>组件报错：</strong><br />{this.state.error.message}
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 function App() {
   const [activePage, setActivePage] = useState<'inheritance' | 'single'>('inheritance');
 
   return (
+    <AppErrorBoundary>
     <div className="flex flex-col h-screen w-screen bg-white">
       {/* Sidebar / Navigation */}
       <div className="flex h-full">
@@ -61,6 +79,7 @@ function App() {
         </div>
       </div>
     </div>
+    </AppErrorBoundary>
   );
 }
 

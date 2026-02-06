@@ -140,11 +140,11 @@ export async function submitImageTask(
   const model = modelId || 'Doubao-image-seedream-v4.5';
   
   // 构建请求体，严格按照 curl 格式
-  // Doubao: {"prompt", "image_size": "2K", "model", "provider", "width": 3600, "height": 2025}
+  // Doubao: 固定使用 image_size=2K
   // Gemini: {"prompt", "image_size": "1K", "model", "provider", "width": 1024, "height": 1024}
   const body: Record<string, unknown> = {
     prompt: promptText,
-    image_size: imageSize || defaultImageSize,
+    image_size: isGemini ? (imageSize || defaultImageSize) : '2K',
     model: model,
     provider: provider,
     width: width || defaultWidth,

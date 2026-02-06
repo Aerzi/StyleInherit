@@ -21,6 +21,8 @@ import {
   ExcelRowItem,
   DEFAULT_BATCH_CONFIG,
 } from '../../keepstyle/batchTypes';
+import { DEFAULT_BATCH_CONFIG } from '../../keepstyle/batchTypes';
+import type { HtmlTemplateInfo } from '../../assets/template/templateLoader';
 import { getTemplateList, loadTemplateById, HtmlTemplateInfo } from '../../assets/template/templateLoader';
 
 // 图片模型选项
