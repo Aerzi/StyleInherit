@@ -14,13 +14,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { parseExcelFile, isValidExcelFile, parseImagesFolder } from '../../keepstyle/excelParser';
 import { batchProcessor } from '../../keepstyle/batchService';
-import type {
+import {
   BatchSession,
   BatchTaskItem,
   BatchConfig,
   ExcelRowItem,
+  DEFAULT_BATCH_CONFIG,
 } from '../../keepstyle/batchTypes';
-import { DEFAULT_BATCH_CONFIG } from '../../keepstyle/batchTypes';
 import { getTemplateList, loadTemplateById, HtmlTemplateInfo } from '../../assets/template/templateLoader';
 
 // 图片模型选项

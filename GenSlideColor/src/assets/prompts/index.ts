@@ -48,3 +48,6 @@ export {
 // 意图识别
 export { INTENT_RECOGNITION_PROMPT } from './intent-prompt';
 
+// 图片清洗
+export { CLEAN_IMAGE_PROMPT } from './clean-image-prompt';
+

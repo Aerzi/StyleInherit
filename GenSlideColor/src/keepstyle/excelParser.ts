@@ -10,7 +10,7 @@
  */
 
 import * as XLSX from 'xlsx';
-import type { ExcelParseResult, ExcelRowItem } from './batchTypes';
+import { ExcelParseResult, ExcelRowItem } from './batchTypes';
 
 /**
  * 解析 Excel 文件，提取图片和主题

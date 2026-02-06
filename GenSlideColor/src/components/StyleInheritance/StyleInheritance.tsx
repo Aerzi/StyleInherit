@@ -1,11 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { extractStyleFromImage } from '../../keepstyle/extractStyleService';
 import { generateSlide } from '../../keepstyle/generateService';
+import { cleanImage, imageUrlToBase64 } from '../../keepstyle/cleanImageService';
 import { fetchModels, type ModelInfo } from '../../services/llmService';
 import { fileToBase64 } from '../../keepstyle/utils';
 import type { StyleExtractResult, GenerateResult } from '../../keepstyle/types';
 import { getTemplateList, loadTemplateById, type HtmlTemplateInfo } from '../../assets/template/templateLoader';
-import { BatchProcessor } from '../BatchProcessor';
 
 // 预填内容选项
 const PRESET_PROMPTS = [
@@ -30,7 +30,6 @@ const HISTORY_STORAGE_KEY = 'style-inheritance-history';
 
 const StyleInheritance: React.FC = () => {
   // State
-  const [activeTab, setActiveTab] = useState<'single' | 'batch'>('single');
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -53,7 +52,15 @@ const StyleInheritance: React.FC = () => {
   // Process State
   const [isExtracting, setIsExtracting] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [currentStage, setCurrentStage] = useState<'extracting' | 'generating' | 'auditing' | ''>('');
+  const [isCleaning, setIsCleaning] = useState(false);
+  const [currentStage, setCurrentStage] = useState<'extracting' | 'cleaning' | 'generating' | 'auditing' | ''>('');
+  
+  // 图片清洗相关状态
+  const [enableImageCleaning, setEnableImageCleaning] = useState(false); // 是否启用图片清洗
+  const [cleanedImageUrl, setCleanedImageUrl] = useState<string>(''); // 清洗后的图片URL
+  const [cleanedImageBase64, setCleanedImageBase64] = useState<string>(''); // 清洗后的图片Base64
+  const [cleaningProgress, setCleaningProgress] = useState(0); // 清洗进度
+  const [useCleanedImageForGenerate, setUseCleanedImageForGenerate] = useState(true); // 生成时是否使用清洗后的图片
   
   // Result State
   const [extractedStyle, setExtractedStyle] = useState<StyleExtractResult | null>(null);
@@ -88,8 +95,9 @@ const StyleInheritance: React.FC = () => {
   const [showHistory, setShowHistory] = useState(false);
   const [showPresetMenu, setShowPresetMenu] = useState(false);
   const [showInputPreview, setShowInputPreview] = useState(false);
+  const [showCleanedImagePreview, setShowCleanedImagePreview] = useState(false);
 
-  const isProcessing = isExtracting || isGenerating;
+  const isProcessing = isExtracting || isGenerating || isCleaning;
 
   // 计算预览缩放比例
   useEffect(() => {
@@ -296,10 +304,116 @@ const StyleInheritance: React.FC = () => {
       );
       
       setExtractedStyle(style);
+      
+      // 如果启用了图片清洗，在样式提取后自动执行清洗
+      if (enableImageCleaning && style.styleDescription) {
+        await handleCleanImage(currentImageBase64s[0], style.styleDescription);
+      }
     } catch (error) {
       console.error('Extract failed:', error);
     } finally {
       setIsExtracting(false);
+      setCurrentStage('');
+    }
+  };
+
+  // 图片清洗处理函数
+  const handleCleanImage = async (originalBase64?: string, styleDesc?: string) => {
+    const imageBase64 = originalBase64 || (imageFiles.length > 0 ? await fileToBase64(imageFiles[0]) : null);
+    const styleDescription = styleDesc || extractedStyle?.styleDescription;
+    
+    if (!imageBase64 || !styleDescription) {
+      console.error('清洗图片需要原始图片和样式描述');
+      return;
+    }
+
+    setIsCleaning(true);
+    setCurrentStage('cleaning');
+    setCleaningProgress(0);
+    setCleanedImageUrl('');
+    setCleanedImageBase64('');
+
+    try {
+      const result = await cleanImage(
+        {
+          originalImageBase64: imageBase64,
+          styleDescription: styleDescription,
+          imageModel: selectedImageModel,
+        },
+        {
+          onProgress: (stage, progress) => {
+            setCleaningProgress(progress);
+          },
+          onError: (err) => console.error('清洗错误:', err),
+        }
+      );
+
+      setCleanedImageUrl(result.cleanedImageUrl);
+      
+      // 将清洗后的图片转换为 base64 以便后续使用
+      try {
+        const base64 = await imageUrlToBase64(result.cleanedImageUrl);
+        setCleanedImageBase64(base64);
+      } catch (e) {
+        console.warn('清洗后图片转 base64 失败，将使用 URL', e);
+      }
+    } catch (error) {
+      console.error('图片清洗失败:', error);
+    } finally {
+      setIsCleaning(false);
+      setCurrentStage('');
+      setCleaningProgress(100);
+    }
+  };
+
+  // 独立图片清洗功能 - 直接清洗，不提取样式
+  const handleStandaloneCleanImage = async () => {
+    if (imageFiles.length === 0) return;
+
+    setIsCleaning(true);
+    setCurrentStage('cleaning');
+    setCleaningProgress(0);
+    setCleanedImageUrl('');
+    setCleanedImageBase64('');
+
+    try {
+      // 获取图片的 base64
+      const imageBase64 = await fileToBase64(imageFiles[0]);
+      
+      // 使用已有的样式描述，如果没有则使用默认的通用描述
+      const styleDescription = extractedStyle?.styleDescription || 
+        '请根据上传的参考图片，完整保留其背景色、渐变、边缘装饰元素、材质质感和色彩体系，去除所有文字、图表、3D元素和具体内容图像，生成一张纯净的幻灯片背景。';
+      
+      // 执行图片清洗
+      const cleanResult = await cleanImage(
+        {
+          originalImageBase64: imageBase64,
+          styleDescription: styleDescription,
+          imageModel: selectedImageModel,
+        },
+        {
+          onProgress: (stage, progress) => {
+            setCleaningProgress(progress);
+          },
+          onError: (err) => console.error('清洗错误:', err),
+        }
+      );
+
+      setCleanedImageUrl(cleanResult.cleanedImageUrl);
+      
+      // 将清洗后的图片转换为 base64 以便后续使用
+      try {
+        const base64 = await imageUrlToBase64(cleanResult.cleanedImageUrl);
+        setCleanedImageBase64(base64);
+      } catch (e) {
+        console.warn('清洗后图片转 base64 失败，将使用 URL', e);
+      }
+      
+      setCleaningProgress(100);
+    } catch (error) {
+      console.error('独立图片清洗失败:', error);
+    } finally {
+      setIsCleaning(false);
       setCurrentStage('');
     }
   };
@@ -318,7 +432,14 @@ const StyleInheritance: React.FC = () => {
 
     let refImageBase64s: string[] | undefined = undefined;
     if (imageFiles.length > 0) {
-      refImageBase64s = await Promise.all(imageFiles.map(fileToBase64));
+      // 如果启用了图片清洗且有清洗后的图片，优先使用清洗后的图片
+      if (enableImageCleaning && useCleanedImageForGenerate && cleanedImageBase64) {
+        refImageBase64s = [cleanedImageBase64];
+        console.log('[Generate] 使用清洗后的图片');
+      } else {
+        refImageBase64s = await Promise.all(imageFiles.map(fileToBase64));
+        console.log('[Generate] 使用原始图片');
+      }
     }
 
     // 根据模式确定提示词策略
@@ -479,37 +600,12 @@ const StyleInheritance: React.FC = () => {
                 </span>
               )}
             </button>
-
-            {/* Tabs */}
-            <div className="flex gap-1 bg-slate-100 p-1 rounded-lg">
-              <button
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === 'single'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
-                }`}
-                onClick={() => setActiveTab('single')}
-              >
-              单张生成
-            </button>
-              <button
-                className={`px-4 py-2 text-sm font-medium rounded-md transition-all ${
-                  activeTab === 'batch'
-                    ? 'bg-white text-indigo-600 shadow-sm'
-                    : 'text-slate-500 hover:text-slate-700'
-                }`}
-                onClick={() => setActiveTab('batch')}
-              >
-                批量运行
-              </button>
-            </div>
           </div>
         </div>
       </header>
 
       {/* Content Area */}
-      {activeTab === 'single' ? (
-        <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden">
           {/* Left Panel: Configuration */}
           <div className="w-[380px] shrink-0 border-r border-slate-200 bg-white flex flex-col overflow-y-auto">
             <div className="p-5 flex flex-col gap-5">
@@ -637,6 +733,77 @@ const StyleInheritance: React.FC = () => {
                   <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5"></div>
                 </div>
               </label>
+
+              {/* Image Cleaning Toggle - 仅在启用样式提取时显示 */}
+              {enableStyleExtract && (
+                <div className="flex flex-col gap-2 p-3 bg-amber-50/50 rounded-lg border border-amber-200">
+                  <label className="flex items-center justify-between cursor-pointer select-none">
+                    <div className="flex items-center gap-2">
+                      <span className="text-sm font-medium text-amber-700">🧹 启用图片清洗</span>
+                      <span className="text-xs text-amber-600">(生成去除噪点的纯净背景)</span>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={enableImageCleaning}
+                        onChange={(e) => setEnableImageCleaning(e.target.checked)}
+                        disabled={isProcessing}
+                        className="sr-only peer"
+                      />
+                      <div className="w-11 h-6 bg-amber-200 rounded-full peer peer-checked:bg-amber-500 peer-disabled:opacity-50 transition-colors"></div>
+                      <div className="absolute left-1 top-1 w-4 h-4 bg-white rounded-full shadow-sm transition-transform peer-checked:translate-x-5"></div>
+                    </div>
+                  </label>
+                  
+                  {/* 清洗后使用开关 */}
+                  {enableImageCleaning && cleanedImageUrl && (
+                    <label className="flex items-center gap-2 text-xs text-amber-600 cursor-pointer ml-1">
+                      <input
+                        type="checkbox"
+                        checked={useCleanedImageForGenerate}
+                        onChange={(e) => setUseCleanedImageForGenerate(e.target.checked)}
+                        disabled={isProcessing}
+                        className="w-3.5 h-3.5 rounded text-amber-500 focus:ring-amber-500"
+                      />
+                      <span>生成时使用清洗后的图片</span>
+                    </label>
+                  )}
+                  
+                  {/* 清洗进度或预览 */}
+                  {isCleaning && (
+                    <div className="flex items-center gap-2 text-xs text-amber-600">
+                      <div className="w-4 h-4 border-2 border-amber-300 border-t-amber-600 rounded-full animate-spin"></div>
+                      <span>正在清洗图片... {cleaningProgress}%</span>
+                    </div>
+                  )}
+                  
+                  {cleanedImageUrl && !isCleaning && (
+                    <div className="flex items-center gap-2">
+                      <div 
+                        className="relative w-16 h-9 rounded overflow-hidden border border-amber-300 cursor-pointer hover:ring-2 hover:ring-amber-400 transition-all group"
+                        onClick={() => setShowCleanedImagePreview(true)}
+                        title="点击放大预览"
+                      >
+                        <img src={cleanedImageUrl} alt="Cleaned" className="w-full h-full object-cover" />
+                        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all">
+                          <span className="text-white text-xs opacity-0 group-hover:opacity-100 transition-opacity">🔍</span>
+                        </div>
+                      </div>
+                      <div className="flex-1 text-xs text-amber-600">
+                        ✓ 清洗完成，已生成纯净背景
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => handleCleanImage()}
+                        disabled={isProcessing}
+                        className="text-xs text-amber-700 hover:text-amber-900 hover:underline"
+                      >
+                        重新清洗
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Configuration Fields */}
               <div className="flex flex-col gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
@@ -809,12 +976,107 @@ const StyleInheritance: React.FC = () => {
                   {isProcessing ? (
                     <>
                       <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                      <span>{currentStage === 'extracting' ? '正在提取样式...' : '正在生成内容...'}</span>
+                      <span>{currentStage === 'extracting' ? '正在提取样式...' : currentStage === 'cleaning' ? '正在清洗图片...' : '正在生成内容...'}</span>
                     </>
                   ) : (
                     <span>🚀 一键生成 {enableStyleExtract ? '(提取 + 生成)' : '(仅生成)'}</span>
                   )}
                 </button>
+              </div>
+
+              {/* 独立图片清洗功能区 */}
+              <div className="flex flex-col gap-3 p-4 bg-gradient-to-br from-cyan-50 to-teal-50 rounded-lg border border-cyan-200">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="text-lg">🧹</span>
+                    <span className="text-sm font-semibold text-cyan-800">图片清洗</span>
+                  </div>
+                  <span className="text-xs text-cyan-600">生成纯净背景图</span>
+                </div>
+                
+                <p className="text-xs text-cyan-700 leading-relaxed">
+                  上传一张图片，自动提取样式并清洗生成一张去除文字、图表等噪点的纯净背景。
+                </p>
+
+                {/* 清洗结果预览 */}
+                {cleanedImageUrl && !isCleaning && (
+                  <div className="flex items-start gap-3 p-3 bg-white/60 rounded-lg border border-cyan-200">
+                    <div 
+                      className="relative w-24 h-[54px] rounded-md overflow-hidden border border-cyan-300 shadow-sm shrink-0 cursor-pointer hover:ring-2 hover:ring-cyan-400 transition-all group"
+                      onClick={() => setShowCleanedImagePreview(true)}
+                      title="点击放大预览"
+                    >
+                      <img src={cleanedImageUrl} alt="Cleaned Background" className="w-full h-full object-cover" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 flex items-center justify-center transition-all">
+                        <span className="text-white text-sm opacity-0 group-hover:opacity-100 transition-opacity">🔍</span>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-xs font-medium text-cyan-800 mb-1">✓ 清洗完成</div>
+                      <div className="flex flex-wrap gap-2">
+                        <a 
+                          href={cleanedImageUrl}
+                          download="cleaned-background.png"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1 text-xs text-white bg-cyan-600 hover:bg-cyan-700 px-2 py-1 rounded transition-colors"
+                        >
+                          💾 下载
+                        </a>
+                        <button
+                          onClick={() => {
+                            if (cleanedImageUrl) {
+                              navigator.clipboard.writeText(cleanedImageUrl);
+                            }
+                          }}
+                          className="text-xs text-cyan-700 hover:text-cyan-900 px-2 py-1 hover:bg-cyan-100 rounded transition-colors"
+                        >
+                          📋 复制URL
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* 清洗进度条 */}
+                {isCleaning && (
+                  <div className="flex flex-col gap-2 p-3 bg-white/60 rounded-lg border border-cyan-200">
+                    <div className="flex items-center gap-2 text-xs text-cyan-700">
+                      <div className="w-4 h-4 border-2 border-cyan-300 border-t-cyan-600 rounded-full animate-spin"></div>
+                      <span>正在清洗图片... {cleaningProgress}%</span>
+                    </div>
+                    <div className="w-full h-2 bg-cyan-100 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full bg-gradient-to-r from-cyan-500 to-teal-500 transition-all duration-300 ease-out"
+                        style={{ width: `${cleaningProgress}%` }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* 清洗按钮 */}
+                <button
+                  className={`w-full py-2.5 px-4 rounded-lg text-sm font-medium flex items-center justify-center gap-2 transition-all
+                    ${imageFiles.length === 0 || isCleaning
+                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed' 
+                      : 'bg-gradient-to-r from-cyan-600 to-teal-600 text-white hover:from-cyan-500 hover:to-teal-500 shadow-md hover:shadow-lg'}
+                  `}
+                  disabled={imageFiles.length === 0 || isCleaning}
+                  onClick={handleStandaloneCleanImage}
+                >
+                  {isCleaning ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      <span>清洗中...</span>
+                    </>
+                  ) : (
+                    <span>🧹 单独清洗背景</span>
+                  )}
+                </button>
+                
+                {imageFiles.length === 0 && (
+                  <p className="text-xs text-cyan-600 text-center">请先上传一张参考图片</p>
+                )}
               </div>
 
             </div>
@@ -1008,11 +1270,6 @@ const StyleInheritance: React.FC = () => {
             )}
           </div>
         </div>
-      ) : (
-        <div className="flex-1 overflow-hidden">
-          <BatchProcessor onClose={() => setActiveTab('single')} />
-        </div>
-      )}
 
       {/* 模板预览模态框 */}
       {showTemplatePreview && selectedHtmlTemplateContent && (
@@ -1209,6 +1466,64 @@ const StyleInheritance: React.FC = () => {
               <button
                 onClick={() => setShowInputPreview(false)}
                 className="px-4 py-2 text-sm font-medium text-slate-600 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                关闭
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* 清洗图片放大预览模态框 */}
+      {showCleanedImagePreview && cleanedImageUrl && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowCleanedImagePreview(false)}
+        >
+          <div 
+            className="relative max-w-[90vw] max-h-[90vh] flex flex-col"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* 关闭按钮 */}
+            <button
+              onClick={() => setShowCleanedImagePreview(false)}
+              className="absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-white/80 hover:text-white bg-white/10 hover:bg-white/20 rounded-full transition-colors z-10"
+            >
+              ✕
+            </button>
+            
+            {/* 图片 */}
+            <div className="relative rounded-xl overflow-hidden shadow-2xl bg-slate-900">
+              <img 
+                src={cleanedImageUrl} 
+                alt="清洗后的背景图片" 
+                className="max-w-[90vw] max-h-[80vh] object-contain"
+              />
+            </div>
+            
+            {/* 底部操作栏 */}
+            <div className="flex items-center justify-center gap-4 mt-4">
+              <a 
+                href={cleanedImageUrl}
+                download="cleaned-background.png"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 rounded-lg transition-colors shadow-lg"
+              >
+                💾 下载图片
+              </a>
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(cleanedImageUrl);
+                  setShowCleanedImagePreview(false);
+                }}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/90 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
+              >
+                📋 复制链接
+              </button>
+              <button
+                onClick={() => setShowCleanedImagePreview(false)}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white/90 bg-white/10 hover:bg-white/20 rounded-lg transition-colors"
               >
                 关闭
               </button>

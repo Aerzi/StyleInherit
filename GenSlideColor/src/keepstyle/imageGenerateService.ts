@@ -117,7 +117,7 @@ function buildStyleExtractImagePrompt(request: GenerateRequest): string {
  * - Doubao: model=Doubao-image-seedream-v4.5, provider=doubao, width=3600, height=2025
  * - Gemini: model=gemini-3-pro-image-preview, provider=google, width=1024, height=1024
  */
-async function submitImageTask(
+export async function submitImageTask(
   promptText: string,
   imageSize: string,
   modelId?: string,
@@ -234,6 +234,52 @@ async function queryTaskStatus(taskId: string): Promise<TaskStatusResponse> {
   }
   
   return result.data;
+}
+
+/**
+ * 轮询获取图片生成结果
+ * @param taskId 任务ID
+ * @param onProgress 进度回调 (0-100)
+ * @returns 生成的图片URL
+ */
+export async function pollForResult(
+  taskId: string,
+  onProgress?: (progress: number) => void
+): Promise<string> {
+  const config = getImageApiConfig();
+  const startTime = Date.now();
+  let pollCount = 0;
+
+  while (true) {
+    pollCount++;
+    const elapsed = Date.now() - startTime;
+
+    if (elapsed >= config.maxPollTime) {
+      throw new Error(`生成超时（已等待 ${Math.round(elapsed / 1000)}s）`);
+    }
+
+    const status = await queryTaskStatus(taskId);
+    
+    // 计算进度 (0-100)
+    const progress = Math.min(95, Math.floor((elapsed / config.maxPollTime) * 100));
+    onProgress?.(progress);
+
+    if (status.status === 'completed') {
+      const images = status.images || [];
+      if (images.length > 0 && images[0].url) {
+        onProgress?.(100);
+        return images[0].url;
+      } else {
+        throw new Error('生成完成但未返回图片URL');
+      }
+    }
+
+    if (status.status === 'failed') {
+      throw new Error(status.error || '生成失败');
+    }
+
+    await delay(config.pollInterval);
+  }
 }
 
 /**
