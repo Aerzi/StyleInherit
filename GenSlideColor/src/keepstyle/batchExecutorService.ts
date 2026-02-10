@@ -16,8 +16,8 @@ import {
   BatchTaskItem,
   BatchTaskConfig,
   BatchJobCallbacks,
-  ExcelParsedItem,
 } from './batchTypes';
+import type { ExcelParsedItem } from './batchTypes';
 import {
   saveBatchJob,
   loadBatchJob,

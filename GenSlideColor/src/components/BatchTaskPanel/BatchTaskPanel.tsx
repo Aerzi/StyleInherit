@@ -16,8 +16,8 @@ import {
   BatchJob, 
   BatchTaskItem, 
   BatchTaskConfig,
-  ExcelParsedItem 
 } from '../../keepstyle/batchTypes';
+import type { ExcelParsedItem } from '../../keepstyle/batchTypes';
 import { 
   parseExcelWithImages, 
   validateExcelFile,

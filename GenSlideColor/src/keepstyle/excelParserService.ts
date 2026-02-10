@@ -2,27 +2,91 @@
  * ============================================
  * Excel 解析服务
  * ============================================
- * 
- * 用途：解析Excel文件，提取浮动图片和对应的文本主题
+ *
+ * 用途：解析Excel文件，提取图片和对应的文本主题
  * 依赖：xlsx 库（需要安装）
- * 
- * Excel格式要求：
- * - 第一列：主题文本
- * - 浮动图片：与对应行关联
+ *
+ * 两种模式：
+ * 1. 嵌入图片：第一列主题，浮动图片与行关联
+ * 2. 图片名+文件夹：第一列主题，第二列图片文件名，从 imageFiles 里按文件名查找
  */
 
 import * as XLSX from 'xlsx';
-import { ExcelParsedItem } from './batchTypes';
+import type { ExcelRowItem } from './batchTypes';
+
+/** 按文件名（含扩展名或不含）在文件列表里查找，不区分大小写 */
+function findImageFileByName(imageFiles: File[], imageName: string): File | undefined {
+  const trimmed = String(imageName || '').trim();
+  if (!trimmed) return undefined;
+  const lower = trimmed.toLowerCase();
+  const withoutExt = lower.replace(/\.[^./]+$/, '');
+  for (const f of imageFiles) {
+    const n = f.name.toLowerCase();
+    if (n === lower || n.replace(/\.[^./]+$/, '') === withoutExt) return f;
+  }
+  return undefined;
+}
 
 /**
- * 解析Excel文件，提取图片和文本
+ * 解析 Excel：第一列主题，第二列图片文件名；从 imageFiles 中按文件名找图并读成 base64
+ * @param excelFile Excel 文件
+ * @param imageFiles 图片文件列表（来自用户选择的「图片文件夹」多选）
+ */
+export async function parseExcelWithImagesFromFolder(
+  excelFile: File,
+  imageFiles: File[]
+): Promise<ExcelRowItem[]> {
+  const arrayBuffer = await excelFile.arrayBuffer();
+  const workbook = XLSX.read(arrayBuffer, {
+    type: 'array',
+    cellStyles: true,
+    cellDates: true,
+  });
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+  const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
+    header: 1,
+    defval: '',
+  }) as unknown[][];
+
+  const results: ExcelRowItem[] = [];
+  for (let i = 1; i < jsonData.length; i++) {
+    const row = jsonData[i] as string[];
+    const userPrompt = String(row[0] ?? '').trim();
+    const imageFileName = row[1] != null ? String(row[1]).trim() : '';
+    if (!userPrompt) continue;
+
+    const file = imageFileName ? findImageFileByName(imageFiles, imageFileName) : undefined;
+    let imageBase64 = '';
+    if (file) {
+      imageBase64 = await new Promise<string>((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve((reader.result as string) ?? '');
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+    if (!imageBase64) continue;
+    results.push({
+      rowIndex: i + 1,
+      theme: userPrompt,
+      userPrompt,
+      imageBase64,
+      imageName: imageFileName || file?.name,
+    });
+  }
+  return results;
+}
+
+/**
+ * 解析Excel文件，提取嵌入的浮动图片和文本主题
  * @param file Excel文件
  * @returns 解析结果数组
  */
-export async function parseExcelWithImages(file: File): Promise<ExcelParsedItem[]> {
+export async function parseExcelWithImages(file: File): Promise<ExcelRowItem[]> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
-    
+
     reader.onload = async (e) => {
       try {
         const data = e.target?.result;
@@ -30,55 +94,42 @@ export async function parseExcelWithImages(file: File): Promise<ExcelParsedItem[
           reject(new Error('文件读取失败'));
           return;
         }
-        
-        // 读取工作簿
-        const workbook = XLSX.read(data, { 
+
+        const workbook = XLSX.read(data, {
           type: 'array',
           cellStyles: true,
           cellDates: true,
         });
-        
-        // 获取第一个工作表
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
-        
-        // 转换为JSON
-        const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, { 
+        const jsonData = XLSX.utils.sheet_to_json<Record<string, unknown>>(worksheet, {
           header: 1,
-          defval: '' 
+          defval: '',
         });
-        
-        // 提取图片
+
         const images = await extractImagesFromExcel(file);
-        
-        // 组合结果
-        const results: ExcelParsedItem[] = [];
-        
-        // 从第2行开始（跳过表头）
+        const results: ExcelRowItem[] = [];
+
         for (let i = 1; i < jsonData.length; i++) {
           const row = jsonData[i] as string[];
           const userPrompt = String(row[0] || '').trim();
-          
           if (!userPrompt) continue;
-          
-          // 查找对应的图片（按行号匹配）
           const imageBase64 = images[i - 1] || '';
-          
           if (imageBase64) {
             results.push({
-              rowIndex: i + 1, // Excel行号（从1开始）
-              imageBase64,
+              rowIndex: i + 1,
+              theme: userPrompt,
               userPrompt,
+              imageBase64,
             });
           }
         }
-        
         resolve(results);
       } catch (error) {
         reject(error);
       }
     };
-    
+
     reader.onerror = () => reject(new Error('文件读取失败'));
     reader.readAsArrayBuffer(file);
   });

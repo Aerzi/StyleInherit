@@ -36,7 +36,8 @@ export interface CleanImageCallbacks {
 function buildCleanImagePrompt(styleDescription: string): string {
   // 使用统一管理的提示词
   return CLEAN_IMAGE_PROMPT
-    .replace(/\{\^styleDescription\^\}/g, styleDescription);
+    .replace(/\{\^styleDescription\^\}/g, styleDescription)
+    .replace(/\{styleDescription\}/g, styleDescription);
 }
 
 /**

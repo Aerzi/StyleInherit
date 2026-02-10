@@ -132,7 +132,8 @@ export interface ExcelParseResult {
  */
 export interface ExcelRowItem {
   rowIndex: number;                    // 行号
-  theme: string;                       // 主题文字
+  theme: string;                       // 主题文字（兼容）
+  userPrompt?: string;                 // 用户输入/主题（Excel 解析器使用）
   imageBase64: string;                 // 图片 Base64
   imageName?: string;                  // 图片名称
 }
@@ -189,5 +190,5 @@ export type BatchTaskConfig = BatchConfig;
 /** @deprecated 使用 BatchProgressCallbacks 代替 */
 export type BatchJobCallbacks = BatchProgressCallbacks;
 
-/** @deprecated 使用 ExcelRowItem 代替 */
-export type ExcelParsedItem = ExcelRowItem;
+/** 解析后的 Excel 行（与 ExcelRowItem 结构一致，保留命名供解析器使用） */
+export interface ExcelParsedItem extends ExcelRowItem {}

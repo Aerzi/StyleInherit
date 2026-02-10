@@ -154,11 +154,16 @@ export async function submitImageTask(
   // 如果有参考图片，添加 input_images（Doubao 和 Gemini 都支持）
   if (referenceImages && referenceImages.length > 0) {
     body.input_images = referenceImages.map((img) => {
-      // 保留完整的 data:image/xxx;base64,... 格式
-      // 如果没有前缀，则添加默认的 png 前缀
+      // 已是 data:image/ 则保留；否则去掉 data:application/octet-stream 等错误前缀，统一为 data:image/png;base64,<payload>
       let imageData = img;
-      if (!img.startsWith('data:image/')) {
-        imageData = `data:image/png;base64,${img}`;
+      if (img.startsWith('data:image/')) {
+        imageData = img;
+      } else if (img.startsWith('data:') && /;base64,/.test(img)) {
+        const base64Match = img.match(/;base64,(.+)$/);
+        const payload = base64Match ? base64Match[1].trim() : img;
+        imageData = `data:image/png;base64,${payload}`;
+      } else {
+        imageData = img.startsWith('data:') ? img : `data:image/png;base64,${img}`;
       }
       return {
         image_data: imageData

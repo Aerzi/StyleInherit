@@ -88,11 +88,17 @@ export async function extractStyleFromImage(
     throw new Error(error);
   }
 
-  // 构建多模态消息 - 支持多张图片
+  // 构建多模态消息 - 支持多张图片；统一为 data:image/png;base64,<payload>，避免 data:application/octet-stream 导致 Invalid base64 image_url
   const imageContents = request.imageBase64s.map((imageBase64) => {
-    const imageUrl = imageBase64.startsWith('data:')
-      ? imageBase64
-      : `data:image/png;base64,${imageBase64}`;
+    let imageUrl: string;
+    if (imageBase64.startsWith('data:image/')) {
+      imageUrl = imageBase64;
+    } else if (imageBase64.startsWith('data:') && /;base64,/.test(imageBase64)) {
+      const m = imageBase64.match(/;base64,(.+)$/);
+      imageUrl = `data:image/png;base64,${m ? m[1].trim() : imageBase64}`;
+    } else {
+      imageUrl = imageBase64.startsWith('data:') ? imageBase64 : `data:image/png;base64,${imageBase64}`;
+    }
     return {
       type: 'image_url' as const,
       image_url: { url: imageUrl },

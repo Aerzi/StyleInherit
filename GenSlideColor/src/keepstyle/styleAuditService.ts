@@ -61,3 +61,60 @@ export async function performPPTAudit(
   }
 }
 
+/** 两张候选图相对于参考图的打分结果 */
+export interface TwoCandidateScoreResult {
+  scoreA: number;
+  scoreB: number;
+  reasonA?: string;
+  reasonB?: string;
+  error?: string;
+}
+
+/**
+ * 根据参考图，对两张「根据样式生成的 PPT 图」分别打分（0-100）
+ * 传参顺序：参考图、候选图A、候选图B
+ */
+export async function scoreTwoCandidates(
+  referenceBase64: string,
+  candidateABase64: string,
+  candidateBBase64: string,
+  model?: string
+): Promise<TwoCandidateScoreResult> {
+  const systemInstruction = `你是一位世界顶级的「PPT视觉总监」。请根据参考图（第一张）的样式，对第二张和第三张「根据样式生成的PPT图」分别打分。
+
+要求：
+1. 第一张为参考图（样式基准），第二张为候选图A，第三张为候选图B。
+2. 从背景纯度、边缘装饰、色彩与材质、布局锚点等维度，分别评价图A、图B与参考图的一致性。
+3. 对图A、图B各打一个 0-100 的整数分，并各用一两句话说明理由。
+
+请严格返回如下 JSON，不要包含 markdown 标记：
+{
+  "scoreA": 0-100的整数,
+  "scoreB": 0-100的整数,
+  "reasonA": "对候选图A的简要评价",
+  "reasonB": "对候选图B的简要评价"
+}`;
+
+  const request = {
+    prompt: systemInstruction,
+    images: [referenceBase64, candidateABase64, candidateBBase64],
+    model: model || 'Doubao-Seed-1.8',
+    stream: false,
+  };
+
+  try {
+    const resultText = await generateWithCustomModel(request);
+    const cleanedText = resultText.replace(/```json/g, '').replace(/```/g, '').trim();
+    const result = JSON.parse(cleanedText);
+    return {
+      scoreA: Number(result.scoreA) ?? 0,
+      scoreB: Number(result.scoreB) ?? 0,
+      reasonA: result.reasonA,
+      reasonB: result.reasonB,
+    };
+  } catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    return { scoreA: 0, scoreB: 0, error: errMsg };
+  }
+}
+

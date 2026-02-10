@@ -1,5 +1,7 @@
 import { useState, Component, type ReactNode } from 'react';
 import StyleInheritance from './components/StyleInheritance/StyleInheritance';
+import { WhiteboxBatchPanel } from './components/WhiteboxBatchPanel';
+import { ImageScorePanel } from './components/ImageScorePanel';
 import './App.css';
 
 class AppErrorBoundary extends Component<{ children: ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -20,7 +22,7 @@ class AppErrorBoundary extends Component<{ children: ReactNode }, { hasError: bo
 }
 
 function App() {
-  const [activePage, setActivePage] = useState<'inheritance' | 'single'>('inheritance');
+  const [activePage, setActivePage] = useState<'inheritance' | 'single' | 'whitebox' | 'score'>('inheritance');
 
   return (
     <AppErrorBoundary>
@@ -58,6 +60,30 @@ function App() {
               <span>📄</span>
               <span className="font-medium">单页生成</span>
             </button>
+
+            <button
+              onClick={() => setActivePage('whitebox')}
+              className={`w-full text-left px-4 py-3 rounded-lg transition-all flex items-center gap-3
+                ${activePage === 'whitebox' 
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'}
+              `}
+            >
+              <span>📦</span>
+              <span className="font-medium">批量测试</span>
+            </button>
+
+            <button
+              onClick={() => setActivePage('score')}
+              className={`w-full text-left px-4 py-3 rounded-lg transition-all flex items-center gap-3
+                ${activePage === 'score' 
+                  ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-900/50' 
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800'}
+              `}
+            >
+              <span>🖼️</span>
+              <span className="font-medium">图片对比打分</span>
+            </button>
           </nav>
 
           <div className="p-4 border-t border-slate-800 text-xs text-slate-500 text-center">
@@ -67,15 +93,16 @@ function App() {
 
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 relative">
-          {activePage === 'inheritance' ? (
-            <StyleInheritance />
-          ) : (
+          {activePage === 'inheritance' && <StyleInheritance />}
+          {activePage === 'single' && (
             <div className="flex-1 flex items-center justify-center text-slate-400 flex-col gap-4">
                <div className="text-6xl opacity-20">📄</div>
                <p className="text-xl font-medium">单页生成功能开发中</p>
                <p className="text-sm">Coming Soon...</p>
             </div>
           )}
+          {activePage === 'whitebox' && <WhiteboxBatchPanel />}
+          {activePage === 'score' && <ImageScorePanel />}
         </div>
       </div>
     </div>

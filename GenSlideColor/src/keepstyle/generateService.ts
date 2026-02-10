@@ -125,6 +125,24 @@ function buildStyleExtractHtmlPrompt(request: GenerateRequest): string {
 }
 
 /**
+ * 从 HTML 接口返回的完整内容中解析出 HTML（与 chat 流式/非流式使用同一套规则）
+ */
+function extractHtmlFromContent(fullContent: string): string {
+  const cleanContent = fullContent.replace(/```html/g, '').replace(/```/g, '').trim();
+  const m1 = cleanContent.match(/===SLIDE_START===\s*([\s\S]*?)\s*===SLIDE_END===/);
+  if (m1) return m1[1].trim();
+  const m2 = cleanContent.match(/(<!DOCTYPE[\s\S]*<\/html>)/i);
+  if (m2) return m2[1].trim();
+  const m3 = cleanContent.match(/(<html[\s\S]*<\/html>)/i);
+  if (m3) return `<!DOCTYPE html>\n${m3[1].trim()}`;
+  const m4 = cleanContent.match(/(<!DOCTYPE[\s\S]*)/i);
+  if (m4) return m4[1].trim();
+  if (cleanContent.includes('<body') && cleanContent.includes('</body')) return cleanContent;
+  if (cleanContent.length > 0) return `<!-- 未匹配到完整 HTML 片段，以下为模型原始输出 -->\n${cleanContent}`;
+  throw new Error('未找到 HTML 内容');
+}
+
+/**
  * 生成 HTML 幻灯片
  */
 async function generateHtml(
@@ -134,24 +152,24 @@ async function generateHtml(
   // 根据模式选择提示词
   const prompt = buildHtmlPromptByMode(request);
   
-  // 优先使用 customAiService
-  const useThinking = true; 
-  
-  if (useThinking) {
-      try {
-          return await generateWithCustomModel({
-              prompt: prompt,
-              images: request.imageBase64s, // 如果有图片，传递给 customService
-              stream: true,
-              mode: request.promptMode // 传递模式信息
-          }, {
-              onStreamContent: callbacks?.onStreamContent,
-              onError: callbacks?.onError,
-              onComplete: callbacks?.onComplete
-          });
-      } catch (e) {
-          console.error('CustomService 调用失败，尝试回退到标准逻辑', e);
-      }
+  // 优先使用 HTML 接口（customAiService），返回后按同一套规则解析 HTML
+  const useCustom = true;
+  if (useCustom) {
+    try {
+      const raw = await generateWithCustomModel({
+        prompt,
+        images: request.imageBase64s,
+        stream: true,
+        mode: request.promptMode,
+      }, {
+        onStreamContent: callbacks?.onStreamContent,
+        onError: callbacks?.onError,
+        onComplete: callbacks?.onComplete,
+      });
+      return extractHtmlFromContent(raw);
+    } catch (e) {
+      console.error('CustomService 调用失败，尝试回退到标准逻辑', e);
+    }
   }
 
   const config = getConfig();
@@ -164,11 +182,17 @@ async function generateHtml(
   let messages: Array<{ role: 'user' | 'assistant' | 'system'; content: MessageContent }>;
   
   if (request.imageBase64s && request.imageBase64s.length > 0) {
-    // 如果有图片，使用多模态格式
+    // 如果有图片，使用多模态格式；统一为 data:image/png;base64,<payload>，避免 data:application/octet-stream 导致 Invalid base64 image_url
     const imageContents = request.imageBase64s.map((imageBase64) => {
-      const imageUrl = imageBase64.startsWith('data:')
-        ? imageBase64
-        : `data:image/png;base64,${imageBase64}`;
+      let imageUrl: string;
+      if (imageBase64.startsWith('data:image/')) {
+        imageUrl = imageBase64;
+      } else if (imageBase64.startsWith('data:') && /;base64,/.test(imageBase64)) {
+        const m = imageBase64.match(/;base64,(.+)$/);
+        imageUrl = `data:image/png;base64,${m ? m[1].trim() : imageBase64}`;
+      } else {
+        imageUrl = imageBase64.startsWith('data:') ? imageBase64 : `data:image/png;base64,${imageBase64}`;
+      }
       return {
         type: 'image_url' as const,
         image_url: { url: imageUrl },
@@ -251,35 +275,7 @@ async function generateHtml(
       }
     }
 
-    // 处理最终内容
-    // 1. 移除 markdown 代码块标记
-    const cleanContent = fullContent.replace(/```html/g, '').replace(/```/g, '');
-
-    // 2. 尝试提取 ===SLIDE_START=== ... ===SLIDE_END=== (兼容旧逻辑)
-    const htmlMatch = cleanContent.match(/===SLIDE_START===\s*([\s\S]*?)\s*===SLIDE_END===/);
-    if (htmlMatch) {
-      return htmlMatch[1].trim();
-    }
-
-    // 3. 尝试提取 <!DOCTYPE ... </html>
-    const htmlMatch2 = cleanContent.match(/(<!DOCTYPE[\s\S]*<\/html>)/i);
-    if (htmlMatch2) {
-      return htmlMatch2[1].trim();
-    }
-
-    // 4. 尝试提取 <html ... </html>
-    const htmlMatch3 = cleanContent.match(/(<html[\s\S]*<\/html>)/i);
-    if (htmlMatch3) {
-      return `<!DOCTYPE html>\n${htmlMatch3[1].trim()}`;
-    }
-    
-    // 5. 如果只是部分片段，尝试 <!DOCTYPE 开头的所有内容
-    const htmlMatch4 = cleanContent.match(/(<!DOCTYPE[\s\S]*)/i);
-    if (htmlMatch4) {
-      return htmlMatch4[1].trim();
-    }
-
-    throw new Error('未找到 HTML 内容');
+    return extractHtmlFromContent(fullContent);
   } else {
     // 非流式响应
     const response = await fetch(`${config.apiUrl}/chat/completions`, {
@@ -306,39 +302,7 @@ async function generateHtml(
 
     const data = await response.json();
     const content = data.choices?.[0]?.message?.content || '';
-
-    // 提取 HTML
-    let html = content.replace(/```html/g, '').replace(/```/g, '');
-    
-    // 尝试提取标记之间的内容
-    const markerMatch = html.match(/===SLIDE_START===\s*([\s\S]*?)\s*===SLIDE_END===/);
-    if (markerMatch) {
-      return markerMatch[1].trim();
-    }
-    
-    // 移除残留标记
-    html = html.replace(/===SLIDE_START===/g, '').replace(/===SLIDE_END===/g, '');
-    
-    const htmlMatch = html.match(/(<!DOCTYPE[\s\S]*<\/html>)/i);
-    if (htmlMatch) {
-      return htmlMatch[1].trim();
-    }
-    
-    const htmlMatch2 = html.match(/(<html[\s\S]*<\/html>)/i);
-    if (htmlMatch2) {
-      return `<!DOCTYPE html>\n${htmlMatch2[1].trim()}`;
-    }
-    
-    const htmlMatch3 = html.match(/(<!DOCTYPE[\s\S]*)/i);
-    if (htmlMatch3) {
-      return htmlMatch3[1].trim();
-    }
-
-    if (html.includes('<body') && html.includes('</body')) {
-        return html.trim();
-    }
-
-    throw new Error('未找到有效的 HTML 内容');
+    return extractHtmlFromContent(content);
   }
 }
 

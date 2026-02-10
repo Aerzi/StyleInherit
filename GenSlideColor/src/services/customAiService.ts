@@ -136,13 +136,18 @@ export async function generateWithCustomModel(
   if (hasImages) {
     // Image + Text OR Pure Image (treated as multimodal with prompt)
     const content: any[] = [];
-    
-    // 图片放前面? 还是文本放前面? 通常文本放前面或者图片放前面都可以。
-    // 这里我们先放图片，再放文本
+    // 统一为 data:image/png;base64,<payload>，避免 data:application/octet-stream 导致 Invalid base64 image_url
     request.images!.forEach(img => {
       let url = img;
-      if (!img.startsWith('http') && !img.startsWith('data:')) {
-        url = `data:image/png;base64,${img}`;
+      if (url.startsWith('http')) {
+        // 保持 URL 不变
+      } else if (url.startsWith('data:image/')) {
+        url = url;
+      } else if (url.startsWith('data:') && /;base64,/.test(url)) {
+        const m = url.match(/;base64,(.+)$/);
+        url = `data:image/png;base64,${m ? m[1].trim() : url}`;
+      } else {
+        url = url.startsWith('data:') ? url : `data:image/png;base64,${url}`;
       }
       content.push({
         type: 'image_url',
