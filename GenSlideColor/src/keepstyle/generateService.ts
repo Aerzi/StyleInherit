@@ -6,6 +6,7 @@
 import type { GenerateRequest, GenerateResult, GenerateCallbacks } from './types';
 import { generateImageByApi } from './imageGenerateService';
 import { generateWithCustomModel } from '../services/customAiService';
+import { getModelParams, imageContentItem } from './utils';
 import { 
   IMAGE_REFERENCE_HTML_PROMPT, 
   TEXT_ONLY_HTML_PROMPT,
@@ -161,6 +162,7 @@ async function generateHtml(
         images: request.imageBase64s,
         stream: true,
         mode: request.promptMode,
+        model: request.model,
       }, {
         onStreamContent: callbacks?.onStreamContent,
         onError: callbacks?.onError,
@@ -177,12 +179,11 @@ async function generateHtml(
   // 通知提示词已准备好
   callbacks?.onPromptReady?.(prompt);
 
-  // 构建消息内容（支持多模态图片）
-  type MessageContent = string | Array<{ type: 'text'; text: string } | { type: 'image_url'; image_url: { url: string } }>;
+  // 构建消息内容（多模态）；kimi-k2.5 用 content，其它用 image_url.url
+  type MessageContent = string | Array<{ type: 'text'; text: string } | ReturnType<typeof imageContentItem>>;
   let messages: Array<{ role: 'user' | 'assistant' | 'system'; content: MessageContent }>;
   
   if (request.imageBase64s && request.imageBase64s.length > 0) {
-    // 如果有图片，使用多模态格式；统一为 data:image/png;base64,<payload>，避免 data:application/octet-stream 导致 Invalid base64 image_url
     const imageContents = request.imageBase64s.map((imageBase64) => {
       let imageUrl: string;
       if (imageBase64.startsWith('data:image/')) {
@@ -193,10 +194,7 @@ async function generateHtml(
       } else {
         imageUrl = imageBase64.startsWith('data:') ? imageBase64 : `data:image/png;base64,${imageBase64}`;
       }
-      return {
-        type: 'image_url' as const,
-        image_url: { url: imageUrl },
-      };
+      return imageContentItem(imageUrl, request.model);
     });
     
     messages = [{
@@ -227,8 +225,7 @@ async function generateHtml(
       body: JSON.stringify({
         model: request.model || config.model,
         messages,
-        temperature: 0.2,
-        max_tokens: request.maxTokens || 16000,
+        ...getModelParams(request.model, { temperature: 0.2, max_tokens: request.maxTokens || 16000 }),
         stream: true,
       }),
     });
@@ -287,8 +284,7 @@ async function generateHtml(
       body: JSON.stringify({
         model: request.model || config.model,
         messages,
-        temperature: 0.2,
-        max_tokens: request.maxTokens || 16000,
+        ...getModelParams(request.model, { temperature: 0.2, max_tokens: request.maxTokens || 16000 }),
         stream: false,
       }),
     });

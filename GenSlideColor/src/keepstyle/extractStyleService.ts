@@ -6,6 +6,7 @@
 import type { StyleExtractRequest, StyleExtractResult } from './types';
 import { generateWithCustomModel } from '../services/customAiService';
 import { STYLE_EXTRACT_PROMPT } from '../assets/prompts';
+import { getModelParams, imageContentItem } from './utils';
 
 // 从环境变量或默认值获取配置
 function getConfig() {
@@ -54,9 +55,9 @@ export async function extractStyleFromImage(
 
   // 优先使用 customAiService（Doubao-Seed-1.8）
   try {
-    // 修正模型名称：前端使用的是小写 doubao-seed-1.8，但 API 需要 Doubao-Seed-1.8
+    // 修正模型名称：前端 Doubao-seed-1.8，API 需要 Doubao-Seed-1.8；kimi-k2.5 保持原样
     let modelName = request.model;
-    if (modelName === 'doubao-seed-1.8') {
+    if (modelName === 'Doubao-seed-1.8') {
       modelName = 'Doubao-Seed-1.8';
     }
 
@@ -88,7 +89,7 @@ export async function extractStyleFromImage(
     throw new Error(error);
   }
 
-  // 构建多模态消息 - 支持多张图片；统一为 data:image/png;base64,<payload>，避免 data:application/octet-stream 导致 Invalid base64 image_url
+  // 构建多模态消息；kimi-k2.5 用 content，其它用 image_url.url
   const imageContents = request.imageBase64s.map((imageBase64) => {
     let imageUrl: string;
     if (imageBase64.startsWith('data:image/')) {
@@ -99,10 +100,7 @@ export async function extractStyleFromImage(
     } else {
       imageUrl = imageBase64.startsWith('data:') ? imageBase64 : `data:image/png;base64,${imageBase64}`;
     }
-    return {
-      type: 'image_url' as const,
-      image_url: { url: imageUrl },
-    };
+    return imageContentItem(imageUrl, request.model);
   });
 
   const messages = [
@@ -129,8 +127,7 @@ export async function extractStyleFromImage(
       body: JSON.stringify({
         model: request.model || config.model,
         messages,
-        temperature: 0.3,
-        max_tokens: 65535,
+        ...getModelParams(request.model, { temperature: 0.3, max_tokens: 65535 }),
         stream: true,
       }),
     });

@@ -2,6 +2,30 @@
  * KeepStyle 工具函数
  */
 
+/** kimi-k2.5：temperature=1, max_tokens=32768；传图用 content 而非 image_url.url */
+export const KIMI_K25 = 'kimi-k2.5';
+
+export function getModelParams(
+  modelId: string | undefined,
+  defaults: { temperature: number; max_tokens: number }
+): { temperature: number; max_tokens: number } {
+  if (modelId === KIMI_K25) {
+    return { temperature: 1, max_tokens: 32768 };
+  }
+  return defaults;
+}
+
+/** 多模态图片项：kimi-k2.5 用 { type: 'image_url', content: url }，其它用 image_url: { url } */
+export function imageContentItem(
+  url: string,
+  modelId?: string
+): { type: 'image_url'; image_url?: { url: string }; content?: string } {
+  if (modelId === KIMI_K25) {
+    return { type: 'image_url', content: url };
+  }
+  return { type: 'image_url', image_url: { url } };
+}
+
 /**
  * 将文件转换为 base64
  */

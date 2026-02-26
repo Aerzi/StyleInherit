@@ -1,3 +1,5 @@
+import { getModelParams, imageContentItem } from '../keepstyle/utils';
+
 export interface LLMConfig {
     apiKey?: string
     apiUrl?: string
@@ -101,6 +103,7 @@ type MessageContent = string | Array<{
     type: 'text' | 'image_url'
     text?: string
     image_url?: { url: string }
+    content?: string  // kimi-k2.5 传图用 content
 }>
 
 interface ChatMessage {
@@ -114,7 +117,7 @@ interface ChatMessage {
 function buildMessages(prompt: string, request: GenerateRequest): ChatMessage[] {
     const { referenceType, customReference } = request
 
-    // 如果有图片参考，使用多模态格式
+    // 如果有图片参考，使用多模态格式；kimi-k2.5 用 content
     if (referenceType === 'custom' && customReference?.type === 'image' && customReference.content) {
         const imageUrl = customReference.content.startsWith('data:')
             ? customReference.content
@@ -123,14 +126,8 @@ function buildMessages(prompt: string, request: GenerateRequest): ChatMessage[] 
         return [{
             role: 'user',
             content: [
-                {
-                    type: 'image_url',
-                    image_url: { url: imageUrl }
-                },
-                {
-                    type: 'text',
-                    text: prompt
-                }
+                imageContentItem(imageUrl, request.model),
+                { type: 'text', text: prompt }
             ]
         }]
     }
@@ -294,8 +291,7 @@ export async function generateSinglePageHtmlPpt(
             body: JSON.stringify({
                 model: request.model || config.model,
                 messages,
-                temperature: 0.2,
-                max_tokens: request.maxTokens || 16000,
+                ...getModelParams(request.model, { temperature: 0.2, max_tokens: request.maxTokens || 16000 }),
                 stream: config.stream
             })
         })
@@ -546,8 +542,7 @@ export async function recognizeTemplateIntent(
             body: JSON.stringify({
                 model: request.model || config.model,
                 messages: [{ role: 'user', content: prompt }],
-                temperature: 0.3,
-                max_tokens: 2000,
+                ...getModelParams(request.model, { temperature: 0.3, max_tokens: 2000 }),
                 stream: true
             })
         })
@@ -728,8 +723,7 @@ export async function fixLayoutIssues(
             body: JSON.stringify({
                 model: request.model || config.model,
                 messages: [{ role: 'user', content: prompt }],
-                temperature: 0.3,
-                max_tokens: 16000,
+                ...getModelParams(request.model, { temperature: 0.3, max_tokens: 16000 }),
                 stream: true
             })
         })

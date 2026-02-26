@@ -2,6 +2,7 @@ import type { SlideResult } from './llmService';
 import { INTENT_RECOGNITION_PROMPT } from '../assets/prompts/intent-prompt';
 import { HTML_GENERATION_SYSTEM_PROMPT } from '../assets/prompts/html-gen-prompt';
 import type { PromptMode } from '../keepstyle/types';
+import { getModelParams, imageContentItem } from '../keepstyle/utils';
 
 const API_CONFIG = {
   url: 'http://10.213.47.79:1234/v1/chat/completions',
@@ -149,10 +150,7 @@ export async function generateWithCustomModel(
       } else {
         url = url.startsWith('data:') ? url : `data:image/png;base64,${url}`;
       }
-      content.push({
-        type: 'image_url',
-        image_url: { url }
-      });
+      content.push(imageContentItem(url, request.model));
     });
 
     // 添加文本提示词
@@ -182,8 +180,7 @@ export async function generateWithCustomModel(
       body: JSON.stringify({
         model: request.model || API_CONFIG.model,
         messages,
-        temperature: 0.2,
-        max_tokens: 65536,
+        ...getModelParams(request.model, { temperature: 0.2, max_tokens: 65536 }),
         stream: request.stream ?? true
       })
     });

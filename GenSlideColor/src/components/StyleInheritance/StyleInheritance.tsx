@@ -75,13 +75,14 @@ const StyleInheritance: React.FC = () => {
   // Preview Scale State
   const [previewScale, setPreviewScale] = useState(1);
 
-  // Models State
-  const [selectedModel, setSelectedModel] = useState('doubao-seed-1.8');
-  const [selectedHtmlModel] = useState('doubao-seed-1.8');
+  // Models State：样式提取 / 生成HTML / 图片生成 / 图片清洗 分别选模型
+  const [selectedExtractModel, setSelectedExtractModel] = useState('Doubao-seed-1.8');
+  const [selectedHtmlModel, setSelectedHtmlModel] = useState('Doubao-seed-1.8');
   const [selectedImageModel, setSelectedImageModel] = useState('Doubao-image-seedream-v4.5');
+  const [selectedCleanImageModel, setSelectedCleanImageModel] = useState('Doubao-image-seedream-v4.5');
   const [modelList, setModelList] = useState<ModelInfo[]>([]);
-  
-  // 图片生成模型列表
+
+  // 图片相关模型列表（生成、清洗共用）
   const imageModelList = [
     { id: 'Doubao-image-seedream-v4.5', name: 'Doubao (16:9 高清)', provider: 'doubao' },
     { id: 'gemini-3-pro-image-preview', name: 'Gemini (1:1 方形)', provider: 'google' },
@@ -127,8 +128,11 @@ const StyleInheritance: React.FC = () => {
     const loadModels = async () => {
       try {
         const models = await fetchModels();
-        if (!models.find(m => m.id === 'doubao-seed-1.8')) {
-          models.unshift({ id: 'doubao-seed-1.8', object: 'model', created: Date.now() });
+        if (!models.find(m => m.id === 'Doubao-seed-1.8')) {
+          models.unshift({ id: 'Doubao-seed-1.8', object: 'model', created: Date.now() });
+        }
+        if (!models.find(m => m.id === 'kimi-k2.5')) {
+          models.unshift({ id: 'kimi-k2.5', object: 'model', created: Date.now() });
         }
         setModelList(models);
       } catch (error) {
@@ -295,7 +299,7 @@ const StyleInheritance: React.FC = () => {
         {
           imageBase64s: currentImageBase64s,
           userPrompt: generateUserPrompt,
-          model: selectedModel,
+          model: selectedExtractModel,
         },
         {
           onStreamContent: (content) => setExtractStreamContent(content),
@@ -338,7 +342,7 @@ const StyleInheritance: React.FC = () => {
         {
           originalImageBase64: imageBase64,
           styleDescription: styleDescription,
-          imageModel: selectedImageModel,
+          imageModel: selectedCleanImageModel,
         },
         {
           onProgress: (stage, progress) => {
@@ -389,7 +393,7 @@ const StyleInheritance: React.FC = () => {
         {
           originalImageBase64: imageBase64,
           styleDescription: styleDescription,
-          imageModel: selectedImageModel,
+          imageModel: selectedCleanImageModel,
         },
         {
           onProgress: (stage, progress) => {
@@ -808,15 +812,57 @@ const StyleInheritance: React.FC = () => {
               {/* Configuration Fields */}
               <div className="flex flex-col gap-4 p-4 bg-slate-50 rounded-lg border border-slate-200">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-slate-600">选择模型</label>
+                  <label className="text-xs font-medium text-slate-600">样式提取模型</label>
                   <select
-                    value={selectedModel}
-                    onChange={(e) => setSelectedModel(e.target.value)}
+                    value={selectedExtractModel}
+                    onChange={(e) => setSelectedExtractModel(e.target.value)}
                     className="w-full p-2 rounded-md border border-slate-300 text-sm bg-white focus:outline-none focus:border-indigo-500"
                     disabled={isProcessing}
                   >
                     {modelList.map(m => (
                       <option key={m.id} value={m.id}>{m.id}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-slate-600">生成 HTML 模型</label>
+                  <select
+                    value={selectedHtmlModel}
+                    onChange={(e) => setSelectedHtmlModel(e.target.value)}
+                    className="w-full p-2 rounded-md border border-slate-300 text-sm bg-white focus:outline-none focus:border-indigo-500"
+                    disabled={isProcessing}
+                  >
+                    {modelList.map(m => (
+                      <option key={m.id} value={m.id}>{m.id}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-slate-600">图片生成模型</label>
+                  <select
+                    value={selectedImageModel}
+                    onChange={(e) => setSelectedImageModel(e.target.value)}
+                    disabled={isProcessing}
+                    className="w-full p-2 rounded-md border border-slate-300 text-sm bg-white focus:outline-none focus:border-indigo-500"
+                  >
+                    {imageModelList.map(m => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
+                    ))}
+                  </select>
+                  <p className="text-xs text-slate-500">
+                    {selectedImageModel === 'Doubao-image-seedream-v4.5' ? '豆包：3600×2025 16:9' : 'Gemini：1024×1024 方形'}
+                  </p>
+                </div>
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-slate-600">图片清洗模型</label>
+                  <select
+                    value={selectedCleanImageModel}
+                    onChange={(e) => setSelectedCleanImageModel(e.target.value)}
+                    disabled={isProcessing}
+                    className="w-full p-2 rounded-md border border-slate-300 text-sm bg-white focus:outline-none focus:border-indigo-500"
+                  >
+                    {imageModelList.map(m => (
+                      <option key={m.id} value={m.id}>{m.name}</option>
                     ))}
                   </select>
                 </div>
@@ -893,30 +939,6 @@ const StyleInheritance: React.FC = () => {
                         </button>
                       </div>
                     )}
-                  </div>
-                )}
-
-                {/* 图片模型选择器 - 当选择图片或HTML+图片模式时显示 */}
-                {(outputType === 'image' || outputType === 'both') && (
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-medium text-slate-600">🖼️ 图片生成模型</label>
-                    <select
-                      value={selectedImageModel}
-                      onChange={(e) => setSelectedImageModel(e.target.value)}
-                      disabled={isProcessing}
-                      className="w-full p-2 rounded-md border border-slate-300 text-sm bg-white focus:outline-none focus:border-indigo-500"
-                    >
-                      {imageModelList.map(m => (
-                        <option key={m.id} value={m.id}>
-                          {m.name}
-                        </option>
-                      ))}
-                    </select>
-                    <p className="text-xs text-slate-500">
-                      {selectedImageModel === 'Doubao-image-seedream-v4.5' 
-                        ? '豆包模型：3600×2025 高清画质，16:9 比例' 
-                        : 'Gemini模型：1024×1024 方形，支持参考图片'}
-                    </p>
                   </div>
                 )}
               </div>
@@ -1454,8 +1476,20 @@ const StyleInheritance: React.FC = () => {
                     </span>
                   </div>
                   <div className="flex justify-between text-sm">
-                    <span className="text-slate-500">使用模型</span>
-                    <span className="text-slate-700 font-medium">{selectedModel}</span>
+                    <span className="text-slate-500">样式提取模型</span>
+                    <span className="text-slate-700 font-medium">{selectedExtractModel}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">生成HTML模型</span>
+                    <span className="text-slate-700 font-medium">{selectedHtmlModel}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">图片生成模型</span>
+                    <span className="text-slate-700 font-medium">{selectedImageModel}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-slate-500">图片清洗模型</span>
+                    <span className="text-slate-700 font-medium">{selectedCleanImageModel}</span>
                   </div>
                 </div>
               </div>

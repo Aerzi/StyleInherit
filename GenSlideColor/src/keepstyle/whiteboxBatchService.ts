@@ -19,7 +19,7 @@ export interface WhiteboxConfig {
   enableStyleExtract: boolean;
   enableImageCleaning: boolean;
   outputType: 'html' | 'image' | 'both';
-  /** 样式提取模型（与样式继承「选择模型」一致，如 doubao-seed-1.8） */
+  /** 样式提取模型（与样式继承一致，如 Doubao-seed-1.8、kimi-k2.5） */
   extractModel?: string;
   /** HTML 生成模型（与样式继承一致，Chat 模型） */
   htmlModel?: string;
