@@ -43,7 +43,7 @@ export async function performPPTAudit(
   const request = {
     prompt: systemInstruction,
     images: [originalImageBase64, generatedImageBase64], // 第一张基准，第二张生成
-    model: model || 'Doubao-Seed-1.8', // 默认使用视觉能力较强的模型
+    model: model || 'kimi-k2.5',
     stream: false
   };
 
@@ -98,7 +98,7 @@ export async function scoreTwoCandidates(
   const request = {
     prompt: systemInstruction,
     images: [referenceBase64, candidateABase64, candidateBBase64],
-    model: model || 'Doubao-Seed-1.8',
+    model: model || 'kimi-k2.5',
     stream: false,
   };
 

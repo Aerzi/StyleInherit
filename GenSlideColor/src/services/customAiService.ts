@@ -7,7 +7,7 @@ import { getModelParams, imageContentItem } from '../keepstyle/utils';
 const API_CONFIG = {
   url: 'http://10.213.47.79:1234/v1/chat/completions',
   key: '{BB949A92-3A7E-4850-B544-355E39048B24}',
-  model: 'Doubao-Seed-1.8'
+  model: 'kimi-k2.5'
 };
 
 export interface CustomModelRequest {
@@ -115,7 +115,7 @@ export async function generateIntentQuestions(
 }
 
 /**
- * Call the custom AI model (Doubao-Seed-1.8)
+ * Call the custom AI model
  */
 export async function generateWithCustomModel(
   request: CustomModelRequest,

@@ -53,19 +53,12 @@ export async function extractStyleFromImage(
   // 通知提示词已准备好
   callbacks?.onPromptReady?.(prompt);
 
-  // 优先使用 customAiService（Doubao-Seed-1.8）
   try {
-    // 修正模型名称：前端 Doubao-seed-1.8，API 需要 Doubao-Seed-1.8；kimi-k2.5 保持原样
-    let modelName = request.model;
-    if (modelName === 'Doubao-seed-1.8') {
-      modelName = 'Doubao-Seed-1.8';
-    }
-
     const fullContent = await generateWithCustomModel({
       prompt: prompt,
       images: request.imageBase64s,
       stream: true,
-      model: modelName // 传递修正后的模型名称
+      model: request.model,
     }, {
       onStreamContent: callbacks?.onStreamContent,
       onError: callbacks?.onError

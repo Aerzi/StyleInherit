@@ -76,8 +76,8 @@ const StyleInheritance: React.FC = () => {
   const [previewScale, setPreviewScale] = useState(1);
 
   // Models State：样式提取 / 生成HTML / 图片生成 / 图片清洗 分别选模型
-  const [selectedExtractModel, setSelectedExtractModel] = useState('Doubao-seed-1.8');
-  const [selectedHtmlModel, setSelectedHtmlModel] = useState('Doubao-seed-1.8');
+  const [selectedExtractModel, setSelectedExtractModel] = useState('kimi-k2.5');
+  const [selectedHtmlModel, setSelectedHtmlModel] = useState('kimi-k2.5');
   const [selectedImageModel, setSelectedImageModel] = useState('Doubao-image-seedream-v4.5');
   const [selectedCleanImageModel, setSelectedCleanImageModel] = useState('Doubao-image-seedream-v4.5');
   const [modelList, setModelList] = useState<ModelInfo[]>([]);
@@ -128,9 +128,6 @@ const StyleInheritance: React.FC = () => {
     const loadModels = async () => {
       try {
         const models = await fetchModels();
-        if (!models.find(m => m.id === 'Doubao-seed-1.8')) {
-          models.unshift({ id: 'Doubao-seed-1.8', object: 'model', created: Date.now() });
-        }
         if (!models.find(m => m.id === 'kimi-k2.5')) {
           models.unshift({ id: 'kimi-k2.5', object: 'model', created: Date.now() });
         }

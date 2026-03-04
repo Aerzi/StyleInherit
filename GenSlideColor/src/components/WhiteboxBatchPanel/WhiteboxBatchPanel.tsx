@@ -31,7 +31,7 @@ export const WhiteboxBatchPanel: React.FC = () => {
   const [parseError, setParseError] = useState('');
   const [isParsing, setIsParsing] = useState(false);
 
-  const defaultChatModel = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_MODEL_NAME || 'Doubao-seed-1.8';
+  const defaultChatModel = (import.meta as unknown as { env?: Record<string, string> }).env?.VITE_MODEL_NAME || 'kimi-k2.5';
   const [config, setConfig] = useState<WhiteboxConfig>({
     enableStyleExtract: true,
     enableImageCleaning: true,
@@ -56,10 +56,7 @@ export const WhiteboxBatchPanel: React.FC = () => {
 
   useEffect(() => {
     fetchModels().then((list) => {
-      let next =
-        list.length > 0 && !list.some((m) => m.id === 'Doubao-seed-1.8')
-          ? [{ id: 'Doubao-seed-1.8', object: 'model', created: Date.now() }, ...list]
-          : list;
+      let next = list;
       if (next.length > 0 && !next.some((m) => m.id === 'kimi-k2.5')) {
         next = [{ id: 'kimi-k2.5', object: 'model', created: Date.now() }, ...next];
       }

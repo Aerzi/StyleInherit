@@ -1,5 +1,6 @@
 import { useState, Component, type ReactNode } from 'react';
 import StyleInheritance from './components/StyleInheritance/StyleInheritance';
+import { SinglePageGen } from './components/SinglePageGen';
 import { WhiteboxBatchPanel } from './components/WhiteboxBatchPanel';
 import { ImageScorePanel } from './components/ImageScorePanel';
 import './App.css';
@@ -94,13 +95,7 @@ function App() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col overflow-hidden bg-gray-50 relative">
           {activePage === 'inheritance' && <StyleInheritance />}
-          {activePage === 'single' && (
-            <div className="flex-1 flex items-center justify-center text-slate-400 flex-col gap-4">
-               <div className="text-6xl opacity-20">📄</div>
-               <p className="text-xl font-medium">单页生成功能开发中</p>
-               <p className="text-sm">Coming Soon...</p>
-            </div>
-          )}
+          {activePage === 'single' && <SinglePageGen />}
           {activePage === 'whitebox' && <WhiteboxBatchPanel />}
           {activePage === 'score' && <ImageScorePanel />}
         </div>
